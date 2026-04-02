@@ -79,6 +79,8 @@ export function MCQ({ id, question, children }: MCQProps): VNode {
             checked: selected === i,
             onChange: () => { if (!submitted) setSelected(i) },
             disabled: submitted,
+            'aria-disabled': submitted,
+            class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
           }),
           h('span', null, option.content),
         ),
@@ -88,6 +90,8 @@ export function MCQ({ id, question, children }: MCQProps): VNode {
           type: 'button',
           onClick: () => { if (selected !== null) setLocalSubmitted(true) },
           disabled: selected === null,
+          'aria-disabled': selected === null,
+          class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 rounded',
         }, 'Odeslat')
         : null,
       ...feedbacks,

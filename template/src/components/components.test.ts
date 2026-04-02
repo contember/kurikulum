@@ -114,6 +114,27 @@ describe('Course', () => {
     expect(container.textContent).not.toContain('Page 1 content')
   })
 
+  it('renders skip-to-content link', () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const container = document.createElement('div')
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Course, null,
+          h(Page, { id: 'page-1' }, 'Page 1 content'),
+        ),
+      ),
+      container,
+    )
+
+    const links = Array.from(container.getElementsByTagName('a'))
+    const skipLink = links.find(a => a.getAttribute('href') === '#page-content')
+    expect(skipLink).toBeDefined()
+    expect(skipLink!.textContent).toBe('Přeskočit na obsah')
+  })
+
   it('returns null when no matching page found', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
@@ -149,6 +170,26 @@ describe('Page', () => {
     )
 
     expect(container.textContent).toContain('Hello from page')
+  })
+
+  it('has role="main" and tabindex for focus management', () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const container = document.createElement('div')
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Page, { id: 'page-1' }, 'Content'),
+      ),
+      container,
+    )
+
+    const divs = Array.from(container.getElementsByTagName('div'))
+    const mainEl = divs.find(d => d.getAttribute('role') === 'main')
+    expect(mainEl).toBeDefined()
+    expect(mainEl!.getAttribute('tabindex')).toBe('-1')
+    expect(mainEl!.getAttribute('id')).toBe('page-content')
   })
 
   it('marks page complete with mount strategy', async () => {
@@ -268,6 +309,44 @@ describe('Navigation', () => {
     expect(navs.length).toBe(1)
     expect(navs[0].getAttribute('role')).toBe('navigation')
     expect(navs[0].getAttribute('aria-label')).toBe('Navigace kurzu')
+  })
+
+  it('has aria-disabled on disabled buttons', () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const container = document.createElement('div')
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Navigation, null),
+      ),
+      container,
+    )
+
+    const buttons = container.getElementsByTagName('button')
+    // First page: prev disabled, next enabled
+    expect(buttons[0].getAttribute('aria-disabled')).toBe('true')
+    expect(buttons[1].getAttribute('aria-disabled')).toBe('false')
+  })
+
+  it('has aria-current on page indicator', () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const container = document.createElement('div')
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Navigation, null),
+      ),
+      container,
+    )
+
+    const spans = container.getElementsByTagName('span')
+    const pageIndicator = Array.from(spans).find(s => s.getAttribute('aria-current') === 'page')
+    expect(pageIndicator).toBeDefined()
+    expect(pageIndicator!.textContent).toContain('1 / 3')
   })
 
   it('disables prev button on first page', () => {

@@ -1,6 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { h } from 'preact'
-import { useState, useRef, useCallback } from 'preact/hooks'
+import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
 import { useCourse } from '@kurikulum/core'
 import { AssessmentContext } from './assessment-context.ts'
 
@@ -43,6 +43,15 @@ export function Assessment({ id, passThreshold, maxAttempts, children }: Assessm
     setAttempt(a => a + 1)
   }
 
+  const statusRef = useRef<HTMLDivElement>(null)
+
+  // Focus on status area after submit
+  useEffect(() => {
+    if (submitted) {
+      statusRef.current?.focus()
+    }
+  }, [submitted])
+
   const { score, maxScore, passed, attempts } = runtime.state
   const canRetry = submitted && passed === false && (maxAttempts === undefined || attempts < maxAttempts)
   const attemptsExhausted = submitted && passed === false && maxAttempts !== undefined && attempts >= maxAttempts
@@ -54,19 +63,19 @@ export function Assessment({ id, passThreshold, maxAttempts, children }: Assessm
         ? h('button', {
           type: 'button',
           onClick: handleSubmit,
-          class: 'mt-4 px-4 py-2 bg-blue-600 text-white rounded',
+          class: 'mt-4 px-4 py-2 bg-blue-600 text-white rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
         }, 'Odeslat')
         : null,
       submitted
-        ? h('div', { class: 'mt-4', role: 'status', 'aria-live': 'polite' },
+        ? h('div', { ref: statusRef, tabIndex: -1, class: 'mt-4 outline-none', role: 'status', 'aria-live': 'polite' },
           h('p', null, `Skóre: ${score}/${maxScore}`),
-          passed === true ? h('p', { class: 'text-green-700' }, 'Splněno!') : null,
-          passed === false ? h('p', { class: 'text-red-700' }, 'Nesplněno.') : null,
+          passed === true ? h('p', { class: 'text-green-700' }, '✓ Splněno!') : null,
+          passed === false ? h('p', { class: 'text-red-700' }, '✗ Nesplněno.') : null,
           canRetry
             ? h('button', {
               type: 'button',
               onClick: handleRetry,
-              class: 'mt-2 px-4 py-2 bg-gray-600 text-white rounded',
+              class: 'mt-2 px-4 py-2 bg-gray-600 text-white rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
             }, 'Zkusit znovu')
             : null,
           attemptsExhausted

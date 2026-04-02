@@ -106,7 +106,7 @@ export function MultiSelect({ id, question, children }: MultiSelectProps): VNode
   }
 
   return h(QuestionContext.Provider, { value: { submitted, correct: isCorrect } },
-    h('fieldset', { 'aria-label': question },
+    h('fieldset', { role: 'group', 'aria-label': question },
       h('legend', { class: 'font-semibold mb-2' }, question),
       ...options.map((option, i) =>
         h('label', { class: 'flex items-center gap-2 py-1', key: i },
@@ -115,6 +115,8 @@ export function MultiSelect({ id, question, children }: MultiSelectProps): VNode
             checked: selected.has(i),
             onChange: () => toggleOption(i),
             disabled: submitted,
+            'aria-disabled': submitted,
+            class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
           }),
           h('span', null, option.content),
         ),
@@ -123,6 +125,7 @@ export function MultiSelect({ id, question, children }: MultiSelectProps): VNode
         ? h('button', {
           type: 'button',
           onClick: () => setLocalSubmitted(true),
+          class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 rounded',
         }, 'Odeslat')
         : null,
       ...feedbacks,

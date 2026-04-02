@@ -687,4 +687,216 @@ describe('Assessment', () => {
     expect(fieldsets[0].getAttribute('role')).toBe('radiogroup')
     expect(fieldsets[0].getAttribute('aria-label')).toBe('Test question')
   })
+
+  it('has aria-disabled on inputs after submit', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, null, 'B'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    for (let i = 0; i < inputs.length; i++) {
+      expect(inputs[i].getAttribute('aria-disabled')).toBe('true')
+    }
+  })
+
+  it('shows icon alongside color in assessment status', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(container.textContent).toContain('✓ Splněno!')
+  })
+
+  it('shows failure icon alongside color in assessment status', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 1.0 },
+        h(MCQ, { id: 'q1', question: 'Q1' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[1])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(container.textContent).toContain('✗ Nesplněno.')
+  })
+})
+
+describe('MultiSelect a11y', () => {
+  it('has role="group" on fieldset', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container } = renderWithContext(ctx, () =>
+      h(MultiSelect, { id: 'q1', question: 'Select:' },
+        h(Option, { correct: true }, 'A'),
+        h(Option, null, 'B'),
+      ),
+    )
+
+    await flushEffects()
+
+    const fieldsets = container.getElementsByTagName('fieldset')
+    expect(fieldsets[0].getAttribute('role')).toBe('group')
+    expect(fieldsets[0].getAttribute('aria-label')).toBe('Select:')
+  })
+
+  it('has aria-disabled on checkboxes after submit', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MultiSelect, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, null, 'B'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    for (let i = 0; i < inputs.length; i++) {
+      expect(inputs[i].getAttribute('aria-disabled')).toBe('true')
+    }
+  })
+})
+
+describe('QuestionFeedback a11y', () => {
+  it('shows icon alongside feedback text', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+          h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // Should have icon prefix alongside text
+    expect(container.textContent).toContain('✓')
+    expect(container.textContent).toContain('Well done!')
+  })
+
+  it('shows incorrect icon for wrong answer feedback', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+          h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[1])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(container.textContent).toContain('✗')
+    expect(container.textContent).toContain('Try again.')
+  })
 })

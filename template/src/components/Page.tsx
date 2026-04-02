@@ -22,6 +22,7 @@ export function Page({ id, completion = 'mount', completionTimer, children }: Pa
   const runtime = useCourse()
   const sentinelRef = useRef<HTMLDivElement>(null)
   const handlerRef = useRef<CompletionHandler | null>(null)
+  const mainRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (isComplete) return
@@ -43,7 +44,12 @@ export function Page({ id, completion = 'mount', completionTimer, children }: Pa
     }
   }, [id, completion, isComplete])
 
-  return h('div', null,
+  // Focus management: focus main content on page mount
+  useEffect(() => {
+    mainRef.current?.focus()
+  }, [id])
+
+  return h('div', { ref: mainRef, tabIndex: -1, role: 'main', id: 'page-content', class: 'outline-none' },
     children,
     completion === 'scroll' ? h('div', { ref: sentinelRef, 'aria-hidden': 'true' }) : null,
   )
