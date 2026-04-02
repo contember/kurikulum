@@ -78,3 +78,86 @@ describe('generateManifest', () => {
     expect(xml).not.toContain('<"A&B">')
   })
 })
+
+describe('generateManifest SCORM 2004', () => {
+  it('generates valid SCORM 2004 manifest XML', () => {
+    const xml = generateManifest({
+      title: 'Test Course',
+      files: ['index.html', 'assets/style.css'],
+      scormVersion: 'scorm-2004',
+    })
+
+    expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>')
+    expect(xml).toContain('xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"')
+    expect(xml).toContain('xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"')
+    expect(xml).toContain('xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"')
+    expect(xml).toContain('xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"')
+    expect(xml).toContain('xmlns:imsss="http://www.imsglobal.org/xsd/imsss"')
+    expect(xml).toContain('<schema>ADL SCORM</schema>')
+    expect(xml).toContain('<schemaversion>2004 4th Edition</schemaversion>')
+  })
+
+  it('uses scormType (camelCase) for SCORM 2004', () => {
+    const xml = generateManifest({
+      title: 'Test',
+      files: ['index.html'],
+      scormVersion: 'scorm-2004',
+    })
+
+    expect(xml).toContain('adlcp:scormType="sco"')
+    expect(xml).not.toContain('adlcp:scormtype="sco"')
+  })
+
+  it('includes title in organization and item', () => {
+    const xml = generateManifest({
+      title: 'My SCORM 2004 Course',
+      files: ['index.html'],
+      scormVersion: 'scorm-2004',
+    })
+
+    const titleMatches = xml.match(/<title>My SCORM 2004 Course<\/title>/g)
+    expect(titleMatches).toHaveLength(2)
+  })
+
+  it('lists all files', () => {
+    const xml = generateManifest({
+      title: 'Test',
+      files: ['index.html', 'assets/main.js'],
+      scormVersion: 'scorm-2004',
+    })
+
+    expect(xml).toContain('<file href="index.html"/>')
+    expect(xml).toContain('<file href="assets/main.js"/>')
+  })
+
+  it('uses custom identifier', () => {
+    const xml = generateManifest({
+      title: 'Test',
+      identifier: 'my-2004-course',
+      files: ['index.html'],
+      scormVersion: 'scorm-2004',
+    })
+
+    expect(xml).toContain('identifier="my-2004-course"')
+  })
+
+  it('escapes XML special characters', () => {
+    const xml = generateManifest({
+      title: 'Course <"A&B">',
+      files: ['index.html'],
+      scormVersion: 'scorm-2004',
+    })
+
+    expect(xml).toContain('Course &lt;&quot;A&amp;B&quot;&gt;')
+  })
+
+  it('defaults to SCORM 1.2 when scormVersion not specified', () => {
+    const xml = generateManifest({
+      title: 'Test',
+      files: ['index.html'],
+    })
+
+    expect(xml).toContain('<schemaversion>1.2</schemaversion>')
+    expect(xml).not.toContain('2004')
+  })
+})

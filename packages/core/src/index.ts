@@ -22,7 +22,7 @@ export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from './hooks/index.ts'
 
 // Adapters
-export { createAdapter, createStandaloneAdapter } from './adapters/index.ts'
+export { createAdapter, createStandaloneAdapter, createScorm2004Adapter } from './adapters/index.ts'
 
 // Components (headless)
 export {

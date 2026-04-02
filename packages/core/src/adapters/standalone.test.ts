@@ -107,4 +107,11 @@ describe('createAdapter', () => {
     adapter.setSuspendData('scorm-test')
     expect(adapter.getSuspendData()).toBe('scorm-test')
   })
+
+  it('returns a scorm-2004 adapter (falls back to standalone without API)', () => {
+    const adapter = createAdapter('scorm-2004')
+    expect(adapter.getSuspendData()).toBeNull()
+    adapter.setSuspendData('scorm2004-test')
+    expect(adapter.getSuspendData()).toBe('scorm2004-test')
+  })
 })

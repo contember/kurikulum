@@ -8,6 +8,7 @@ export interface PackageOptions {
   outputDir: string
   outputZip: string
   title: string
+  scormVersion?: 'scorm-1.2' | 'scorm-2004'
 }
 
 async function collectFiles(dir: string, base: string): Promise<string[]> {
@@ -28,7 +29,7 @@ export async function createScormPackage(options: PackageOptions): Promise<void>
   const { outputDir, outputZip, title } = options
 
   const files = await collectFiles(outputDir, outputDir)
-  const manifest = generateManifest({ title, files })
+  const manifest = generateManifest({ title, files, scormVersion: options.scormVersion })
 
   return new Promise((resolve, reject) => {
     const output = createWriteStream(outputZip)

@@ -14,7 +14,8 @@ import { Option } from './components/Option.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
-const adapter = createAdapter(target === 'scorm-1.2' ? 'scorm-1.2' : 'standalone')
+const adapterType = target === 'scorm-1.2' ? 'scorm-1.2' : target === 'scorm-2004' ? 'scorm-2004' : 'standalone'
+const adapter = createAdapter(adapterType)
 
 const config: CourseConfig = {
   title: 'Základy webové bezpečnosti',
