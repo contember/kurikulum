@@ -24,7 +24,7 @@
 | # | Issue | Spec | Status |
 |---|-------|------|--------|
 | 1 | Monorepo scaffold — Bun workspace, @kurikulum/core + template | [spec/01-monorepo-scaffold.md](spec/01-monorepo-scaffold.md) | `[x]` |
-| 2 | CourseState + CourseRuntime — flat state, navigace, completion, assessment, lifecycle | [spec/02-course-runtime.md](spec/02-course-runtime.md) | `[ ]` |
+| 2 | CourseState + CourseRuntime — flat state, navigace, completion, assessment, lifecycle | [spec/02-course-runtime.md](spec/02-course-runtime.md) | `[x]` |
 | 3 | Completion strategie — mount, timer, scroll, manual, interactive | [spec/03-completion-strategies.md](spec/03-completion-strategies.md) | `[ ]` |
 | 4 | Hooky — useCourse, useNavigation, useCompletion, useAssessment, usePage | [spec/04-hooks.md](spec/04-hooks.md) | `[ ]` |
 | 5 | CourseProvider — Preact context, inicializace runtime, restore/suspend | [spec/05-course-provider.md](spec/05-course-provider.md) | `[ ]` |
