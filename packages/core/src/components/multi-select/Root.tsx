@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useState, useEffect, useContext, useRef, useCallback } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
+import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
 import { MultiSelectContext } from './context.ts'
 
@@ -14,11 +15,13 @@ export interface MultiSelectRootProps {
 
 export function Root({ id, weight, children, class: className, 'aria-label': ariaLabel }: MultiSelectRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
+  const courseCtx = useContext(CourseContext)
   const { markComplete } = useCompletion(id)
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [localSubmitted, setLocalSubmitted] = useState(false)
   const selectedRef = useRef(selected)
   selectedRef.current = selected
+  const mountTimeRef = useRef(Date.now())
 
   // Item registration
   const counterRef = useRef(0)
@@ -84,6 +87,28 @@ export function Root({ id, weight, children, class: className, 'aria-label': ari
     }
     if (!submitted) {
       markedRef.current = false
+    }
+  }, [submitted])
+
+  // Record interaction on submit
+  const interactionRecordedRef = useRef(false)
+  useEffect(() => {
+    if (submitted && !interactionRecordedRef.current) {
+      interactionRecordedRef.current = true
+      const sel = [...selectedRef.current].sort((a, b) => a - b).join(',')
+      const correct = [...correctIndices()].sort((a, b) => a - b).join(',')
+      courseCtx?.adapter.recordInteraction({
+        id,
+        type: 'choice',
+        studentResponse: sel,
+        correctResponse: correct,
+        result: evaluate() === 1 ? 'correct' : 'wrong',
+        latency: Date.now() - mountTimeRef.current,
+        weighting: weight,
+      })
+    }
+    if (!submitted) {
+      interactionRecordedRef.current = false
     }
   }, [submitted])
 

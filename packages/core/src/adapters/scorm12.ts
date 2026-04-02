@@ -1,4 +1,4 @@
-import type { DeliveryAdapter } from '../types.ts'
+import type { DeliveryAdapter, InteractionRecord } from '../types.ts'
 import { createStandaloneAdapter } from './standalone.ts'
 
 interface SCORM12API {
@@ -39,6 +39,27 @@ function mapStatus(status: string): string {
   }
 }
 
+function formatLatency(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+}
+
+function formatTimeOfDay(): string {
+  const now = new Date()
+  return `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`
+}
+
+function mapResult(result: InteractionRecord['result']): string {
+  switch (result) {
+    case 'correct': return 'correct'
+    case 'wrong': return 'wrong'
+    case 'neutral': return 'neutral'
+  }
+}
+
 export function createScorm12Adapter(win?: Window): DeliveryAdapter {
   const targetWindow = win ?? (typeof window !== 'undefined' ? window : null)
   const api = targetWindow ? findAPI(targetWindow) : null
@@ -47,6 +68,8 @@ export function createScorm12Adapter(win?: Window): DeliveryAdapter {
     console.warn('[kurikulum] SCORM API not found, falling back to standalone')
     return createStandaloneAdapter()
   }
+
+  let interactionCount = 0
 
   return {
     async initialize() {
@@ -82,6 +105,23 @@ export function createScorm12Adapter(win?: Window): DeliveryAdapter {
 
     setSessionTime(ms: number) {
       api.LMSSetValue('cmi.core.session_time', formatTime(ms))
+    },
+
+    recordInteraction(interaction: InteractionRecord) {
+      const n = interactionCount++
+      const prefix = `cmi.interactions.${n}`
+      api.LMSSetValue(`${prefix}.id`, interaction.id)
+      api.LMSSetValue(`${prefix}.type`, interaction.type)
+      api.LMSSetValue(`${prefix}.student_response`, interaction.studentResponse)
+      api.LMSSetValue(`${prefix}.correct_responses.0.pattern`, interaction.correctResponse)
+      api.LMSSetValue(`${prefix}.result`, mapResult(interaction.result))
+      api.LMSSetValue(`${prefix}.time`, formatTimeOfDay())
+      if (interaction.weighting !== undefined) {
+        api.LMSSetValue(`${prefix}.weighting`, String(interaction.weighting))
+      }
+      if (interaction.latency !== undefined) {
+        api.LMSSetValue(`${prefix}.latency`, formatLatency(interaction.latency))
+      }
     },
 
     commit() {

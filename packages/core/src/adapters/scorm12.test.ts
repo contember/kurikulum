@@ -147,6 +147,117 @@ describe('createScorm12Adapter', () => {
     })
   })
 
+  describe('recordInteraction', () => {
+    let mockAPI: ReturnType<typeof createMockAPI>
+    let adapter: ReturnType<typeof createScorm12Adapter>
+
+    beforeEach(() => {
+      mockAPI = createMockAPI()
+      adapter = createScorm12Adapter(createMockWindow(mockAPI))
+    })
+
+    it('writes choice interaction to cmi.interactions.0.*', () => {
+      adapter.recordInteraction({
+        id: 'q1',
+        type: 'choice',
+        studentResponse: '1',
+        correctResponse: '1',
+        result: 'correct',
+        latency: 30000,
+        weighting: 1,
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.id']).toBe('q1')
+      expect(mockAPI._store['cmi.interactions.0.type']).toBe('choice')
+      expect(mockAPI._store['cmi.interactions.0.student_response']).toBe('1')
+      expect(mockAPI._store['cmi.interactions.0.correct_responses.0.pattern']).toBe('1')
+      expect(mockAPI._store['cmi.interactions.0.result']).toBe('correct')
+      expect(mockAPI._store['cmi.interactions.0.latency']).toBe('00:00:30')
+      expect(mockAPI._store['cmi.interactions.0.weighting']).toBe('1')
+      expect(mockAPI._store['cmi.interactions.0.time']).toMatch(/^\d{2}:\d{2}:\d{2}$/)
+    })
+
+    it('increments interaction count for multiple interactions', () => {
+      adapter.recordInteraction({
+        id: 'q1',
+        type: 'choice',
+        studentResponse: '0',
+        correctResponse: '1',
+        result: 'wrong',
+      })
+      adapter.recordInteraction({
+        id: 'q2',
+        type: 'fill-in',
+        studentResponse: 'Paris',
+        correctResponse: 'Paris',
+        result: 'correct',
+        latency: 5000,
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.id']).toBe('q1')
+      expect(mockAPI._store['cmi.interactions.0.type']).toBe('choice')
+      expect(mockAPI._store['cmi.interactions.1.id']).toBe('q2')
+      expect(mockAPI._store['cmi.interactions.1.type']).toBe('fill-in')
+      expect(mockAPI._store['cmi.interactions.1.student_response']).toBe('Paris')
+      expect(mockAPI._store['cmi.interactions.1.latency']).toBe('00:00:05')
+    })
+
+    it('writes matching interaction with SCORM format', () => {
+      adapter.recordInteraction({
+        id: 'q3',
+        type: 'matching',
+        studentResponse: 'Cat[.]Animal[,]Rose[.]Plant',
+        correctResponse: 'Cat[.]Animal[,]Rose[.]Plant',
+        result: 'correct',
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.type']).toBe('matching')
+      expect(mockAPI._store['cmi.interactions.0.student_response']).toBe('Cat[.]Animal[,]Rose[.]Plant')
+    })
+
+    it('writes sequencing interaction', () => {
+      adapter.recordInteraction({
+        id: 'q4',
+        type: 'sequencing',
+        studentResponse: '2,0,1',
+        correctResponse: '0,1,2',
+        result: 'wrong',
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.type']).toBe('sequencing')
+      expect(mockAPI._store['cmi.interactions.0.student_response']).toBe('2,0,1')
+      expect(mockAPI._store['cmi.interactions.0.correct_responses.0.pattern']).toBe('0,1,2')
+      expect(mockAPI._store['cmi.interactions.0.result']).toBe('wrong')
+    })
+
+    it('omits optional fields when not provided', () => {
+      adapter.recordInteraction({
+        id: 'q5',
+        type: 'choice',
+        studentResponse: '0',
+        correctResponse: '1',
+        result: 'wrong',
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.id']).toBe('q5')
+      expect(mockAPI._store['cmi.interactions.0.weighting']).toBeUndefined()
+      expect(mockAPI._store['cmi.interactions.0.latency']).toBeUndefined()
+    })
+
+    it('formats large latency correctly', () => {
+      adapter.recordInteraction({
+        id: 'q6',
+        type: 'fill-in',
+        studentResponse: 'answer',
+        correctResponse: 'answer',
+        result: 'correct',
+        latency: 3661000, // 1h 1m 1s
+      })
+
+      expect(mockAPI._store['cmi.interactions.0.latency']).toBe('01:01:01')
+    })
+  })
+
   describe('API discovery', () => {
     it('finds API on window.parent', () => {
       const mockAPI = createMockAPI()

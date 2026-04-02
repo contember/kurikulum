@@ -30,6 +30,7 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     setLocation(pageId: string) { this.location = pageId },
     getLocation() { return this.location || null },
     setSessionTime() {},
+    recordInteraction() {},
     terminate() {},
   }
 }
@@ -45,6 +46,7 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const { subscribe, notify } = createNotifier()
   return {
     runtime,
+    adapter: createMockAdapter(),
     subscribe,
     notify,
     defaultCompletion: config.defaultCompletion ?? 'mount',

@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
+import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
 import { MatchingContext } from './context.ts'
 import type { MatchingPairDef, MatchingContextValue } from './context.ts'
@@ -30,10 +31,12 @@ export function Root({
   weight,
 }: MatchingRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
+  const courseCtx = useContext(CourseContext)
   const { markComplete } = useCompletion(id)
   const [pairs, setPairs] = useState<MatchingPairDef[]>([])
   const [selections, setSelections] = useState<Map<number, string>>(new Map())
   const [localSubmitted, setLocalSubmitted] = useState(false)
+  const mountTimeRef = useRef(Date.now())
 
   const selectionsRef = useRef(selections)
   selectionsRef.current = selections
@@ -100,6 +103,30 @@ export function Root({
     }
     if (!submitted) {
       markedRef.current = false
+    }
+  }, [submitted])
+
+  // Record interaction on submit
+  const interactionRecordedRef = useRef(false)
+  useEffect(() => {
+    if (submitted && !interactionRecordedRef.current) {
+      interactionRecordedRef.current = true
+      const p = pairsRef.current
+      const sel = selectionsRef.current
+      const studentPairs = p.map((_, i) => `${p[i].prompt}[.]${sel.get(i) ?? ''}`).join('[,]')
+      const correctPairs = p.map(pair => `${pair.prompt}[.]${pair.response}`).join('[,]')
+      courseCtx?.adapter.recordInteraction({
+        id,
+        type: 'matching',
+        studentResponse: studentPairs,
+        correctResponse: correctPairs,
+        result: evaluate() === 1 ? 'correct' : 'wrong',
+        latency: Date.now() - mountTimeRef.current,
+        weighting: weight,
+      })
+    }
+    if (!submitted) {
+      interactionRecordedRef.current = false
     }
   }, [submitted])
 

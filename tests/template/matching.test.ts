@@ -54,6 +54,7 @@ function createMockAdapter(): DeliveryAdapter & { committed: number } {
     setLocation() {},
     getLocation() { return null },
     setSessionTime() {},
+    recordInteraction() {},
     terminate() {},
   }
 }
@@ -79,6 +80,7 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
 
   return {
     runtime,
+    adapter: createMockAdapter(),
     subscribe,
     notify,
     defaultCompletion: config.defaultCompletion ?? 'mount',

@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
+import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
 import { OrderingContext } from './context.ts'
 import type { OrderingItemDef, OrderingContextValue } from './context.ts'
@@ -30,10 +31,12 @@ export function Root({
   weight,
 }: OrderingRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
+  const courseCtx = useContext(CourseContext)
   const { markComplete } = useCompletion(id)
   const [items, setItems] = useState<OrderingItemDef[]>([])
   const [currentOrder, setCurrentOrder] = useState<number[]>([])
   const [localSubmitted, setLocalSubmitted] = useState(false)
+  const mountTimeRef = useRef(Date.now())
 
   const currentOrderRef = useRef(currentOrder)
   currentOrderRef.current = currentOrder
@@ -98,6 +101,29 @@ export function Root({
     }
     if (!submitted) {
       markedRef.current = false
+    }
+  }, [submitted])
+
+  // Record interaction on submit
+  const interactionRecordedRef = useRef(false)
+  useEffect(() => {
+    if (submitted && !interactionRecordedRef.current) {
+      interactionRecordedRef.current = true
+      const order = currentOrderRef.current
+      const studentSeq = order.join(',')
+      const correctSeq = itemsRef.current.map((item) => item.order).join(',')
+      courseCtx?.adapter.recordInteraction({
+        id,
+        type: 'sequencing',
+        studentResponse: studentSeq,
+        correctResponse: correctSeq,
+        result: evaluate() === 1 ? 'correct' : 'wrong',
+        latency: Date.now() - mountTimeRef.current,
+        weighting: weight,
+      })
+    }
+    if (!submitted) {
+      interactionRecordedRef.current = false
     }
   }, [submitted])
 

@@ -6,6 +6,7 @@ import { createCourseRuntime } from './runtime.ts'
 
 export interface CourseContextValue {
   runtime: CourseRuntime
+  adapter: DeliveryAdapter
   subscribe(listener: () => void): () => void
   defaultCompletion: CompletionStrategy
   pageCompletions?: Record<string, CompletionStrategy>
@@ -42,6 +43,7 @@ function createNoopAdapter(): DeliveryAdapter {
     setLocation() {},
     getLocation() { return null },
     setSessionTime() {},
+    recordInteraction() {},
     commit() {},
     terminate() {},
   }
@@ -77,6 +79,7 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
 
     ref.current = {
       runtime,
+      adapter: resolvedAdapter,
       subscribe,
       defaultCompletion: config.defaultCompletion ?? 'mount',
     }

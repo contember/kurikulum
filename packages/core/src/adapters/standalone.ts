@@ -1,4 +1,4 @@
-import type { DeliveryAdapter } from '../types.ts'
+import type { DeliveryAdapter, InteractionRecord } from '../types.ts'
 
 const SUSPEND_KEY = 'kurikulum:suspend'
 const LOCATION_KEY = 'kurikulum:location'
@@ -34,6 +34,10 @@ export function createStandaloneAdapter(): DeliveryAdapter {
 
     setSessionTime(ms: number) {
       console.log('[kurikulum]', 'setSessionTime', ms)
+    },
+
+    recordInteraction(interaction: InteractionRecord) {
+      console.log('[kurikulum]', 'recordInteraction', interaction)
     },
 
     commit() {},

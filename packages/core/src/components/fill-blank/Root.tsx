@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useState, useEffect, useContext, useRef, useCallback } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
+import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
 import { FillBlankContext } from './context.ts'
 
@@ -37,11 +38,13 @@ export function Root({
   'aria-label': ariaLabel,
 }: FillBlankRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
+  const courseCtx = useContext(CourseContext)
   const { markComplete } = useCompletion(id)
   const [value, setValue] = useState('')
   const [localSubmitted, setLocalSubmitted] = useState(false)
   const valueRef = useRef(value)
   valueRef.current = value
+  const mountTimeRef = useRef(Date.now())
 
   // Register evaluate function with Assessment parent
   useEffect(() => {
@@ -73,6 +76,27 @@ export function Root({
     }
     if (!submitted) {
       markedRef.current = false
+    }
+  }, [submitted])
+
+  // Record interaction on submit
+  const interactionRecordedRef = useRef(false)
+  useEffect(() => {
+    if (submitted && !interactionRecordedRef.current) {
+      interactionRecordedRef.current = true
+      const correctAnswer = Array.isArray(accept) ? accept[0] : String(accept)
+      courseCtx?.adapter.recordInteraction({
+        id,
+        type: 'fill-in',
+        studentResponse: valueRef.current.trim(),
+        correctResponse: correctAnswer,
+        result: evaluate(valueRef.current, accept, caseSensitive) ? 'correct' : 'wrong',
+        latency: Date.now() - mountTimeRef.current,
+        weighting: weight,
+      })
+    }
+    if (!submitted) {
+      interactionRecordedRef.current = false
     }
   }, [submitted])
 

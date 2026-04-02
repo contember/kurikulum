@@ -63,6 +63,16 @@ export interface CourseConfig {
   passThreshold?: number // 0-1, default 0.7
 }
 
+export interface InteractionRecord {
+  id: string
+  type: 'choice' | 'true-false' | 'fill-in' | 'matching' | 'sequencing'
+  studentResponse: string
+  correctResponse: string
+  result: 'correct' | 'wrong' | 'neutral'
+  latency?: number       // ms
+  weighting?: number
+}
+
 export interface DeliveryAdapter {
   initialize(): Promise<void>
 
@@ -76,6 +86,9 @@ export interface DeliveryAdapter {
   setLocation(pageId: string): void
   getLocation(): string | null
   setSessionTime(ms: number): void
+
+  // Interactions
+  recordInteraction(interaction: InteractionRecord): void
 
   // Lifecycle
   commit(): void
