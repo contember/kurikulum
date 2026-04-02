@@ -30,6 +30,7 @@ export function Assessment({ id, passThreshold, maxAttempts, children }: Assessm
       <A.AttemptsExhausted class="text-text-secondary">
         Vyčerpány všechny pokusy.
       </A.AttemptsExhausted>
+      <A.History class="mt-4 text-sm text-text-secondary" />
     </A.Root>
   )
 }

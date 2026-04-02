@@ -1,6 +1,6 @@
 import { render } from 'preact'
-import { CourseProvider, createAdapter } from '@kurikulum/core'
-import type { CourseConfig } from '@kurikulum/core'
+import { CourseProvider, createAdapter, useCourse } from '@kurikulum/core'
+import type { CourseConfig, CourseRuntime } from '@kurikulum/core'
 import { Course } from './components/Course.tsx'
 import { Page } from './components/Page.tsx'
 import { Navigation } from './components/Navigation.tsx'
@@ -11,6 +11,10 @@ import { Assessment } from './components/Assessment.tsx'
 import { MCQ } from './components/MCQ.tsx'
 import { MultiSelect } from './components/MultiSelect.tsx'
 import { Option } from './components/Option.tsx'
+import { FillBlank } from './components/FillBlank.tsx'
+import { Matching, MatchingPair } from './components/Matching.tsx'
+import { Ordering, OrderingItem } from './components/Ordering.tsx'
+import { QuestionFeedback } from './components/QuestionFeedback.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
@@ -19,7 +23,29 @@ const adapter = createAdapter(adapterType)
 
 const config: CourseConfig = {
   title: 'Základy webové bezpečnosti',
-  pages: ['intro', 'theory', 'media', 'standalone-quiz', 'assessment', 'scroll-page', 'summary'],
+  pages: ['intro', 'theory', 'media', 'standalone-quiz', 'advanced-quiz', 'assessment', 'bonus', 'scroll-page', 'summary'],
+  version: '2',
+  onMigrate(old, oldVersion) {
+    if (!oldVersion || oldVersion === '1') {
+      // v1→v2: new pages added, state shape unchanged — just return existing state
+      return old
+    }
+    return null
+  },
+}
+
+// Runtime ref for conditional navigation — populated by RuntimeRef component
+let runtime: CourseRuntime | null = null
+
+function RuntimeRef() {
+  runtime = useCourse()
+  return null
+}
+
+function quizPassed(): boolean {
+  if (!runtime) return false
+  const result = runtime.state.assessments['quick-quiz']
+  return result?.passed === true
 }
 
 function App() {
@@ -27,6 +53,7 @@ function App() {
     <CourseProvider config={config} adapter={adapter}>
       <div class="h-screen flex flex-col bg-bg text-text font-sans">
         <Course>
+          <RuntimeRef />
           {/* Page 1: Úvod – completion="mount" (okamžitě po zobrazení) */}
           <Page id="intro" completion="mount">
             <Text>
@@ -130,7 +157,53 @@ function App() {
             </Assessment>
           </Page>
 
-          {/* Page 5: Hodnocený test – completion="interactive" (Assessment s retry) */}
+          {/* Page 5: Pokročilé typy otázek – FillBlank, Matching, Ordering s váženým skórováním */}
+          <Page id="advanced-quiz" completion="interactive">
+            <Text>
+              <h1>Pokročilé otázky</h1>
+              <p>
+                Tato sekce ukazuje pokročilé typy otázek s <strong>váženým skórováním</strong> —
+                důležitější otázky mají vyšší váhu.
+              </p>
+            </Text>
+            <Assessment id="advanced-test" passThreshold={0.6}>
+              <FillBlank
+                id="fb-header"
+                question="Která HTTP hlavička chrání proti XSS omezením zdrojů skriptů?"
+                accept={['Content-Security-Policy', 'CSP']}
+                weight={2}
+                placeholder="Zadejte název hlavičky…"
+              >
+                <QuestionFeedback
+                  correct="Content-Security-Policy (CSP) omezuje zdroje skriptů."
+                  incorrect="Správná odpověď je Content-Security-Policy."
+                />
+              </FillBlank>
+
+              <Matching
+                id="match-attacks"
+                question="Přiřaďte útok k jeho hlavní obraně:"
+                weight={3}
+              >
+                <MatchingPair prompt="XSS" response="Content Security Policy" />
+                <MatchingPair prompt="SQL Injection" response="Parametrizované dotazy" />
+                <MatchingPair prompt="CSRF" response="CSRF token" />
+              </Matching>
+
+              <Ordering
+                id="order-severity"
+                question="Seřaďte zranitelnosti od nejčastější po nejméně častou (dle OWASP 2021):"
+                weight={1}
+              >
+                <OrderingItem order={1}>Broken Access Control</OrderingItem>
+                <OrderingItem order={2}>Cryptographic Failures</OrderingItem>
+                <OrderingItem order={3}>Injection</OrderingItem>
+                <OrderingItem order={4}>Insecure Design</OrderingItem>
+              </Ordering>
+            </Assessment>
+          </Page>
+
+          {/* Page 6: Hodnocený test – completion="interactive" (Assessment s retry) */}
           <Page id="assessment" completion="interactive">
             <Text>
               <h1>Závěrečný test</h1>
@@ -161,7 +234,29 @@ function App() {
             </Assessment>
           </Page>
 
-          {/* Page 6: Doplňkové čtení – completion="scroll" */}
+          {/* Page 7: Bonusová stránka – podmíněná navigace (viditelná jen po splnění kvízu) */}
+          <Page id="bonus" completion="mount" when={quizPassed}>
+            <Text>
+              <h1>Bonusový materiál</h1>
+              <p>
+                Gratulujeme ke splnění rychlého kvízu! Tato stránka je viditelná pouze pro ty,
+                kteří úspěšně prošli kvízem — to je ukázka <strong>podmíněné navigace</strong>.
+              </p>
+              <h2>OWASP Top 10 — 2021</h2>
+              <ol>
+                <li>A01 — Broken Access Control</li>
+                <li>A02 — Cryptographic Failures</li>
+                <li>A03 — Injection</li>
+                <li>A04 — Insecure Design</li>
+                <li>A05 — Security Misconfiguration</li>
+              </ol>
+              <p>
+                Kompletní seznam najdete na oficiálních stránkách OWASP.
+              </p>
+            </Text>
+          </Page>
+
+          {/* Page 8: Doplňkové čtení – completion="scroll" */}
           <Page id="scroll-page" completion="scroll">
             <Text>
               <h1>Další doporučení</h1>
@@ -192,7 +287,7 @@ function App() {
             </Text>
           </Page>
 
-          {/* Page 7: Shrnutí – completion="manual" (vyžaduje ruční potvrzení) */}
+          {/* Page 9: Shrnutí – completion="manual" (vyžaduje ruční potvrzení) */}
           <Page id="summary" completion="manual">
             <Text>
               <h1>Shrnutí kurzu</h1>
