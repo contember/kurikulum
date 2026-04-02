@@ -37,4 +37,4 @@
 | 12 | Vite plugin — Preact alias, single-file build, target z env | [spec/12-vite-plugin.md](spec/12-vite-plugin.md) | `[x]` |
 | 13 | SCORM 1.2 adapter — CMI mapování, API discovery, fallback | [spec/13-scorm-adapter.md](spec/13-scorm-adapter.md) | `[x]` |
 | 14 | SCORM packaging — imsmanifest.xml generátor, ZIP balení | [spec/14-scorm-packaging.md](spec/14-scorm-packaging.md) | `[x]` |
-| 15 | E2E test — testovací kurz, standalone + SCORM ověření | [spec/15-e2e-test.md](spec/15-e2e-test.md) | `[ ]` |
+| 15 | E2E test — testovací kurz, standalone + SCORM ověření | [spec/15-e2e-test.md](spec/15-e2e-test.md) | `[x]` |
