@@ -35,10 +35,16 @@ export function createNotifier() {
 
 function createNoopAdapter(): DeliveryAdapter {
   return {
-    commit() {},
+    async initialize() {},
+    getSuspendData() { return null },
     setSuspendData() {},
-    getSuspendData() { return '' },
+    setScore() {},
+    setStatus() {},
     setLocation() {},
+    getLocation() { return null },
+    setSessionTime() {},
+    commit() {},
+    terminate() {},
   }
 }
 

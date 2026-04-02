@@ -20,3 +20,6 @@ export type { CourseContextValue, CourseProviderProps } from './context.ts'
 
 // Hooks
 export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from './hooks/index.ts'
+
+// Adapters
+export { createAdapter, createStandaloneAdapter } from './adapters/index.ts'

@@ -21,10 +21,16 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     committed: 0,
     suspendData: '',
     location: '',
+    async initialize() {},
     commit() { this.committed++ },
     setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData },
+    getSuspendData() { return this.suspendData || null },
+    setScore() {},
+    setStatus() {},
     setLocation(pageId: string) { this.location = pageId },
+    getLocation() { return this.location || null },
+    setSessionTime() {},
+    terminate() {},
   }
 }
 

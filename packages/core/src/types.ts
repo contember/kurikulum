@@ -48,8 +48,20 @@ export interface CourseConfig {
 }
 
 export interface DeliveryAdapter {
-  commit(): void
+  initialize(): Promise<void>
+
+  // State persistence
+  getSuspendData(): string | null
   setSuspendData(data: string): void
-  getSuspendData(): string
+
+  // SCORM-mapped values
+  setScore(score: number, max: number): void
+  setStatus(status: 'incomplete' | 'completed' | 'passed' | 'failed'): void
   setLocation(pageId: string): void
+  getLocation(): string | null
+  setSessionTime(ms: number): void
+
+  // Lifecycle
+  commit(): void
+  terminate(): void
 }
