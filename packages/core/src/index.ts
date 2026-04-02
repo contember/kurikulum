@@ -33,8 +33,8 @@ export {
 } from './components/index.ts'
 export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue } from './components/index.ts'
 
-// SCORM packaging
+// SCORM packaging (types + manifest only; createScormPackage is Node-only,
+// import it directly from '@kurikulum/core/scorm/package' in build scripts)
 export { generateManifest } from './scorm/manifest.ts'
 export type { ManifestOptions } from './scorm/manifest.ts'
-export { createScormPackage } from './scorm/package.ts'
 export type { PackageOptions } from './scorm/package.ts'
