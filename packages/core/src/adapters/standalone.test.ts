@@ -101,7 +101,10 @@ describe('createAdapter', () => {
     expect(adapter.getSuspendData()).toBe('test')
   })
 
-  it('throws for "scorm-1.2" type (not yet implemented)', () => {
-    expect(() => createAdapter('scorm-1.2')).toThrow('SCORM 1.2 adapter is not yet implemented')
+  it('returns a scorm-1.2 adapter (falls back to standalone without API)', () => {
+    const adapter = createAdapter('scorm-1.2')
+    expect(adapter.getSuspendData()).toBeNull()
+    adapter.setSuspendData('scorm-test')
+    expect(adapter.getSuspendData()).toBe('scorm-test')
   })
 })
