@@ -44,12 +44,20 @@ const config: CourseConfig = {
 
 function createTestContext(runtime: CourseRuntime): CourseContextValue & { notify: () => void } {
   const { subscribe, notify } = createNotifier()
+  const pageConditions: Record<string, () => boolean> = {}
   return {
     runtime,
     adapter: createMockAdapter(),
     subscribe,
     notify,
     defaultCompletion: config.defaultCompletion ?? 'mount',
+    pageConditions,
+    getVisiblePages() {
+      return runtime.state.pages.filter(id => {
+        const cond = pageConditions[id]
+        return cond ? cond() : true
+      })
+    },
   }
 }
 

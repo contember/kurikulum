@@ -1,5 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { toChildArray, cloneElement } from 'preact'
+import { useContext, useEffect } from 'preact/hooks'
+import { CourseContext } from '../../context.tsx'
 import { useNavigation } from '../../hooks/index.ts'
 
 export interface CourseRootProps {
@@ -8,6 +10,7 @@ export interface CourseRootProps {
 }
 
 export function Root({ children, class: className }: CourseRootProps): VNode {
+  const ctx = useContext(CourseContext)!
   const { currentPage } = useNavigation()
 
   const allChildren = toChildArray(children) as VNode[]
@@ -23,11 +26,47 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
     }
   }
 
+  // Register when conditions from page props
+  const conditions = ctx.pageConditions
+  for (const key of Object.keys(conditions)) {
+    delete conditions[key]
+  }
+  for (const page of pages) {
+    const props = page.props as { id: string; when?: () => boolean }
+    if (props.when) {
+      conditions[props.id] = props.when
+    }
+  }
+
+  const visiblePages = ctx.getVisiblePages()
+
+  // If current page is not visible, navigate to nearest visible page
+  useEffect(() => {
+    if (visiblePages.length > 0 && !visiblePages.includes(currentPage)) {
+      const allPageIds = ctx.runtime.state.pages
+      const currentIdx = allPageIds.indexOf(currentPage)
+      // Find nearest visible page (prefer forward, then backward)
+      let nearest = visiblePages[0]
+      for (const vp of visiblePages) {
+        const vpIdx = allPageIds.indexOf(vp)
+        if (vpIdx >= currentIdx) {
+          nearest = vp
+          break
+        }
+        nearest = vp
+      }
+      ctx.runtime.navigateTo(nearest)
+    }
+  })
+
   return (
     <div class={className}>
       {nonPages}
       {pages.map((page) => {
-        const id = (page as VNode<{ id: string }>).props.id
+        const props = page.props as { id: string; when?: () => boolean }
+        const id = props.id
+        // Skip pages whose when condition returns false
+        if (props.when && !props.when()) return null
         const active = id === currentPage
         return (
           <div key={id} style={active ? undefined : { display: 'none' }}>

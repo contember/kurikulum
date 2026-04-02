@@ -10,6 +10,8 @@ export interface CourseContextValue {
   subscribe(listener: () => void): () => void
   defaultCompletion: CompletionStrategy
   pageCompletions?: Record<string, CompletionStrategy>
+  pageConditions: Record<string, () => boolean>
+  getVisiblePages(): string[]
 }
 
 export const CourseContext = createContext<CourseContextValue | null>(null)
@@ -63,6 +65,15 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
     const runtime = createCourseRuntime(config, resolvedAdapter)
     const { subscribe, notify } = createNotifier()
 
+    const pageConditions: Record<string, () => boolean> = {}
+
+    function getVisiblePages(): string[] {
+      return runtime.state.pages.filter(id => {
+        const cond = pageConditions[id]
+        return cond ? cond() : true
+      })
+    }
+
     const originalNavigateTo = runtime.navigateTo.bind(runtime)
     const originalMarkComplete = runtime.markComplete.bind(runtime)
     const originalSubmitScore = runtime.submitScore.bind(runtime)
@@ -77,11 +88,29 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
       originalSubmitAssessmentScore(assessmentId, score, max, threshold, weight); notify()
     }
 
+    runtime.nextPage = () => {
+      const visible = getVisiblePages()
+      const idx = visible.indexOf(runtime.state.currentPage)
+      if (idx < visible.length - 1) {
+        runtime.navigateTo(visible[idx + 1])
+      }
+    }
+
+    runtime.prevPage = () => {
+      const visible = getVisiblePages()
+      const idx = visible.indexOf(runtime.state.currentPage)
+      if (idx > 0) {
+        runtime.navigateTo(visible[idx - 1])
+      }
+    }
+
     ref.current = {
       runtime,
       adapter: resolvedAdapter,
       subscribe,
       defaultCompletion: config.defaultCompletion ?? 'mount',
+      pageConditions,
+      getVisiblePages,
     }
   }
 

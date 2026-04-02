@@ -12,9 +12,10 @@ export function useNavigation() {
 
   const { runtime } = ctx
   const { state } = runtime
-  const pageIndex = state.pages.indexOf(state.currentPage)
+  const visiblePages = ctx.getVisiblePages()
+  const pageIndex = visiblePages.indexOf(state.currentPage)
 
-  const hasNext = pageIndex < state.pages.length - 1
+  const hasNext = pageIndex < visiblePages.length - 1
   const currentComplete = runtime.isPageComplete(state.currentPage)
 
   return {
@@ -25,6 +26,6 @@ export function useNavigation() {
     canGoNext: hasNext && currentComplete,
     canGoPrev: pageIndex > 0,
     pageIndex,
-    totalPages: state.pages.length,
+    totalPages: visiblePages.length,
   }
 }

@@ -17,6 +17,7 @@ export interface PageRootProps {
   completion?: CompletionStrategy
   completionTimer?: number
   active?: boolean
+  when?: () => boolean
   children: ComponentChildren
   class?: string
 }
