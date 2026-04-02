@@ -1,6 +1,6 @@
 export const VERSION = '0.1.0';
 
-export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter } from './types.ts'
+export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, AssessmentResult } from './types.ts'
 export { createCourseRuntime } from './runtime.ts'
 export {
   resolveCompletionStrategy,

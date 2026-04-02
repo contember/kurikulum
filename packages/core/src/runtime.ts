@@ -1,4 +1,4 @@
-import type { CourseConfig, CourseRuntime, CourseState, DeliveryAdapter } from './types.ts'
+import type { AssessmentResult, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter } from './types.ts'
 
 function createInitialState(config: CourseConfig): CourseState {
   return {
@@ -9,9 +9,29 @@ function createInitialState(config: CourseConfig): CourseState {
     maxScore: 0,
     passed: null,
     attempts: 0,
+    assessments: {},
     sessionStart: Date.now(),
     totalTimeMs: 0,
   }
+}
+
+function recomputeAggregateScore(state: CourseState): void {
+  const assessments = Object.values(state.assessments)
+  if (assessments.length === 0) {
+    state.score = null
+    state.maxScore = 0
+    state.passed = null
+    state.attempts = 0
+    return
+  }
+
+  const totalWeight = assessments.reduce((sum, a) => sum + a.weight, 0)
+  if (totalWeight === 0) return
+
+  state.score = assessments.reduce((sum, a) => sum + a.score * a.weight, 0) / totalWeight
+  state.maxScore = assessments.reduce((sum, a) => sum + a.maxScore * a.weight, 0) / totalWeight
+  state.passed = assessments.every(a => a.passed)
+  state.attempts = Math.max(...assessments.map(a => a.attempts))
 }
 
 export function createCourseRuntime(
@@ -71,11 +91,27 @@ export function createCourseRuntime(
     },
 
     submitScore(score: number, max: number, threshold?: number) {
-      state.score = score
-      state.maxScore = max
-      state.passed = score / max >= (threshold ?? passThreshold)
-      state.attempts += 1
+      runtime.submitAssessmentScore('__default__', score, max, threshold)
+    },
+
+    submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number) {
+      const existing = state.assessments[assessmentId]
+      state.assessments[assessmentId] = {
+        id: assessmentId,
+        score,
+        maxScore: max,
+        passed: score / max >= (threshold ?? passThreshold),
+        attempts: (existing?.attempts ?? 0) + 1,
+        weight: weight ?? existing?.weight ?? 1,
+      }
+      recomputeAggregateScore(state)
+      adapter.setScore(state.score!, state.maxScore)
+      adapter.setStatus(state.passed ? 'passed' : 'failed')
       debouncedCommit()
+    },
+
+    getAssessmentResult(assessmentId: string): AssessmentResult | null {
+      return state.assessments[assessmentId] ?? null
     },
 
     suspend() {

@@ -1,3 +1,12 @@
+export interface AssessmentResult {
+  id: string
+  score: number
+  maxScore: number
+  passed: boolean
+  attempts: number
+  weight: number
+}
+
 export interface CourseState {
   // Navigation
   currentPage: string
@@ -6,11 +15,14 @@ export interface CourseState {
   // Completion — flat registry
   completions: Record<string, boolean>
 
-  // Assessment
+  // Assessment — computed from assessments record
   score: number | null
   maxScore: number
   passed: boolean | null
   attempts: number
+
+  // Per-assessment tracking
+  assessments: Record<string, AssessmentResult>
 
   // Time
   sessionStart: number
@@ -30,8 +42,12 @@ export interface CourseRuntime {
   isComplete(id: string): boolean
   isPageComplete(pageId: string): boolean
 
-  // Assessment
+  // Assessment — backward compatible
   submitScore(score: number, max: number, passThreshold?: number): void
+
+  // Assessment — per-assessment
+  submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number): void
+  getAssessmentResult(assessmentId: string): AssessmentResult | null
 
   // Lifecycle
   suspend(): void

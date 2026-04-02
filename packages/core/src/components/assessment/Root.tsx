@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
+import { useState, useRef, useCallback } from 'preact/hooks'
 import { useCourse } from '../../hooks/index.ts'
 import { AssessmentContext } from './context.ts'
 
@@ -7,18 +7,19 @@ export interface AssessmentRootProps {
   id: string
   passThreshold?: number
   maxAttempts?: number
+  weight?: number
   children: ComponentChildren
   class?: string
 }
 
-export function Root({ id, passThreshold, maxAttempts, children, class: className }: AssessmentRootProps): VNode {
+export function Root({ id, passThreshold, maxAttempts, weight = 1, children, class: className }: AssessmentRootProps): VNode {
   const runtime = useCourse()
   const [submitted, setSubmitted] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const evaluatorsRef = useRef<Map<string, { evaluate: () => number; weight: number }>>(new Map())
 
-  const register = useCallback((qId: string, evaluate: () => number, weight: number = 1) => {
-    evaluatorsRef.current.set(qId, { evaluate, weight })
+  const register = useCallback((qId: string, evaluate: () => number, qWeight: number = 1) => {
+    evaluatorsRef.current.set(qId, { evaluate, weight: qWeight })
     return () => { evaluatorsRef.current.delete(qId) }
   }, [])
 
@@ -27,23 +28,27 @@ export function Root({ id, passThreshold, maxAttempts, children, class: classNam
     let totalWeight = 0
     let weightedScore = 0
 
-    for (const [, { evaluate, weight }] of evaluators) {
-      totalWeight += weight
-      weightedScore += evaluate() * weight
+    for (const [, { evaluate, weight: qWeight }] of evaluators) {
+      totalWeight += qWeight
+      weightedScore += evaluate() * qWeight
     }
 
     if (totalWeight === 0) return
 
-    runtime.submitScore(weightedScore, totalWeight, passThreshold)
+    runtime.submitAssessmentScore(id, weightedScore, totalWeight, passThreshold, weight)
     setSubmitted(true)
-  }, [runtime, passThreshold])
+  }, [runtime, id, passThreshold, weight])
 
   const retry = useCallback(() => {
     setSubmitted(false)
     setAttempt(a => a + 1)
   }, [])
 
-  const { score, maxScore, passed, attempts } = runtime.state
+  const result = runtime.getAssessmentResult(id)
+  const score = result?.score ?? null
+  const maxScore = result?.maxScore ?? 0
+  const passed = result?.passed ?? null
+  const attempts = result?.attempts ?? 0
   const canRetry = submitted && passed === false && (maxAttempts === undefined || attempts < maxAttempts)
   const attemptsExhausted = submitted && passed === false && maxAttempts !== undefined && attempts >= maxAttempts
 

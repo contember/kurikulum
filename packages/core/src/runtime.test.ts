@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
 import { createCourseRuntime } from './runtime.ts'
-import type { CourseConfig, CourseRuntime, DeliveryAdapter } from './types.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter, AssessmentResult } from './types.ts'
 
 function createMockAdapter(): DeliveryAdapter & {
   committed: number
@@ -194,6 +194,151 @@ describe('createCourseRuntime', () => {
       const beforeRestore = Date.now()
       runtime2.restore()
       expect(runtime2.state.sessionStart).toBeGreaterThanOrEqual(beforeRestore)
+    })
+
+    it('roundtrips multi-assessment state through suspend and restore', () => {
+      runtime.submitAssessmentScore('quiz-1', 8, 10, undefined, 0.3)
+      runtime.submitAssessmentScore('quiz-2', 6, 10, undefined, 0.7)
+
+      runtime.suspend()
+
+      const adapter2 = createMockAdapter()
+      adapter2.suspendData = adapter.suspendData
+      const runtime2 = createCourseRuntime(config, adapter2)
+      runtime2.restore()
+
+      const q1 = runtime2.getAssessmentResult('quiz-1')!
+      expect(q1.score).toBe(8)
+      expect(q1.maxScore).toBe(10)
+      expect(q1.weight).toBe(0.3)
+      expect(q1.passed).toBe(true)
+
+      const q2 = runtime2.getAssessmentResult('quiz-2')!
+      expect(q2.score).toBe(6)
+      expect(q2.maxScore).toBe(10)
+      expect(q2.weight).toBe(0.7)
+      expect(q2.passed).toBe(false)
+
+      // Aggregate score should be recomputed from restored assessments
+      expect(runtime2.state.score).not.toBeNull()
+    })
+  })
+
+  describe('multi-assessment', () => {
+    it('submitAssessmentScore tracks independent assessment results', () => {
+      runtime.submitAssessmentScore('quiz-1', 8, 10)
+      runtime.submitAssessmentScore('quiz-2', 6, 10)
+
+      const q1 = runtime.getAssessmentResult('quiz-1')!
+      expect(q1.score).toBe(8)
+      expect(q1.maxScore).toBe(10)
+      expect(q1.passed).toBe(true)
+      expect(q1.attempts).toBe(1)
+
+      const q2 = runtime.getAssessmentResult('quiz-2')!
+      expect(q2.score).toBe(6)
+      expect(q2.maxScore).toBe(10)
+      expect(q2.passed).toBe(false)
+      expect(q2.attempts).toBe(1)
+    })
+
+    it('getAssessmentResult returns null for unknown assessment', () => {
+      expect(runtime.getAssessmentResult('nonexistent')).toBeNull()
+    })
+
+    it('submitAssessmentScore increments attempts on re-submit', () => {
+      runtime.submitAssessmentScore('quiz-1', 5, 10)
+      runtime.submitAssessmentScore('quiz-1', 8, 10)
+      const q1 = runtime.getAssessmentResult('quiz-1')!
+      expect(q1.attempts).toBe(2)
+      expect(q1.score).toBe(8)
+    })
+
+    it('submitAssessmentScore accepts weight parameter', () => {
+      runtime.submitAssessmentScore('quiz-1', 8, 10, undefined, 0.2)
+      const q1 = runtime.getAssessmentResult('quiz-1')!
+      expect(q1.weight).toBe(0.2)
+    })
+
+    it('submitAssessmentScore preserves existing weight on re-submit', () => {
+      runtime.submitAssessmentScore('quiz-1', 5, 10, undefined, 0.3)
+      runtime.submitAssessmentScore('quiz-1', 8, 10)
+      const q1 = runtime.getAssessmentResult('quiz-1')!
+      expect(q1.weight).toBe(0.3)
+    })
+
+    it('computes weighted aggregate score', () => {
+      // quiz-1: score=8/10, weight=0.2
+      // quiz-2: score=9/10, weight=0.8
+      runtime.submitAssessmentScore('quiz-1', 8, 10, undefined, 0.2)
+      runtime.submitAssessmentScore('quiz-2', 9, 10, undefined, 0.8)
+
+      // Weighted avg score = (8*0.2 + 9*0.8) / (0.2+0.8) = 8.8
+      expect(runtime.state.score).toBeCloseTo(8.8)
+      // Weighted avg maxScore = (10*0.2 + 10*0.8) / (0.2+0.8) = 10
+      expect(runtime.state.maxScore).toBeCloseTo(10)
+    })
+
+    it('aggregate passed requires all assessments to pass', () => {
+      runtime.submitAssessmentScore('quiz-1', 8, 10) // passed
+      runtime.submitAssessmentScore('quiz-2', 5, 10) // failed (0.5 < 0.7)
+
+      expect(runtime.state.passed).toBe(false)
+
+      // Now re-submit quiz-2 with passing score
+      runtime.submitAssessmentScore('quiz-2', 8, 10)
+      expect(runtime.state.passed).toBe(true)
+    })
+
+    it('aggregate attempts is max of all assessment attempts', () => {
+      runtime.submitAssessmentScore('quiz-1', 5, 10)
+      runtime.submitAssessmentScore('quiz-1', 8, 10)
+      runtime.submitAssessmentScore('quiz-2', 9, 10)
+
+      expect(runtime.state.attempts).toBe(2) // max(2, 1)
+    })
+
+    it('submitScore backward compat uses __default__ assessment', () => {
+      runtime.submitScore(8, 10)
+
+      const result = runtime.getAssessmentResult('__default__')!
+      expect(result.score).toBe(8)
+      expect(result.maxScore).toBe(10)
+      expect(result.passed).toBe(true)
+
+      // Global state should match
+      expect(runtime.state.score).toBe(8)
+      expect(runtime.state.maxScore).toBe(10)
+      expect(runtime.state.passed).toBe(true)
+      expect(runtime.state.attempts).toBe(1)
+    })
+
+    it('calls adapter.setScore and adapter.setStatus on assessment submit', () => {
+      const scoreArgs: [number, number][] = []
+      const statusArgs: string[] = []
+      adapter.setScore = (score: number, max: number) => { scoreArgs.push([score, max]) }
+      adapter.setStatus = (status: any) => { statusArgs.push(status) }
+
+      runtime.submitAssessmentScore('quiz-1', 8, 10)
+
+      expect(scoreArgs).toEqual([[8, 10]])
+      expect(statusArgs).toEqual(['passed'])
+    })
+
+    it('reports aggregate score to adapter with multiple assessments', () => {
+      const scoreArgs: [number, number][] = []
+      adapter.setScore = (score: number, max: number) => { scoreArgs.push([score, max]) }
+
+      runtime.submitAssessmentScore('quiz-1', 8, 10, undefined, 0.4)
+      runtime.submitAssessmentScore('quiz-2', 6, 10, undefined, 0.6)
+
+      // Last call should have aggregate: (8*0.4 + 6*0.6)/(0.4+0.6) = 6.8
+      const lastScore = scoreArgs[scoreArgs.length - 1]
+      expect(lastScore[0]).toBeCloseTo(6.8)
+    })
+
+    it('initial state has empty assessments', () => {
+      expect(runtime.state.assessments).toEqual({})
     })
   })
 })

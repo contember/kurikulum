@@ -64,11 +64,15 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
     const originalNavigateTo = runtime.navigateTo.bind(runtime)
     const originalMarkComplete = runtime.markComplete.bind(runtime)
     const originalSubmitScore = runtime.submitScore.bind(runtime)
+    const originalSubmitAssessmentScore = runtime.submitAssessmentScore.bind(runtime)
 
     runtime.navigateTo = (pageId: string) => { originalNavigateTo(pageId); notify() }
     runtime.markComplete = (id: string) => { originalMarkComplete(id); notify() }
     runtime.submitScore = (score: number, max: number, threshold?: number) => {
       originalSubmitScore(score, max, threshold); notify()
+    }
+    runtime.submitAssessmentScore = (assessmentId: string, score: number, max: number, threshold?: number, weight?: number) => {
+      originalSubmitAssessmentScore(assessmentId, score, max, threshold, weight); notify()
     }
 
     ref.current = {
