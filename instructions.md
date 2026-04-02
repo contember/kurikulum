@@ -48,7 +48,7 @@
 | 18 | Matching — přiřazování prompt→response, dropdown, partial credit | [spec/18-matching.md](spec/18-matching.md) | `[x]` |
 | 19 | Ordering — řazení položek, move up/down, partial credit | [spec/19-ordering.md](spec/19-ordering.md) | `[x]` |
 | 20 | Multi-assessment per kurz — nezávislé skóre, vážený celkový výsledek | [spec/20-multi-assessment.md](spec/20-multi-assessment.md) | `[x]` |
-| 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[ ]` |
+| 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[x]` |
 | 22 | Podmíněná navigace — when prop na Page, branching, remediace | [spec/22-conditional-navigation.md](spec/22-conditional-navigation.md) | `[ ]` |
 | 23 | Historie pokusů — log skóre per pokus, Assessment.History component | [spec/23-attempt-history.md](spec/23-attempt-history.md) | `[ ]` |
 | 24 | SCORM 2004 adapter — API_1484_11, split status, ISO 8601, scaled score | [spec/24-scorm-2004.md](spec/24-scorm-2004.md) | `[ ]` |
