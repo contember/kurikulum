@@ -3,7 +3,7 @@ import { existsSync, readFileSync, rmSync } from 'fs'
 import { resolve } from 'path'
 import JSZip from 'jszip'
 
-const templateDir = import.meta.dir
+const templateDir = resolve(import.meta.dir, '../../template')
 const distDir = resolve(templateDir, 'dist')
 
 describe('E2E: Standalone build', () => {

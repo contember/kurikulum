@@ -1,5 +1,13 @@
 {
   "name": "kurikulum",
   "private": true,
-  "workspaces": ["packages/*", "template"]
+  "workspaces": ["packages/*", "template"],
+  "dependencies": {
+    "@kurikulum/core": "workspace:*"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.8.9",
+    "jszip": "^3.10.1",
+    "preact": "^10.0.0"
+  }
 }

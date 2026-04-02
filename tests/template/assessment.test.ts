@@ -29,11 +29,11 @@ import {
   createCourseRuntime,
 } from '@kurikulum/core'
 import type { CourseContextValue } from '@kurikulum/core'
-import { Assessment } from './Assessment.tsx'
-import { MCQ } from './MCQ.tsx'
-import { MultiSelect } from './MultiSelect.tsx'
-import { Option } from './Option.tsx'
-import { QuestionFeedback } from './QuestionFeedback.tsx'
+import { Assessment } from '../../template/src/components/Assessment.tsx'
+import { MCQ } from '../../template/src/components/MCQ.tsx'
+import { MultiSelect } from '../../template/src/components/MultiSelect.tsx'
+import { Option } from '../../template/src/components/Option.tsx'
+import { QuestionFeedback } from '../../template/src/components/QuestionFeedback.tsx'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))

@@ -20,12 +20,12 @@ import {
   createCourseRuntime,
 } from '@kurikulum/core'
 import type { CourseContextValue } from '@kurikulum/core'
-import { Course } from './Course.tsx'
-import { Page } from './Page.tsx'
-import { Navigation } from './Navigation.tsx'
-import { Text } from './Text.tsx'
-import { Image } from './Image.tsx'
-import { Video } from './Video.tsx'
+import { Course } from '../../template/src/components/Course.tsx'
+import { Page } from '../../template/src/components/Page.tsx'
+import { Navigation } from '../../template/src/components/Navigation.tsx'
+import { Text } from '../../template/src/components/Text.tsx'
+import { Image } from '../../template/src/components/Image.tsx'
+import { Video } from '../../template/src/components/Video.tsx'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
