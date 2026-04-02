@@ -45,7 +45,7 @@
 |---|-------|------|--------|
 | 16 | Vážené skórování a partial credit — weighted evaluators, MultiSelect partial scoring | [spec/16-weighted-scoring.md](spec/16-weighted-scoring.md) | `[x]` |
 | 17 | Fill-in-the-blank — textový input s validací (string, pole, regex) | [spec/17-fill-in-the-blank.md](spec/17-fill-in-the-blank.md) | `[x]` |
-| 18 | Matching — přiřazování prompt→response, dropdown, partial credit | [spec/18-matching.md](spec/18-matching.md) | `[ ]` |
+| 18 | Matching — přiřazování prompt→response, dropdown, partial credit | [spec/18-matching.md](spec/18-matching.md) | `[x]` |
 | 19 | Ordering — řazení položek, move up/down, partial credit | [spec/19-ordering.md](spec/19-ordering.md) | `[ ]` |
 | 20 | Multi-assessment per kurz — nezávislé skóre, vážený celkový výsledek | [spec/20-multi-assessment.md](spec/20-multi-assessment.md) | `[ ]` |
 | 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[ ]` |

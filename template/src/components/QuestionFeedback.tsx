@@ -1,6 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { MCQ, MultiSelect, FillBlank, MCQContext, MultiSelectContext, FillBlankContext } from '@kurikulum/core'
+import { MCQ, MultiSelect, FillBlank, Matching, MCQContext, MultiSelectContext, FillBlankContext, MatchingContext } from '@kurikulum/core'
 
 export interface QuestionFeedbackProps {
   correct?: ComponentChildren
@@ -12,6 +12,7 @@ const feedbackClass = "mt-2 outline-none [&[data-correct='true']]:text-success [
 export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps): VNode | null {
   const msCtx = useContext(MultiSelectContext)
   const fbCtx = useContext(FillBlankContext)
+  const matchCtx = useContext(MatchingContext)
 
   const correctNode = <>{'✓ '}{correct}</>
   const incorrectNode = <>{'✗ '}{incorrect}</>
@@ -29,6 +30,16 @@ export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps):
   if (fbCtx) {
     return (
       <FillBlank.Feedback
+        correct={correctNode}
+        incorrect={incorrectNode}
+        class={feedbackClass}
+      />
+    )
+  }
+
+  if (matchCtx) {
+    return (
+      <Matching.Feedback
         correct={correctNode}
         incorrect={incorrectNode}
         class={feedbackClass}
