@@ -1,0 +1,38 @@
+# Kurikulum SDK — Specifikace v1
+
+Opinionated SDK na tvorbu e-learningových kurzů v JSX (Preact). Autor kurzu píše JSX komponenty, SDK řeší SCORM balení, stav, skórování, navigaci.
+
+## Architektura
+
+- **@kurikulum/core** — Preact-first npm balíček (runtime, hooky, adaptery)
+- **kurikulum-template** — degit-ready template repo s UI komponentami + Tailwind
+- **Stack:** Bun workspace + Vite + Preact + Tailwind v4
+- **Build target:** env/CLI flag (`scorm-1.2` | `standalone`), jeden target per build
+
+## Klíčová rozhodnutí
+
+- Preact-first, žádná framework-agnostic abstrakce
+- UI komponenty jsou template (degit), ne spravovaná knihovna / registry
+- Flat CourseState + CourseRuntime místo orchestrátor pattern
+- Completion konfigurovatelná per-stránka (5 strategií + manuální trigger)
+- V1: jen SCORM 1.2 + standalone, SCORM 2004 odložen
+- Žádné CLI, žádné virtual modules
+- A11y zahrnutá od začátku
+
+## Implementační kroky
+
+1. [Monorepo scaffold](./01-monorepo-scaffold.md)
+2. [CourseState + CourseRuntime](./02-course-runtime.md)
+3. [Completion strategie](./03-completion-strategies.md)
+4. [Hooky](./04-hooks.md)
+5. [CourseProvider context](./05-course-provider.md)
+6. [Standalone adapter](./06-standalone-adapter.md)
+7. [Template: Course, Page, Navigation](./07-template-layout.md)
+8. [Template: Text, Image, Video](./08-template-content.md)
+9. [Template: MCQ, MultiSelect, Assessment](./09-template-assessment.md)
+10. [A11y](./10-a11y.md)
+11. [Tailwind v4 theme](./11-tailwind-theme.md)
+12. [Vite plugin + single-file build](./12-vite-plugin.md)
+13. [SCORM 1.2 adapter](./13-scorm-adapter.md)
+14. [SCORM manifest + ZIP](./14-scorm-packaging.md)
+15. [E2E test](./15-e2e-test.md)
