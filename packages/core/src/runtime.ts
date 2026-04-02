@@ -88,8 +88,13 @@ export function createCourseRuntime(
       const data = adapter.getSuspendData()
       if (!data) return
       const restored = JSON.parse(data) as CourseState
+      const pages = state.pages
       Object.assign(state, restored)
+      state.pages = pages
       state.sessionStart = Date.now()
+      if (!pages.includes(state.currentPage)) {
+        state.currentPage = pages[0] ?? ''
+      }
     },
   }
 
