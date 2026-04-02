@@ -79,7 +79,11 @@ export function Root({
   // Register with Assessment
   useEffect(() => {
     if (!assessmentCtx) return
-    return assessmentCtx.register(id, evaluate, weight)
+    return assessmentCtx.register(id, evaluate, weight, () => {
+      const p = pairsRef.current
+      const sel = selectionsRef.current
+      return p.map((_, i) => `${p[i].prompt}:${sel.get(i) ?? ''}`).join(',')
+    })
   }, [id, assessmentCtx])
 
   // Reset on new attempt

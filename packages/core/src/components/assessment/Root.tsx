@@ -2,6 +2,7 @@ import type { ComponentChildren, VNode } from 'preact'
 import { useState, useRef, useCallback } from 'preact/hooks'
 import { useCourse } from '../../hooks/index.ts'
 import { AssessmentContext } from './context.ts'
+import type { AttemptAnswer } from '../../types.ts'
 
 export interface AssessmentRootProps {
   id: string
@@ -16,10 +17,10 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, children, cla
   const runtime = useCourse()
   const [submitted, setSubmitted] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const evaluatorsRef = useRef<Map<string, { evaluate: () => number; weight: number }>>(new Map())
+  const evaluatorsRef = useRef<Map<string, { evaluate: () => number; weight: number; getResponse?: () => string }>>(new Map())
 
-  const register = useCallback((qId: string, evaluate: () => number, qWeight: number = 1) => {
-    evaluatorsRef.current.set(qId, { evaluate, weight: qWeight })
+  const register = useCallback((qId: string, evaluate: () => number, qWeight: number = 1, getResponse?: () => string) => {
+    evaluatorsRef.current.set(qId, { evaluate, weight: qWeight, getResponse })
     return () => { evaluatorsRef.current.delete(qId) }
   }, [])
 
@@ -27,15 +28,22 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, children, cla
     const evaluators = evaluatorsRef.current
     let totalWeight = 0
     let weightedScore = 0
+    const answers: Record<string, AttemptAnswer> = {}
 
-    for (const [, { evaluate, weight: qWeight }] of evaluators) {
+    for (const [qId, { evaluate, weight: qWeight, getResponse }] of evaluators) {
+      const qScore = evaluate()
       totalWeight += qWeight
-      weightedScore += evaluate() * qWeight
+      weightedScore += qScore * qWeight
+      answers[qId] = {
+        response: getResponse?.() ?? '',
+        correct: qScore >= 1,
+        score: qScore,
+      }
     }
 
     if (totalWeight === 0) return
 
-    runtime.submitAssessmentScore(id, weightedScore, totalWeight, passThreshold, weight)
+    runtime.submitAssessmentScore(id, weightedScore, totalWeight, passThreshold, weight, answers)
     setSubmitted(true)
   }, [runtime, id, passThreshold, weight])
 
@@ -49,6 +57,7 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, children, cla
   const maxScore = result?.maxScore ?? 0
   const passed = result?.passed ?? null
   const attempts = result?.attempts ?? 0
+  const history = result?.history ?? []
   const canRetry = submitted && passed === false && (maxAttempts === undefined || attempts < maxAttempts)
   const attemptsExhausted = submitted && passed === false && maxAttempts !== undefined && attempts >= maxAttempts
 
@@ -65,6 +74,7 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, children, cla
       attempts,
       canRetry,
       attemptsExhausted,
+      history,
     }}>
       <div
         role="region"

@@ -53,6 +53,7 @@ export function Root({
       id,
       () => evaluate(valueRef.current, accept, caseSensitive) ? 1 : 0,
       weight,
+      () => valueRef.current.trim(),
     )
   }, [id, assessmentCtx])
 

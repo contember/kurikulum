@@ -76,7 +76,7 @@ export function Root({
   // Register with Assessment
   useEffect(() => {
     if (!assessmentCtx) return
-    return assessmentCtx.register(id, evaluate, weight)
+    return assessmentCtx.register(id, evaluate, weight, () => currentOrderRef.current.join(','))
   }, [id, assessmentCtx])
 
   // Reset on new attempt

@@ -1,4 +1,4 @@
-import type { AssessmentResult, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter } from './types.ts'
+import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter } from './types.ts'
 
 function createInitialState(config: CourseConfig): CourseState {
   return {
@@ -94,15 +94,24 @@ export function createCourseRuntime(
       runtime.submitAssessmentScore('__default__', score, max, threshold)
     },
 
-    submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number) {
+    submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number, answers?: Record<string, AttemptAnswer>) {
       const existing = state.assessments[assessmentId]
+      const passed = score / max >= (threshold ?? passThreshold)
+      const record = {
+        score,
+        maxScore: max,
+        passed,
+        timestamp: Date.now(),
+        answers: answers ?? {},
+      }
       state.assessments[assessmentId] = {
         id: assessmentId,
         score,
         maxScore: max,
-        passed: score / max >= (threshold ?? passThreshold),
+        passed,
         attempts: (existing?.attempts ?? 0) + 1,
         weight: weight ?? existing?.weight ?? 1,
+        history: [...(existing?.history ?? []), record],
       }
       recomputeAggregateScore(state)
       adapter.setScore(state.score!, state.maxScore)

@@ -1,3 +1,17 @@
+export interface AttemptAnswer {
+  response: string
+  correct: boolean
+  score: number
+}
+
+export interface AttemptRecord {
+  score: number
+  maxScore: number
+  passed: boolean
+  timestamp: number
+  answers: Record<string, AttemptAnswer>
+}
+
 export interface AssessmentResult {
   id: string
   score: number
@@ -5,6 +19,7 @@ export interface AssessmentResult {
   passed: boolean
   attempts: number
   weight: number
+  history: AttemptRecord[]
 }
 
 export interface CourseState {
@@ -46,7 +61,7 @@ export interface CourseRuntime {
   submitScore(score: number, max: number, passThreshold?: number): void
 
   // Assessment — per-assessment
-  submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number): void
+  submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number, answers?: Record<string, AttemptAnswer>): void
   getAssessmentResult(assessmentId: string): AssessmentResult | null
 
   // Lifecycle

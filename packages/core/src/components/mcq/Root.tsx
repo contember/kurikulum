@@ -38,7 +38,7 @@ export function Root({ id, weight, children, class: className, 'aria-label': ari
   // Register evaluate function with Assessment parent
   useEffect(() => {
     if (!assessmentCtx) return
-    return assessmentCtx.register(id, () => selectedRef.current === correctIndex() ? 1 : 0, weight)
+    return assessmentCtx.register(id, () => selectedRef.current === correctIndex() ? 1 : 0, weight, () => String(selectedRef.current ?? ''))
   }, [id, assessmentCtx])
 
   // Reset on new attempt
