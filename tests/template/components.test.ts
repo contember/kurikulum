@@ -66,7 +66,7 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
 }
 
 describe('Course', () => {
-  it('renders only the active page', () => {
+  it('renders all pages but hides inactive ones', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
@@ -83,12 +83,23 @@ describe('Course', () => {
       container,
     )
 
+    // All page content is in the DOM
     expect(container.textContent).toContain('Page 1 content')
-    expect(container.textContent).not.toContain('Page 2 content')
-    expect(container.textContent).not.toContain('Page 3 content')
+    expect(container.textContent).toContain('Page 2 content')
+    expect(container.textContent).toContain('Page 3 content')
+
+    // Find page wrappers by data-page-id on the main divs
+    const divs = Array.from(container.getElementsByTagName('div'))
+    const pageDivs = divs.filter(d => d.getAttribute('data-page-id'))
+    expect(pageDivs.length).toBe(3)
+
+    // Inactive pages have display:none on their wrapper parent
+    expect(pageDivs[0].parentElement!.style.display).not.toBe('none') // page-1 active
+    expect(pageDivs[1].parentElement!.style.display).toBe('none')     // page-2 hidden
+    expect(pageDivs[2].parentElement!.style.display).toBe('none')     // page-3 hidden
   })
 
-  it('switches to new page after navigation', () => {
+  it('switches visible page after navigation', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
@@ -104,14 +115,22 @@ describe('Course', () => {
     }
 
     render(h(App, null), container)
-    expect(container.textContent).toContain('Page 1 content')
+    const getPageWrappers = () => {
+      const divs = Array.from(container.getElementsByTagName('div'))
+      return divs.filter(d => d.getAttribute('data-page-id')).map(d => d.parentElement!)
+    }
+
+    // page-1 visible, page-2 hidden
+    expect(getPageWrappers()[0].style.display).not.toBe('none')
+    expect(getPageWrappers()[1].style.display).toBe('none')
 
     runtime.navigateTo('page-2')
     ctx.notify()
 
     render(h(App, null), container)
-    expect(container.textContent).toContain('Page 2 content')
-    expect(container.textContent).not.toContain('Page 1 content')
+    // page-2 visible, page-1 hidden
+    expect(getPageWrappers()[0].style.display).toBe('none')
+    expect(getPageWrappers()[1].style.display).not.toBe('none')
   })
 
   it('renders skip-to-content link', () => {
@@ -135,7 +154,7 @@ describe('Course', () => {
     expect(skipLink!.textContent).toBe('Přeskočit na obsah')
   })
 
-  it('returns null when no matching page found', () => {
+  it('hides pages that do not match current page', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     runtime.navigateTo('page-1')
@@ -151,7 +170,11 @@ describe('Course', () => {
       container,
     )
 
-    expect(container.textContent).toBe('')
+    // The page is rendered but hidden
+    const divs = Array.from(container.getElementsByTagName('div'))
+    const pageDiv = divs.find(d => d.getAttribute('data-page-id') === 'nonexistent')
+    expect(pageDiv).toBeDefined()
+    expect(pageDiv!.parentElement!.style.display).toBe('none')
   })
 })
 
@@ -314,6 +337,7 @@ describe('Navigation', () => {
   it('has aria-disabled on disabled buttons', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
+    runtime.markComplete('page-1')
     const ctx = createTestContext(runtime)
 
     const container = document.createElement('div')
@@ -325,7 +349,7 @@ describe('Navigation', () => {
     )
 
     const buttons = container.getElementsByTagName('button')
-    // First page: prev disabled, next enabled
+    // First page (complete): prev disabled, next enabled
     expect(buttons[0].getAttribute('aria-disabled')).toBe('true')
     expect(buttons[1].getAttribute('aria-disabled')).toBe('false')
   })
@@ -349,7 +373,7 @@ describe('Navigation', () => {
     expect(pageIndicator!.textContent).toContain('1 / 3')
   })
 
-  it('disables prev button on first page', () => {
+  it('disables prev button on first page and next when incomplete', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
@@ -363,8 +387,20 @@ describe('Navigation', () => {
     )
 
     const buttons = container.getElementsByTagName('button')
-    expect(buttons[0].disabled).toBe(true)   // prev
-    expect(buttons[1].disabled).toBe(false)  // next
+    expect(buttons[0].disabled).toBe(true)   // prev (first page)
+    expect(buttons[1].disabled).toBe(true)   // next (page not complete)
+
+    // After completing the page, next becomes enabled
+    runtime.markComplete('page-1')
+    ctx.notify()
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Navigation, null),
+      ),
+      container,
+    )
+    const buttons2 = container.getElementsByTagName('button')
+    expect(buttons2[1].disabled).toBe(false) // next (page complete)
   })
 
   it('disables next button on last page', () => {
@@ -389,6 +425,7 @@ describe('Navigation', () => {
   it('navigates when buttons are clicked', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
+    runtime.markComplete('page-1')
     const ctx = createTestContext(runtime)
 
     const container = document.createElement('div')
@@ -401,7 +438,7 @@ describe('Navigation', () => {
     render(h(App, null), container)
 
     const buttons = container.getElementsByTagName('button')
-    // Click next
+    // Click next (page-1 is complete, so next is enabled)
     buttons[1].click()
     ctx.notify()
 

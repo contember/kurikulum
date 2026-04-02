@@ -1,5 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useEffect, useRef } from 'preact/hooks'
+import { useContext, useEffect, useMemo, useRef } from 'preact/hooks'
+import { CourseContext } from '../../context.tsx'
 import {
   useCompletion,
   useCourse,
@@ -15,43 +16,59 @@ export interface PageRootProps {
   id: string
   completion?: CompletionStrategy
   completionTimer?: number
+  active?: boolean
   children: ComponentChildren
   class?: string
 }
 
-export function Root({ id, completion = 'mount', completionTimer, children, class: className }: PageRootProps): VNode {
+export function Root({ id, completion = 'mount', completionTimer, active = true, children, class: className }: PageRootProps): VNode {
   const { markComplete, isComplete } = useCompletion(id)
   const runtime = useCourse()
+  const ctx = useContext(CourseContext)!
   const sentinelRef = useRef<HTMLDivElement>(null)
   const handlerRef = useRef<CompletionHandler | null>(null)
   const mainRef = useRef<HTMLDivElement>(null)
+  const registry = useMemo(() => new CompletableRegistry(), [id])
 
   useEffect(() => {
-    if (isComplete) return
+    if (!active || isComplete) return
 
     const handler = createCompletionHandler(completion, markComplete, {
       timerSeconds: completionTimer,
       sentinel: sentinelRef.current ?? undefined,
       pageId: id,
-      registry: new CompletableRegistry(),
+      registry,
       getCompletions: () => runtime.state.completions,
     })
 
     handlerRef.current = handler
     handler.start()
 
+    // For interactive strategy, re-check on every state change
+    let unsub: (() => void) | undefined
+    if (completion === 'interactive') {
+      unsub = ctx.subscribe(() => {
+        if (registry.isPageInteractiveComplete(id, runtime.state.completions)) {
+          markComplete()
+        }
+      })
+    }
+
     return () => {
       handler.stop()
       handlerRef.current = null
+      unsub?.()
     }
-  }, [id, completion, isComplete])
+  }, [id, completion, isComplete, active])
 
   useEffect(() => {
-    mainRef.current?.focus()
-  }, [id])
+    if (active) {
+      mainRef.current?.focus()
+    }
+  }, [id, active])
 
   return (
-    <PageContext.Provider value={{ sentinelRef, id, completion }}>
+    <PageContext.Provider value={{ sentinelRef, id, completion, registry }}>
       <div
         ref={mainRef}
         tabIndex={-1}

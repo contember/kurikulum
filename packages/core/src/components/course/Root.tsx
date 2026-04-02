@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { toChildArray } from 'preact'
+import { toChildArray, cloneElement } from 'preact'
 import { useNavigation } from '../../hooks/index.ts'
 
 export interface CourseRootProps {
@@ -12,27 +12,29 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
 
   const allChildren = toChildArray(children) as VNode[]
   const nonPages: VNode[] = []
-  let activePage: VNode | null = null
+  const pages: VNode[] = []
 
   for (const child of allChildren) {
     const id = (child as VNode<{ id?: string }>)?.props?.id
     if (id != null) {
-      if (id === currentPage) {
-        activePage = child
-      }
+      pages.push(child)
     } else {
       nonPages.push(child)
     }
   }
 
-  if (!activePage) {
-    return null
-  }
-
   return (
     <div class={className}>
       {nonPages}
-      <div key={(activePage as VNode<{ id?: string }>).props.id}>{activePage}</div>
+      {pages.map((page) => {
+        const id = (page as VNode<{ id: string }>).props.id
+        const active = id === currentPage
+        return (
+          <div key={id} style={active ? undefined : { display: 'none' }}>
+            {cloneElement(page, { active })}
+          </div>
+        )
+      })}
     </div>
   )
 }

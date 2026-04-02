@@ -14,12 +14,15 @@ export function useNavigation() {
   const { state } = runtime
   const pageIndex = state.pages.indexOf(state.currentPage)
 
+  const hasNext = pageIndex < state.pages.length - 1
+  const currentComplete = runtime.isPageComplete(state.currentPage)
+
   return {
     currentPage: state.currentPage,
     next: () => runtime.nextPage(),
     prev: () => runtime.prevPage(),
     goTo: (id: string) => runtime.navigateTo(id),
-    canGoNext: pageIndex < state.pages.length - 1,
+    canGoNext: hasNext && currentComplete,
     canGoPrev: pageIndex > 0,
     pageIndex,
     totalPages: state.pages.length,

@@ -146,16 +146,24 @@ describe('useNavigation', () => {
     expect(nav.currentPage).toBe('page-1')
     expect(nav.pageIndex).toBe(0)
     expect(nav.totalPages).toBe(3)
-    expect(nav.canGoNext).toBe(true)
+    expect(nav.canGoNext).toBe(false) // page-1 not yet complete
     expect(nav.canGoPrev).toBe(false)
   })
 
+  it('canGoNext is true when current page is complete', () => {
+    runtime.markComplete('page-1')
+    const { get } = renderHook(() => useNavigation(), ctx)
+    expect(get().canGoNext).toBe(true)
+  })
+
   it('navigates forward with next()', () => {
+    runtime.markComplete('page-1')
     const { get, container } = renderHook(() => useNavigation(), ctx)
     get().next()
     ctx.notify()
     // Re-render to pick up state change
     render(null, container)
+    runtime.markComplete('page-2')
     const { get: get2 } = renderHook(() => useNavigation(), ctx)
     const nav = get2()
     expect(nav.currentPage).toBe('page-2')
