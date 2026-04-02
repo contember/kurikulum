@@ -24,6 +24,15 @@ export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from 
 // Adapters
 export { createAdapter, createStandaloneAdapter } from './adapters/index.ts'
 
+// Components (headless)
+export {
+  Assessment, AssessmentContext,
+  MCQ, MCQContext,
+  MultiSelect, MultiSelectContext,
+  Page, Navigation, Course,
+} from './components/index.ts'
+export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue } from './components/index.ts'
+
 // SCORM packaging
 export { generateManifest } from './scorm/manifest.ts'
 export type { ManifestOptions } from './scorm/manifest.ts'
