@@ -33,7 +33,7 @@
 | 8 | Template content — Text, Image, Video komponenty | [spec/08-template-content.md](spec/08-template-content.md) | `[x]` |
 | 9 | Template assessment — MCQ, MultiSelect, Option, Assessment, QuestionFeedback | [spec/09-template-assessment.md](spec/09-template-assessment.md) | `[x]` |
 | 10 | Accessibility — WCAG 2.1 AA, keyboard nav, ARIA, focus management | [spec/10-a11y.md](spec/10-a11y.md) | `[x]` |
-| 11 | Tailwind v4 theme — CSS-first konfigurace, design tokens | [spec/11-tailwind-theme.md](spec/11-tailwind-theme.md) | `[ ]` |
+| 11 | Tailwind v4 theme — CSS-first konfigurace, design tokens | [spec/11-tailwind-theme.md](spec/11-tailwind-theme.md) | `[x]` |
 | 12 | Vite plugin — Preact alias, single-file build, target z env | [spec/12-vite-plugin.md](spec/12-vite-plugin.md) | `[ ]` |
 | 13 | SCORM 1.2 adapter — CMI mapování, API discovery, fallback | [spec/13-scorm-adapter.md](spec/13-scorm-adapter.md) | `[ ]` |
 | 14 | SCORM packaging — imsmanifest.xml generátor, ZIP balení | [spec/14-scorm-packaging.md](spec/14-scorm-packaging.md) | `[ ]` |
