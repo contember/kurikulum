@@ -1,5 +1,5 @@
 import { useContext, useEffect, useReducer } from 'preact/hooks'
-import { CourseContext } from '../context.ts'
+import { CourseContext } from '../context.tsx'
 import { resolveCompletionStrategy } from '../completion.ts'
 
 export function usePage() {

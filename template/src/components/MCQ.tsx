@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { h, toChildArray } from 'preact'
+import { toChildArray } from 'preact'
 import { useState, useEffect, useContext, useRef } from 'preact/hooks'
 import { useCompletion } from '@kurikulum/core'
 import { AssessmentContext, QuestionContext } from './assessment-context.ts'
@@ -68,33 +68,37 @@ export function MCQ({ id, question, children }: MCQProps): VNode {
     }
   }, [submitted])
 
-  return h(QuestionContext.Provider, { value: { submitted, correct: isCorrect } },
-    h('fieldset', { role: 'radiogroup', 'aria-label': question },
-      h('legend', { class: 'font-semibold mb-2' }, question),
-      ...options.map((option, i) =>
-        h('label', { class: 'flex items-center gap-2 py-1', key: i },
-          h('input', {
-            type: 'radio',
-            name: id,
-            checked: selected === i,
-            onChange: () => { if (!submitted) setSelected(i) },
-            disabled: submitted,
-            'aria-disabled': submitted,
-            class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-          }),
-          h('span', null, option.content),
-        ),
-      ),
-      !assessmentCtx && !submitted
-        ? h('button', {
-          type: 'button',
-          onClick: () => { if (selected !== null) setLocalSubmitted(true) },
-          disabled: selected === null,
-          'aria-disabled': selected === null,
-          class: 'mt-2 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-        }, 'Odeslat')
-        : null,
-      ...feedbacks,
-    ),
+  return (
+    <QuestionContext.Provider value={{ submitted, correct: isCorrect }}>
+      <fieldset role="radiogroup" aria-label={question}>
+        <legend class="font-semibold mb-2">{question}</legend>
+        {options.map((option, i) => (
+          <label class="flex items-center gap-2 py-1" key={i}>
+            <input
+              type="radio"
+              name={id}
+              checked={selected === i}
+              onChange={() => { if (!submitted) setSelected(i) }}
+              disabled={submitted}
+              aria-disabled={submitted}
+              class="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            />
+            <span>{option.content}</span>
+          </label>
+        ))}
+        {!assessmentCtx && !submitted ? (
+          <button
+            type="button"
+            onClick={() => { if (selected !== null) setLocalSubmitted(true) }}
+            disabled={selected === null}
+            aria-disabled={selected === null}
+            class="mt-2 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Odeslat
+          </button>
+        ) : null}
+        {feedbacks}
+      </fieldset>
+    </QuestionContext.Provider>
   )
 }

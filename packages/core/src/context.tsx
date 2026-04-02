@@ -1,7 +1,6 @@
 import { createContext } from 'preact'
 import type { ComponentChildren, VNode } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
-import { h } from 'preact'
 import type { CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter } from './types.ts'
 import { createCourseRuntime } from './runtime.ts'
 
@@ -96,5 +95,9 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
     }
   }, [ctx])
 
-  return h(CourseContext.Provider, { value: ctx }, children)
+  return (
+    <CourseContext.Provider value={ctx}>
+      {children}
+    </CourseContext.Provider>
+  )
 }

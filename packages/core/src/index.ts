@@ -15,8 +15,8 @@ export {
 export type { CompletionHandler } from './completion.ts'
 
 // Context
-export { CourseContext, createNotifier, CourseProvider } from './context.ts'
-export type { CourseContextValue, CourseProviderProps } from './context.ts'
+export { CourseContext, createNotifier, CourseProvider } from './context.tsx'
+export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // Hooks
 export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from './hooks/index.ts'

@@ -1,5 +1,4 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { h } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
 import {
   useCompletion,
@@ -49,8 +48,10 @@ export function Page({ id, completion = 'mount', completionTimer, children }: Pa
     mainRef.current?.focus()
   }, [id])
 
-  return h('div', { ref: mainRef, tabIndex: -1, role: 'main', id: 'page-content', class: 'max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 outline-none' },
-    children,
-    completion === 'scroll' ? h('div', { ref: sentinelRef, 'aria-hidden': 'true' }) : null,
+  return (
+    <div ref={mainRef} tabIndex={-1} role="main" id="page-content" class="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 outline-none">
+      {children}
+      {completion === 'scroll' ? <div ref={sentinelRef} aria-hidden="true" /> : null}
+    </div>
   )
 }

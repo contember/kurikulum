@@ -1,5 +1,4 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { h } from 'preact'
 
 export interface OptionProps {
   correct?: boolean
@@ -11,5 +10,5 @@ export interface OptionProps {
  * Rendering is handled by the parent question component.
  */
 export function Option({ children }: OptionProps): VNode {
-  return h('span', null, children)
+  return <span>{children}</span>
 }

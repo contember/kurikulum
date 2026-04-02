@@ -1,5 +1,5 @@
 import { useContext, useEffect, useReducer } from 'preact/hooks'
-import { CourseContext } from '../context.ts'
+import { CourseContext } from '../context.tsx'
 
 export function useAssessment() {
   const ctx = useContext(CourseContext)

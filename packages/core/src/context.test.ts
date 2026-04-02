@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, mock } from 'bun:test'
 import { h, options } from 'preact'
 import { render } from 'preact'
 import type { CourseConfig, DeliveryAdapter, CourseRuntime } from './types.ts'
-import { CourseContext, CourseProvider, createNotifier } from './context.ts'
+import { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 import { useCourse } from './hooks/useCourse.ts'
 
 /** Flush Preact's pending effects */

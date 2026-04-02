@@ -1,5 +1,4 @@
 import { render } from 'preact'
-import { h } from 'preact'
 import { CourseProvider, createAdapter } from '@kurikulum/core'
 import type { CourseConfig } from '@kurikulum/core'
 import { Course } from './components/Course.tsx'
@@ -21,29 +20,31 @@ const config: CourseConfig = {
 }
 
 function App() {
-  return h(CourseProvider, { config, adapter },
-    h(Course, null,
-      h(Page, { id: 'intro', completion: 'mount' },
-        h(Text, null, 'Úvod'),
-      ),
-      h(Page, { id: 'reading', completion: 'timer', completionTimer: 3 },
-        h(Text, null, 'Obsah ke čtení'),
-        h(Image, { src: './test.png', alt: 'Test obrázek' }),
-      ),
-      h(Page, { id: 'quiz', completion: 'interactive' },
-        h(Assessment, { id: 'test-assessment', passThreshold: 0.5 },
-          h(MCQ, { id: 'q1', question: 'Test otázka' },
-            h(Option, { correct: true }, 'Správně'),
-            h(Option, null, 'Špatně'),
-          ),
-        ),
-      ),
-      h(Page, { id: 'summary', completion: 'manual' },
-        h(Text, null, 'Shrnutí'),
-      ),
-    ),
-    h(Navigation, null),
+  return (
+    <CourseProvider config={config} adapter={adapter}>
+      <Course>
+        <Page id="intro" completion="mount">
+          <Text>Úvod</Text>
+        </Page>
+        <Page id="reading" completion="timer" completionTimer={3}>
+          <Text>Obsah ke čtení</Text>
+          <Image src="./test.png" alt="Test obrázek" />
+        </Page>
+        <Page id="quiz" completion="interactive">
+          <Assessment id="test-assessment" passThreshold={0.5}>
+            <MCQ id="q1" question="Test otázka">
+              <Option correct>Správně</Option>
+              <Option>Špatně</Option>
+            </MCQ>
+          </Assessment>
+        </Page>
+        <Page id="summary" completion="manual">
+          <Text>Shrnutí</Text>
+        </Page>
+      </Course>
+      <Navigation />
+    </CourseProvider>
   )
 }
 
-render(h(App, null), document.getElementById('app')!)
+render(<App />, document.getElementById('app')!)

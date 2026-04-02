@@ -1,5 +1,4 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { h } from 'preact'
 import { useContext, useEffect, useRef } from 'preact/hooks'
 import { QuestionContext } from './assessment-context.ts'
 
@@ -27,13 +26,15 @@ export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps):
   // Use icon prefix (✓/✗) alongside color — not color-only indication
   const icon = ctx!.correct ? '✓ ' : '✗ '
 
-  return h('div', {
-    ref: feedbackRef,
-    tabIndex: -1,
-    role: 'status',
-    'aria-live': 'polite',
-    class: ctx!.correct
-      ? 'mt-2 text-success outline-none'
-      : 'mt-2 text-danger outline-none',
-  }, icon, message)
+  return (
+    <div
+      ref={feedbackRef}
+      tabIndex={-1}
+      role="status"
+      aria-live="polite"
+      class={ctx!.correct ? 'mt-2 text-success outline-none' : 'mt-2 text-danger outline-none'}
+    >
+      {icon}{message}
+    </div>
+  )
 }

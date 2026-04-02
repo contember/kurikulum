@@ -1,5 +1,4 @@
 import type { VNode } from 'preact'
-import { h } from 'preact'
 
 export interface VideoProps {
   src: string
@@ -8,13 +7,10 @@ export interface VideoProps {
 }
 
 export function Video({ src, poster, caption }: VideoProps): VNode {
-  return h('figure', { class: 'my-4' },
-    h('video', {
-      src,
-      controls: true,
-      poster,
-      class: 'max-w-full',
-    }),
-    caption ? h('figcaption', { class: 'mt-2 text-sm text-text-secondary' }, caption) : null,
+  return (
+    <figure class="my-4">
+      <video src={src} controls poster={poster} class="max-w-full" />
+      {caption ? <figcaption class="mt-2 text-sm text-text-secondary">{caption}</figcaption> : null}
+    </figure>
   )
 }
