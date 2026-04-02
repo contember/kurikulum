@@ -6,9 +6,10 @@ globalThis.document = window.document as unknown as Document
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
 import { h, options } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from './types.ts'
+import type { CourseConfig, DeliveryAdapter, CourseRuntime, SuspendEnvelope } from './types.ts'
 import { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 import { useCourse } from './hooks/useCourse.ts'
+import { CURRENT_SCHEMA_VERSION } from './runtime.ts'
 
 /** Flush Preact's pending effects */
 function flushEffects(): Promise<void> {
@@ -64,18 +65,22 @@ describe('CourseProvider', () => {
   it('calls restore() on mount', () => {
     const adapter = createMockAdapter()
     // Pre-set suspend data to verify restore is called
-    const savedState = {
-      currentPage: 'page-2',
-      pages: ['page-1', 'page-2', 'page-3'],
-      completions: { 'page-1': true },
-      score: null,
-      maxScore: 0,
-      passed: null,
-      attempts: 0,
-      sessionStart: Date.now(),
-      totalTimeMs: 5000,
+    const envelope: SuspendEnvelope = {
+      v: CURRENT_SCHEMA_VERSION,
+      state: {
+        currentPage: 'page-2',
+        pages: ['page-1', 'page-2', 'page-3'],
+        completions: { 'page-1': true },
+        score: null,
+        maxScore: 0,
+        passed: null,
+        attempts: 0,
+        assessments: {},
+        sessionStart: Date.now(),
+        totalTimeMs: 5000,
+      },
     }
-    adapter.suspendData = JSON.stringify(savedState)
+    adapter.suspendData = JSON.stringify(envelope)
 
     let runtime: CourseRuntime | undefined
     function Child() {
@@ -119,8 +124,9 @@ describe('CourseProvider', () => {
     globalThis.dispatchEvent(event)
 
     expect(adapter.suspendData).toBeTruthy()
-    const suspended = JSON.parse(adapter.suspendData)
-    expect(suspended.currentPage).toBe('page-1')
+    const suspended = JSON.parse(adapter.suspendData) as SuspendEnvelope
+    expect(suspended.v).toBe(CURRENT_SCHEMA_VERSION)
+    expect(suspended.state.currentPage).toBe('page-1')
     expect(adapter.committed).toBeGreaterThan(0)
   })
 

@@ -76,6 +76,14 @@ export interface CourseConfig {
   pages: string[]
   defaultCompletion?: CompletionStrategy
   passThreshold?: number // 0-1, default 0.7
+  version?: string
+  onMigrate?: (old: CourseState, oldVersion: string) => CourseState | null
+}
+
+export interface SuspendEnvelope {
+  v: number
+  courseVersion?: string
+  state: CourseState
 }
 
 export interface InteractionRecord {

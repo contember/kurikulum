@@ -1,4 +1,6 @@
-import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter } from './types.ts'
+import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter, SuspendEnvelope } from './types.ts'
+
+export const CURRENT_SCHEMA_VERSION = 1
 
 function createInitialState(config: CourseConfig): CourseState {
   return {
@@ -125,16 +127,62 @@ export function createCourseRuntime(
 
     suspend() {
       state.totalTimeMs += Date.now() - state.sessionStart
-      adapter.setSuspendData(JSON.stringify(state))
+      const envelope: SuspendEnvelope = {
+        v: CURRENT_SCHEMA_VERSION,
+        courseVersion: config.version,
+        state,
+      }
+      adapter.setSuspendData(JSON.stringify(envelope))
       adapter.commit()
     },
 
     restore() {
       const data = adapter.getSuspendData()
       if (!data) return
-      const restored = JSON.parse(data) as CourseState
+
+      let parsed: unknown
+      try {
+        parsed = JSON.parse(data)
+      } catch {
+        console.warn('[kurikulum] Invalid suspend_data JSON, resetting')
+        return
+      }
+
+      // Old format (no envelope) — safely discard
+      if (!parsed || typeof parsed !== 'object' || !('v' in parsed)) {
+        console.warn('[kurikulum] Legacy suspend_data without envelope, resetting')
+        return
+      }
+
+      const envelope = parsed as SuspendEnvelope
+
+      // Schema version mismatch → reset
+      if (envelope.v !== CURRENT_SCHEMA_VERSION) {
+        console.warn('[kurikulum] Incompatible suspend_data schema, resetting')
+        return
+      }
+
+      // Course version changed → try migration
+      if (envelope.courseVersion !== config.version) {
+        if (config.onMigrate) {
+          const migrated = config.onMigrate(envelope.state, envelope.courseVersion ?? '')
+          if (migrated) {
+            Object.assign(state, migrated)
+            state.pages = config.pages
+            state.sessionStart = Date.now()
+            if (!config.pages.includes(state.currentPage)) {
+              state.currentPage = config.pages[0] ?? ''
+            }
+            return
+          }
+        }
+        console.warn('[kurikulum] Course version changed, resetting progress')
+        return
+      }
+
+      // Same version → normal restore
       const pages = state.pages
-      Object.assign(state, restored)
+      Object.assign(state, envelope.state)
       state.pages = pages
       state.sessionStart = Date.now()
       if (!pages.includes(state.currentPage)) {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, mock } from 'bun:test'
-import { createCourseRuntime } from './runtime.ts'
-import type { CourseConfig, CourseRuntime, DeliveryAdapter, AssessmentResult } from './types.ts'
+import { createCourseRuntime, CURRENT_SCHEMA_VERSION } from './runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter, AssessmentResult, SuspendEnvelope } from './types.ts'
 
 function createMockAdapter(): DeliveryAdapter & {
   committed: number
@@ -173,11 +173,12 @@ describe('createCourseRuntime', () => {
       expect(adapter.committed).toBeGreaterThanOrEqual(1)
     })
 
-    it('suspend serializes state to adapter', () => {
+    it('suspend serializes state as envelope to adapter', () => {
       runtime.suspend()
       expect(adapter.suspendData).toBeTruthy()
-      const parsed = JSON.parse(adapter.suspendData)
-      expect(parsed.currentPage).toBe('page-1')
+      const parsed = JSON.parse(adapter.suspendData) as SuspendEnvelope
+      expect(parsed.v).toBe(CURRENT_SCHEMA_VERSION)
+      expect(parsed.state.currentPage).toBe('page-1')
     })
 
     it('restore does nothing when no suspend data', () => {
@@ -339,6 +340,214 @@ describe('createCourseRuntime', () => {
 
     it('initial state has empty assessments', () => {
       expect(runtime.state.assessments).toEqual({})
+    })
+  })
+
+  describe('suspend_data versioning', () => {
+    it('suspend_data contains schema version and course version', () => {
+      const vConfig: CourseConfig = { ...config, version: '1.0' }
+      const rt = createCourseRuntime(vConfig, adapter)
+      rt.suspend()
+      const envelope = JSON.parse(adapter.suspendData) as SuspendEnvelope
+      expect(envelope.v).toBe(CURRENT_SCHEMA_VERSION)
+      expect(envelope.courseVersion).toBe('1.0')
+      expect(envelope.state).toBeDefined()
+    })
+
+    it('suspend_data without version in config omits courseVersion', () => {
+      runtime.suspend()
+      const envelope = JSON.parse(adapter.suspendData) as SuspendEnvelope
+      expect(envelope.v).toBe(CURRENT_SCHEMA_VERSION)
+      expect(envelope.courseVersion).toBeUndefined()
+    })
+
+    it('restores normally when schema and course version match', () => {
+      const vConfig: CourseConfig = { ...config, version: '1.0' }
+      const rt1 = createCourseRuntime(vConfig, adapter)
+      rt1.navigateTo('page-2')
+      rt1.markComplete('page-1')
+      rt1.suspend()
+
+      const adapter2 = createMockAdapter()
+      adapter2.suspendData = adapter.suspendData
+      const rt2 = createCourseRuntime(vConfig, adapter2)
+      rt2.restore()
+
+      expect(rt2.state.currentPage).toBe('page-2')
+      expect(rt2.state.completions['page-1']).toBe(true)
+    })
+
+    it('resets on incompatible schema version', () => {
+      const envelope: SuspendEnvelope = {
+        v: 999,
+        courseVersion: '1.0',
+        state: {
+          currentPage: 'page-2',
+          pages: ['page-1', 'page-2'],
+          completions: { 'page-1': true },
+          score: null,
+          maxScore: 0,
+          passed: null,
+          attempts: 0,
+          assessments: {},
+          sessionStart: 0,
+          totalTimeMs: 5000,
+        },
+      }
+      adapter.suspendData = JSON.stringify(envelope)
+      const vConfig: CourseConfig = { ...config, version: '1.0' }
+      const rt = createCourseRuntime(vConfig, adapter)
+      rt.restore()
+
+      // Should be reset — initial state
+      expect(rt.state.currentPage).toBe('page-1')
+      expect(rt.state.completions).toEqual({})
+      expect(rt.state.totalTimeMs).toBe(0)
+    })
+
+    it('resets when course version changed and no onMigrate', () => {
+      const envelope: SuspendEnvelope = {
+        v: CURRENT_SCHEMA_VERSION,
+        courseVersion: '1.0',
+        state: {
+          currentPage: 'page-2',
+          pages: ['page-1', 'page-2'],
+          completions: { 'page-1': true },
+          score: null,
+          maxScore: 0,
+          passed: null,
+          attempts: 0,
+          assessments: {},
+          sessionStart: 0,
+          totalTimeMs: 5000,
+        },
+      }
+      adapter.suspendData = JSON.stringify(envelope)
+      const vConfig: CourseConfig = { ...config, version: '2.0' }
+      const rt = createCourseRuntime(vConfig, adapter)
+      rt.restore()
+
+      expect(rt.state.currentPage).toBe('page-1')
+      expect(rt.state.completions).toEqual({})
+    })
+
+    it('calls onMigrate when course version changes', () => {
+      const envelope: SuspendEnvelope = {
+        v: CURRENT_SCHEMA_VERSION,
+        courseVersion: '1.0',
+        state: {
+          currentPage: 'page-1',
+          pages: ['page-1', 'page-2'],
+          completions: { 'old-page': true },
+          score: null,
+          maxScore: 0,
+          passed: null,
+          attempts: 0,
+          assessments: {},
+          sessionStart: 0,
+          totalTimeMs: 3000,
+        },
+      }
+      adapter.suspendData = JSON.stringify(envelope)
+
+      const vConfig: CourseConfig = {
+        ...config,
+        version: '2.0',
+        onMigrate(old, oldVersion) {
+          expect(oldVersion).toBe('1.0')
+          const completions = { ...old.completions }
+          if (completions['old-page']) {
+            completions['page-1'] = true
+            delete completions['old-page']
+          }
+          return { ...old, completions }
+        },
+      }
+      const rt = createCourseRuntime(vConfig, adapter)
+      rt.restore()
+
+      expect(rt.state.completions['page-1']).toBe(true)
+      expect(rt.state.completions['old-page']).toBeUndefined()
+      expect(rt.state.totalTimeMs).toBe(3000)
+      // pages should come from config, not old state
+      expect(rt.state.pages).toEqual(config.pages)
+    })
+
+    it('resets when onMigrate returns null', () => {
+      const envelope: SuspendEnvelope = {
+        v: CURRENT_SCHEMA_VERSION,
+        courseVersion: '1.0',
+        state: {
+          currentPage: 'page-2',
+          pages: ['page-1', 'page-2'],
+          completions: { 'page-1': true },
+          score: null,
+          maxScore: 0,
+          passed: null,
+          attempts: 0,
+          assessments: {},
+          sessionStart: 0,
+          totalTimeMs: 5000,
+        },
+      }
+      adapter.suspendData = JSON.stringify(envelope)
+
+      const vConfig: CourseConfig = {
+        ...config,
+        version: '2.0',
+        onMigrate: () => null,
+      }
+      const rt = createCourseRuntime(vConfig, adapter)
+      rt.restore()
+
+      expect(rt.state.currentPage).toBe('page-1')
+      expect(rt.state.completions).toEqual({})
+    })
+
+    it('safely discards old suspend_data without envelope', () => {
+      // Old format: raw CourseState without envelope wrapper
+      adapter.suspendData = JSON.stringify({
+        currentPage: 'page-2',
+        pages: ['page-1', 'page-2'],
+        completions: { 'page-1': true },
+        score: null,
+        maxScore: 0,
+        passed: null,
+        attempts: 0,
+        assessments: {},
+        sessionStart: 0,
+        totalTimeMs: 5000,
+      })
+      const rt = createCourseRuntime(config, adapter)
+      rt.restore()
+
+      // Should be reset
+      expect(rt.state.currentPage).toBe('page-1')
+      expect(rt.state.completions).toEqual({})
+    })
+
+    it('safely handles corrupt suspend_data', () => {
+      adapter.suspendData = 'not-valid-json{{'
+      const rt = createCourseRuntime(config, adapter)
+      // Should not throw
+      rt.restore()
+      expect(rt.state.currentPage).toBe('page-1')
+    })
+
+    it('backward compatible — no version in config works like before', () => {
+      // Config without version
+      const rt1 = createCourseRuntime(config, adapter)
+      rt1.navigateTo('page-2')
+      rt1.markComplete('page-1')
+      rt1.suspend()
+
+      const adapter2 = createMockAdapter()
+      adapter2.suspendData = adapter.suspendData
+      const rt2 = createCourseRuntime(config, adapter2)
+      rt2.restore()
+
+      expect(rt2.state.currentPage).toBe('page-2')
+      expect(rt2.state.completions['page-1']).toBe(true)
     })
   })
 })
