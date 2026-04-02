@@ -31,9 +31,10 @@ export {
   MultiSelect, MultiSelectContext,
   FillBlank, FillBlankContext,
   Matching, MatchingContext,
+  Ordering, OrderingContext, OrderingItemContext,
   Page, Navigation, Course,
 } from './components/index.ts'
-export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue } from './components/index.ts'
+export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue } from './components/index.ts'
 
 // SCORM packaging (types + manifest only; createScormPackage is Node-only,
 // import it directly from '@kurikulum/core/scorm/package' in build scripts)

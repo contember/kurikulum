@@ -1,6 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { MCQ, MultiSelect, FillBlank, Matching, MCQContext, MultiSelectContext, FillBlankContext, MatchingContext } from '@kurikulum/core'
+import { MCQ, MultiSelect, FillBlank, Matching, Ordering, MCQContext, MultiSelectContext, FillBlankContext, MatchingContext, OrderingContext } from '@kurikulum/core'
 
 export interface QuestionFeedbackProps {
   correct?: ComponentChildren
@@ -13,6 +13,7 @@ export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps):
   const msCtx = useContext(MultiSelectContext)
   const fbCtx = useContext(FillBlankContext)
   const matchCtx = useContext(MatchingContext)
+  const orderCtx = useContext(OrderingContext)
 
   const correctNode = <>{'✓ '}{correct}</>
   const incorrectNode = <>{'✗ '}{incorrect}</>
@@ -40,6 +41,16 @@ export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps):
   if (matchCtx) {
     return (
       <Matching.Feedback
+        correct={correctNode}
+        incorrect={incorrectNode}
+        class={feedbackClass}
+      />
+    )
+  }
+
+  if (orderCtx) {
+    return (
+      <Ordering.Feedback
         correct={correctNode}
         incorrect={incorrectNode}
         class={feedbackClass}
