@@ -16,6 +16,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "build:scorm": "KURIKULUM_TARGET=scorm-1.2 vite build && bun run package",
+    "package": "bun packages/core/src/scorm/package.ts dist Course"
   }
 }

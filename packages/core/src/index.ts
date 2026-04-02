@@ -23,3 +23,9 @@ export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from 
 
 // Adapters
 export { createAdapter, createStandaloneAdapter } from './adapters/index.ts'
+
+// SCORM packaging
+export { generateManifest } from './scorm/manifest.ts'
+export type { ManifestOptions } from './scorm/manifest.ts'
+export { createScormPackage } from './scorm/package.ts'
+export type { PackageOptions } from './scorm/package.ts'

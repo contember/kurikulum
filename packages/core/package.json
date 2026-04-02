@@ -8,6 +8,11 @@
   },
   "devDependencies": {
     "happy-dom": "^20.8.9",
+    "jszip": "^3.10.1",
     "preact": "^10.0.0"
+  },
+  "dependencies": {
+    "@types/archiver": "^7.0.0",
+    "archiver": "^7.0.1"
   }
 }
