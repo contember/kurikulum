@@ -1,7 +1,7 @@
 import { createContext } from 'preact'
 
 export interface AssessmentContextValue {
-  register(id: string, evaluate: () => boolean): () => void
+  register(id: string, evaluate: () => number, weight?: number): () => void
   submitted: boolean
   attempt: number
   submit(): void

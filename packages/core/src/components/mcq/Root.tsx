@@ -6,12 +6,13 @@ import { MCQContext } from './context.ts'
 
 export interface MCQRootProps {
   id: string
+  weight?: number
   children: ComponentChildren
   class?: string
   'aria-label'?: string
 }
 
-export function Root({ id, children, class: className, 'aria-label': ariaLabel }: MCQRootProps): VNode {
+export function Root({ id, weight, children, class: className, 'aria-label': ariaLabel }: MCQRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
   const { markComplete } = useCompletion(id)
   const [selected, setSelected] = useState<number | null>(null)
@@ -34,7 +35,7 @@ export function Root({ id, children, class: className, 'aria-label': ariaLabel }
   // Register evaluate function with Assessment parent
   useEffect(() => {
     if (!assessmentCtx) return
-    return assessmentCtx.register(id, () => selectedRef.current === correctIndex())
+    return assessmentCtx.register(id, () => selectedRef.current === correctIndex() ? 1 : 0, weight)
   }, [id, assessmentCtx])
 
   // Reset on new attempt

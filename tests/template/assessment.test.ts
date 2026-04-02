@@ -626,7 +626,7 @@ describe('Assessment', () => {
     await flushEffects()
     rerender()
 
-    expect(runtime.state.score).toBe(0)
+    expect(runtime.state.score).toBe(0.5)
     expect(runtime.state.passed).toBe(false)
   })
 
@@ -898,5 +898,299 @@ describe('QuestionFeedback a11y', () => {
 
     expect(container.textContent).toContain('✗')
     expect(container.textContent).toContain('Try again.')
+  })
+})
+
+describe('Weighted scoring', () => {
+  it('MCQ evaluator returns 0 or 1', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0])
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(runtime.state.score).toBe(1)
+    expect(runtime.state.maxScore).toBe(1)
+  })
+
+  it('weight prop affects score calculation', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    // q1 weight=2 (correct), q2 weight=3 (incorrect)
+    // weightedScore = 1*2 + 0*3 = 2, totalWeight = 5
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1', weight: 2 },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+        h(MCQ, { id: 'q2', question: 'Q2', weight: 3 },
+          h(Option, null, 'Wrong'),
+          h(Option, { correct: true }, 'Right'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // q1: correct
+    rerender()
+    fireChange(inputs[2]) // q2: wrong (first option of q2)
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(runtime.state.score).toBe(2)
+    expect(runtime.state.maxScore).toBe(5)
+    // 2/5 = 0.4 < 0.5 → failed
+    expect(runtime.state.passed).toBe(false)
+  })
+
+  it('default weight is 1', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+        h(MCQ, { id: 'q2', question: 'Q2' },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // q1: correct
+    rerender()
+    fireChange(inputs[2]) // q2: correct
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    expect(runtime.state.score).toBe(2)
+    expect(runtime.state.maxScore).toBe(2)
+    expect(runtime.state.passed).toBe(true)
+  })
+})
+
+describe('MultiSelect partial credit', () => {
+  it('gives full credit for all correct selected', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MultiSelect, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, { correct: true }, 'B'),
+          h(Option, null, 'C'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // A correct
+    rerender()
+    fireChange(inputs[1]) // B correct
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // (2 - 0) / 2 = 1.0
+    expect(runtime.state.score).toBe(1)
+    expect(runtime.state.maxScore).toBe(1)
+  })
+
+  it('gives partial credit for some correct selected', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MultiSelect, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, { correct: true }, 'B'),
+          h(Option, null, 'C'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // A correct only
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // (1 - 0) / 2 = 0.5
+    expect(runtime.state.score).toBe(0.5)
+    expect(runtime.state.maxScore).toBe(1)
+  })
+
+  it('penalizes incorrect selections', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MultiSelect, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, { correct: true }, 'B'),
+          h(Option, null, 'C'),
+          h(Option, null, 'D'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // A correct
+    rerender()
+    fireChange(inputs[2]) // C incorrect
+    rerender()
+    fireChange(inputs[3]) // D incorrect
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // (1 - 2) / 2 = -0.5 → max(0, -0.5) = 0
+    expect(runtime.state.score).toBe(0)
+    expect(runtime.state.maxScore).toBe(1)
+  })
+
+  it('gives zero when no correct selected and one incorrect', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MultiSelect, { id: 'q1', question: 'Q?' },
+          h(Option, { correct: true }, 'A'),
+          h(Option, null, 'B'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[1]) // B incorrect
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // (0 - 1) / 1 = -1 → max(0, -1) = 0
+    expect(runtime.state.score).toBe(0)
+    expect(runtime.state.maxScore).toBe(1)
+  })
+
+  it('MultiSelect with weight in assessment', async () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    // MCQ weight=1 (correct), MultiSelect weight=3 (partial: 1 of 2 correct)
+    const { container, rerender } = renderWithContext(ctx, () =>
+      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
+        h(MCQ, { id: 'q1', question: 'Q1', weight: 1 },
+          h(Option, { correct: true }, 'Right'),
+          h(Option, null, 'Wrong'),
+        ),
+        h(MultiSelect, { id: 'q2', question: 'Q2', weight: 3 },
+          h(Option, { correct: true }, 'A'),
+          h(Option, { correct: true }, 'B'),
+          h(Option, null, 'C'),
+        ),
+      ),
+    )
+
+    await flushEffects()
+
+    const inputs = container.getElementsByTagName('input')
+    fireChange(inputs[0]) // q1: correct → 1
+    rerender()
+    fireChange(inputs[2]) // q2: select first correct only → 0.5
+    rerender()
+
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn.click()
+    rerender()
+
+    await flushEffects()
+    rerender()
+
+    // weightedScore = 1*1 + 0.5*3 = 2.5, totalWeight = 4
+    expect(runtime.state.score).toBe(2.5)
+    expect(runtime.state.maxScore).toBe(4)
+    // 2.5/4 = 0.625 > 0.5 → passed
+    expect(runtime.state.passed).toBe(true)
   })
 })

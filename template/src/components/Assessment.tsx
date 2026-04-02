@@ -18,7 +18,7 @@ export function Assessment({ id, passThreshold, maxAttempts, children }: Assessm
       <A.Status class="mt-4 outline-none">
         {({ score, maxScore, passed }) => (
           <>
-            <p>Skóre: {score}/{maxScore}</p>
+            <p>Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}</p>
             {passed === true ? <p class="text-success">✓ Splněno!</p> : null}
             {passed === false ? <p class="text-danger">✗ Nesplněno.</p> : null}
           </>

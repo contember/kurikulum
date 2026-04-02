@@ -6,12 +6,13 @@ import { MultiSelectContext } from './context.ts'
 
 export interface MultiSelectRootProps {
   id: string
+  weight?: number
   children: ComponentChildren
   class?: string
   'aria-label'?: string
 }
 
-export function Root({ id, children, class: className, 'aria-label': ariaLabel }: MultiSelectRootProps): VNode {
+export function Root({ id, weight, children, class: className, 'aria-label': ariaLabel }: MultiSelectRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
   const { markComplete } = useCompletion(id)
   const [selected, setSelected] = useState<Set<number>>(new Set())
@@ -37,20 +38,30 @@ export function Root({ id, children, class: className, 'aria-label': ariaLabel }
     return result
   }
 
-  const evaluate = (): boolean => {
+  const evaluate = (): number => {
     const sel = selectedRef.current
     const correct = correctIndices()
-    if (sel.size !== correct.size) return false
-    for (const idx of correct) {
-      if (!sel.has(idx)) return false
+    const totalCorrect = correct.size
+    if (totalCorrect === 0) return 1
+
+    let correctSelected = 0
+    let incorrectSelected = 0
+
+    for (const idx of sel) {
+      if (correct.has(idx)) {
+        correctSelected++
+      } else {
+        incorrectSelected++
+      }
     }
-    return true
+
+    return Math.max(0, (correctSelected - incorrectSelected) / totalCorrect)
   }
 
   // Register evaluate function with Assessment parent
   useEffect(() => {
     if (!assessmentCtx) return
-    return assessmentCtx.register(id, evaluate)
+    return assessmentCtx.register(id, evaluate, weight)
   }, [id, assessmentCtx])
 
   // Reset on new attempt
@@ -62,7 +73,7 @@ export function Root({ id, children, class: className, 'aria-label': ariaLabel }
   }, [assessmentCtx?.attempt])
 
   const submitted = assessmentCtx ? assessmentCtx.submitted : localSubmitted
-  const isCorrect = submitted ? evaluate() : null
+  const isCorrect = submitted ? evaluate() === 1 : null
 
   // Mark complete on submit
   const markedRef = useRef(false)

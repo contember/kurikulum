@@ -15,26 +15,26 @@ export function Root({ id, passThreshold, maxAttempts, children, class: classNam
   const runtime = useCourse()
   const [submitted, setSubmitted] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const evaluatorsRef = useRef<Map<string, () => boolean>>(new Map())
+  const evaluatorsRef = useRef<Map<string, { evaluate: () => number; weight: number }>>(new Map())
 
-  const register = useCallback((qId: string, evaluate: () => boolean) => {
-    evaluatorsRef.current.set(qId, evaluate)
+  const register = useCallback((qId: string, evaluate: () => number, weight: number = 1) => {
+    evaluatorsRef.current.set(qId, { evaluate, weight })
     return () => { evaluatorsRef.current.delete(qId) }
   }, [])
 
   const submit = useCallback(() => {
     const evaluators = evaluatorsRef.current
-    let correct = 0
-    let total = 0
+    let totalWeight = 0
+    let weightedScore = 0
 
-    for (const [, evaluate] of evaluators) {
-      total++
-      if (evaluate()) correct++
+    for (const [, { evaluate, weight }] of evaluators) {
+      totalWeight += weight
+      weightedScore += evaluate() * weight
     }
 
-    if (total === 0) return
+    if (totalWeight === 0) return
 
-    runtime.submitScore(correct, total, passThreshold)
+    runtime.submitScore(weightedScore, totalWeight, passThreshold)
     setSubmitted(true)
   }, [runtime, passThreshold])
 
