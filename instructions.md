@@ -29,7 +29,7 @@
 | 4 | Hooky — useCourse, useNavigation, useCompletion, useAssessment, usePage | [spec/04-hooks.md](spec/04-hooks.md) | `[x]` |
 | 5 | CourseProvider — Preact context, inicializace runtime, restore/suspend | [spec/05-course-provider.md](spec/05-course-provider.md) | `[x]` |
 | 6 | Standalone adapter — DeliveryAdapter interface, localStorage persistence | [spec/06-standalone-adapter.md](spec/06-standalone-adapter.md) | `[x]` |
-| 7 | Template layout — Course, Page, Navigation komponenty | [spec/07-template-layout.md](spec/07-template-layout.md) | `[ ]` |
+| 7 | Template layout — Course, Page, Navigation komponenty | [spec/07-template-layout.md](spec/07-template-layout.md) | `[x]` |
 | 8 | Template content — Text, Image, Video komponenty | [spec/08-template-content.md](spec/08-template-content.md) | `[ ]` |
 | 9 | Template assessment — MCQ, MultiSelect, Option, Assessment, QuestionFeedback | [spec/09-template-assessment.md](spec/09-template-assessment.md) | `[ ]` |
 | 10 | Accessibility — WCAG 2.1 AA, keyboard nav, ARIA, focus management | [spec/10-a11y.md](spec/10-a11y.md) | `[ ]` |
