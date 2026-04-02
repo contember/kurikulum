@@ -23,6 +23,9 @@ import type { CourseContextValue } from '@kurikulum/core'
 import { Course } from './Course.tsx'
 import { Page } from './Page.tsx'
 import { Navigation } from './Navigation.tsx'
+import { Text } from './Text.tsx'
+import { Image } from './Image.tsx'
+import { Video } from './Video.tsx'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -335,5 +338,112 @@ describe('Navigation', () => {
     render(h(App, null), container)
     expect(container.textContent).toContain('1 / 3')
     expect(runtime.state.currentPage).toBe('page-1')
+  })
+})
+
+describe('Text', () => {
+  it('renders children in a prose div', () => {
+    const container = document.createElement('div')
+    render(h(Text, null, 'Hello world'), container)
+
+    expect(container.textContent).toContain('Hello world')
+    const div = container.firstElementChild as HTMLElement
+    expect(div.tagName).toBe('DIV')
+    expect(div.className).toContain('prose')
+  })
+})
+
+describe('Image', () => {
+  it('renders figure with img and alt text', () => {
+    const container = document.createElement('div')
+    render(h(Image, { src: '/photo.jpg', alt: 'A photo' }), container)
+
+    const figures = container.getElementsByTagName('figure')
+    expect(figures.length).toBe(1)
+
+    const imgs = container.getElementsByTagName('img')
+    expect(imgs.length).toBe(1)
+    expect(imgs[0].getAttribute('src')).toBe('/photo.jpg')
+    expect(imgs[0].getAttribute('alt')).toBe('A photo')
+    expect(imgs[0].className).toContain('max-w-full')
+  })
+
+  it('renders figcaption when caption is provided', () => {
+    const container = document.createElement('div')
+    render(h(Image, { src: '/photo.jpg', alt: 'A photo', caption: 'My caption' }), container)
+
+    const captions = container.getElementsByTagName('figcaption')
+    expect(captions.length).toBe(1)
+    expect(captions[0].textContent).toBe('My caption')
+  })
+
+  it('does not render figcaption without caption', () => {
+    const container = document.createElement('div')
+    render(h(Image, { src: '/photo.jpg', alt: 'A photo' }), container)
+
+    const captions = container.getElementsByTagName('figcaption')
+    expect(captions.length).toBe(0)
+  })
+})
+
+describe('Video', () => {
+  it('renders video with controls', () => {
+    const container = document.createElement('div')
+    render(h(Video, { src: '/video.mp4' }), container)
+
+    const figures = container.getElementsByTagName('figure')
+    expect(figures.length).toBe(1)
+
+    const videos = container.getElementsByTagName('video')
+    expect(videos.length).toBe(1)
+    expect(videos[0].getAttribute('src')).toBe('/video.mp4')
+    expect(videos[0].hasAttribute('controls')).toBe(true)
+  })
+
+  it('renders with poster', () => {
+    const container = document.createElement('div')
+    render(h(Video, { src: '/video.mp4', poster: '/poster.jpg' }), container)
+
+    const videos = container.getElementsByTagName('video')
+    expect(videos[0].getAttribute('poster')).toBe('/poster.jpg')
+  })
+
+  it('renders figcaption when caption is provided', () => {
+    const container = document.createElement('div')
+    render(h(Video, { src: '/video.mp4', caption: 'Video caption' }), container)
+
+    const captions = container.getElementsByTagName('figcaption')
+    expect(captions.length).toBe(1)
+    expect(captions[0].textContent).toBe('Video caption')
+  })
+
+  it('does not render figcaption without caption', () => {
+    const container = document.createElement('div')
+    render(h(Video, { src: '/video.mp4' }), container)
+
+    const captions = container.getElementsByTagName('figcaption')
+    expect(captions.length).toBe(0)
+  })
+
+  it('works inside a Page component', () => {
+    const adapter = createMockAdapter()
+    const runtime = createCourseRuntime(config, adapter)
+    const ctx = createTestContext(runtime)
+
+    const container = document.createElement('div')
+    render(
+      h(CourseContext.Provider, { value: ctx } as any,
+        h(Page, { id: 'page-1', completion: 'manual' },
+          h(Text, null, 'Some text'),
+          h(Image, { src: '/img.png', alt: 'Image' }),
+          h(Video, { src: '/vid.mp4' }),
+        ),
+      ),
+      container,
+    )
+
+    expect(container.textContent).toContain('Some text')
+    expect(container.getElementsByTagName('img').length).toBe(1)
+    expect(container.getElementsByTagName('video').length).toBe(1)
   })
 })
