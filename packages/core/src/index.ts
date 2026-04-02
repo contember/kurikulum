@@ -13,3 +13,10 @@ export {
   CompletableRegistry,
 } from './completion.ts'
 export type { CompletionHandler } from './completion.ts'
+
+// Context
+export { CourseContext, createNotifier } from './context.ts'
+export type { CourseContextValue } from './context.ts'
+
+// Hooks
+export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from './hooks/index.ts'

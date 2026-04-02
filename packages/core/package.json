@@ -5,5 +5,9 @@
   "main": "src/index.ts",
   "peerDependencies": {
     "preact": "^10.0.0"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.8.9",
+    "preact": "^10.0.0"
   }
 }
