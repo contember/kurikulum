@@ -51,5 +51,5 @@
 | 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[x]` |
 | 22 | Podmíněná navigace — when prop na Page, branching, remediace | [spec/22-conditional-navigation.md](spec/22-conditional-navigation.md) | `[x]` |
 | 23 | Historie pokusů — log skóre per pokus, Assessment.History component | [spec/23-attempt-history.md](spec/23-attempt-history.md) | `[x]` |
-| 24 | SCORM 2004 adapter — API_1484_11, split status, ISO 8601, scaled score | [spec/24-scorm-2004.md](spec/24-scorm-2004.md) | `[ ]` |
+| 24 | SCORM 2004 adapter — API_1484_11, split status, ISO 8601, scaled score | [spec/24-scorm-2004.md](spec/24-scorm-2004.md) | `[x]` |
 | 25 | Verzování suspend_data — envelope s verzí, migrace, bezpečný reset | [spec/25-suspend-data-versioning.md](spec/25-suspend-data-versioning.md) | `[ ]` |
