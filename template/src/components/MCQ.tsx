@@ -80,7 +80,7 @@ export function MCQ({ id, question, children }: MCQProps): VNode {
             onChange: () => { if (!submitted) setSelected(i) },
             disabled: submitted,
             'aria-disabled': submitted,
-            class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
+            class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           }),
           h('span', null, option.content),
         ),
@@ -91,7 +91,7 @@ export function MCQ({ id, question, children }: MCQProps): VNode {
           onClick: () => { if (selected !== null) setLocalSubmitted(true) },
           disabled: selected === null,
           'aria-disabled': selected === null,
-          class: 'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 rounded',
+          class: 'mt-2 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         }, 'Odeslat')
         : null,
       ...feedbacks,

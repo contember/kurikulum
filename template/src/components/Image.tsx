@@ -14,6 +14,6 @@ export function Image({ src, alt, caption }: ImageProps): VNode {
       alt,
       class: 'max-w-full h-auto',
     }),
-    caption ? h('figcaption', { class: 'mt-2 text-sm text-gray-600' }, caption) : null,
+    caption ? h('figcaption', { class: 'mt-2 text-sm text-text-secondary' }, caption) : null,
   )
 }

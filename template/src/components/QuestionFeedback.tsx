@@ -33,7 +33,7 @@ export function QuestionFeedback({ correct, incorrect }: QuestionFeedbackProps):
     role: 'status',
     'aria-live': 'polite',
     class: ctx!.correct
-      ? 'mt-2 text-green-700 outline-none'
-      : 'mt-2 text-red-700 outline-none',
+      ? 'mt-2 text-success outline-none'
+      : 'mt-2 text-danger outline-none',
   }, icon, message)
 }

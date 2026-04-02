@@ -63,23 +63,23 @@ export function Assessment({ id, passThreshold, maxAttempts, children }: Assessm
         ? h('button', {
           type: 'button',
           onClick: handleSubmit,
-          class: 'mt-4 px-4 py-2 bg-blue-600 text-white rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
+          class: 'mt-4 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         }, 'Odeslat')
         : null,
       submitted
         ? h('div', { ref: statusRef, tabIndex: -1, class: 'mt-4 outline-none', role: 'status', 'aria-live': 'polite' },
           h('p', null, `Skóre: ${score}/${maxScore}`),
-          passed === true ? h('p', { class: 'text-green-700' }, '✓ Splněno!') : null,
-          passed === false ? h('p', { class: 'text-red-700' }, '✗ Nesplněno.') : null,
+          passed === true ? h('p', { class: 'text-success' }, '✓ Splněno!') : null,
+          passed === false ? h('p', { class: 'text-danger' }, '✗ Nesplněno.') : null,
           canRetry
             ? h('button', {
               type: 'button',
               onClick: handleRetry,
-              class: 'mt-2 px-4 py-2 bg-gray-600 text-white rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
+              class: 'mt-2 px-4 py-2 bg-text-secondary text-white rounded-default hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
             }, 'Zkusit znovu')
             : null,
           attemptsExhausted
-            ? h('p', { class: 'text-gray-600' }, `Vyčerpány všechny pokusy (${maxAttempts}).`)
+            ? h('p', { class: 'text-text-secondary' }, `Vyčerpány všechny pokusy (${maxAttempts}).`)
             : null,
         )
         : null,

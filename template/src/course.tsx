@@ -1,6 +1,6 @@
 import { render } from 'preact';
 import { VERSION } from '@kurikulum/core';
-import './app.css';
+import './styles.css';
 
 function Course() {
   return (

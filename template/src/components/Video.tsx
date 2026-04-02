@@ -15,6 +15,6 @@ export function Video({ src, poster, caption }: VideoProps): VNode {
       poster,
       class: 'max-w-full',
     }),
-    caption ? h('figcaption', { class: 'mt-2 text-sm text-gray-600' }, caption) : null,
+    caption ? h('figcaption', { class: 'mt-2 text-sm text-text-secondary' }, caption) : null,
   )
 }
