@@ -47,7 +47,7 @@
 | 17 | Fill-in-the-blank — textový input s validací (string, pole, regex) | [spec/17-fill-in-the-blank.md](spec/17-fill-in-the-blank.md) | `[x]` |
 | 18 | Matching — přiřazování prompt→response, dropdown, partial credit | [spec/18-matching.md](spec/18-matching.md) | `[x]` |
 | 19 | Ordering — řazení položek, move up/down, partial credit | [spec/19-ordering.md](spec/19-ordering.md) | `[x]` |
-| 20 | Multi-assessment per kurz — nezávislé skóre, vážený celkový výsledek | [spec/20-multi-assessment.md](spec/20-multi-assessment.md) | `[ ]` |
+| 20 | Multi-assessment per kurz — nezávislé skóre, vážený celkový výsledek | [spec/20-multi-assessment.md](spec/20-multi-assessment.md) | `[x]` |
 | 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[ ]` |
 | 22 | Podmíněná navigace — when prop na Page, branching, remediace | [spec/22-conditional-navigation.md](spec/22-conditional-navigation.md) | `[ ]` |
 | 23 | Historie pokusů — log skóre per pokus, Assessment.History component | [spec/23-attempt-history.md](spec/23-attempt-history.md) | `[ ]` |
