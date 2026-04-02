@@ -19,7 +19,7 @@
 - **Nerozbij existující kód.** Před commitem spusť `bun test` na celém projektu.
 - **Drž se specifikace.** Nepřidávej features navíc, nerefaktoruj existující kód mimo scope issue.
 
-## Issues
+## Issues — v1 (hotovo)
 
 | # | Issue | Spec | Status |
 |---|-------|------|--------|
@@ -38,3 +38,18 @@
 | 13 | SCORM 1.2 adapter — CMI mapování, API discovery, fallback | [spec/13-scorm-adapter.md](spec/13-scorm-adapter.md) | `[x]` |
 | 14 | SCORM packaging — imsmanifest.xml generátor, ZIP balení | [spec/14-scorm-packaging.md](spec/14-scorm-packaging.md) | `[x]` |
 | 15 | E2E test — testovací kurz, standalone + SCORM ověření | [spec/15-e2e-test.md](spec/15-e2e-test.md) | `[x]` |
+
+## Issues — v2
+
+| # | Issue | Spec | Status |
+|---|-------|------|--------|
+| 16 | Vážené skórování a partial credit — weighted evaluators, MultiSelect partial scoring | [spec/16-weighted-scoring.md](spec/16-weighted-scoring.md) | `[ ]` |
+| 17 | Fill-in-the-blank — textový input s validací (string, pole, regex) | [spec/17-fill-in-the-blank.md](spec/17-fill-in-the-blank.md) | `[ ]` |
+| 18 | Matching — přiřazování prompt→response, dropdown, partial credit | [spec/18-matching.md](spec/18-matching.md) | `[ ]` |
+| 19 | Ordering — řazení položek, move up/down, partial credit | [spec/19-ordering.md](spec/19-ordering.md) | `[ ]` |
+| 20 | Multi-assessment per kurz — nezávislé skóre, vážený celkový výsledek | [spec/20-multi-assessment.md](spec/20-multi-assessment.md) | `[ ]` |
+| 21 | SCORM interaction logging — cmi.interactions.*, per-question audit trail | [spec/21-scorm-interactions.md](spec/21-scorm-interactions.md) | `[ ]` |
+| 22 | Podmíněná navigace — when prop na Page, branching, remediace | [spec/22-conditional-navigation.md](spec/22-conditional-navigation.md) | `[ ]` |
+| 23 | Historie pokusů — log skóre per pokus, Assessment.History component | [spec/23-attempt-history.md](spec/23-attempt-history.md) | `[ ]` |
+| 24 | SCORM 2004 adapter — API_1484_11, split status, ISO 8601, scaled score | [spec/24-scorm-2004.md](spec/24-scorm-2004.md) | `[ ]` |
+| 25 | Verzování suspend_data — envelope s verzí, migrace, bezpečný reset | [spec/25-suspend-data-versioning.md](spec/25-suspend-data-versioning.md) | `[ ]` |

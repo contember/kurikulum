@@ -19,7 +19,7 @@ Opinionated SDK na tvorbu e-learningových kurzů v JSX (Preact). Autor kurzu p�
 - Žádné CLI, žádné virtual modules
 - A11y zahrnutá od začátku
 
-## Implementační kroky
+## Implementační kroky — v1 (hotovo)
 
 1. [Monorepo scaffold](./01-monorepo-scaffold.md)
 2. [CourseState + CourseRuntime](./02-course-runtime.md)
@@ -36,3 +36,16 @@ Opinionated SDK na tvorbu e-learningových kurzů v JSX (Preact). Autor kurzu p�
 13. [SCORM 1.2 adapter](./13-scorm-adapter.md)
 14. [SCORM manifest + ZIP](./14-scorm-packaging.md)
 15. [E2E test](./15-e2e-test.md)
+
+## Roadmap — v2
+
+16. [Vážené skórování a partial credit](./16-weighted-scoring.md)
+17. [Fill-in-the-blank komponenta](./17-fill-in-the-blank.md)
+18. [Matching komponenta (přiřazování)](./18-matching.md)
+19. [Ordering komponenta (řazení)](./19-ordering.md)
+20. [Více nezávislých assessmentů per kurz](./20-multi-assessment.md)
+21. [SCORM interaction logging](./21-scorm-interactions.md)
+22. [Podmíněná navigace a branching](./22-conditional-navigation.md)
+23. [Historie pokusů](./23-attempt-history.md)
+24. [SCORM 2004 adapter](./24-scorm-2004.md)
+25. [Verzování suspend_data](./25-suspend-data-versioning.md)
