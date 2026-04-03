@@ -1,0 +1,60 @@
+import type { ComponentChildren, VNode } from 'preact'
+import { useState, useCallback, useMemo, useEffect, useContext } from 'preact/hooks'
+import { SearchContext } from './context.ts'
+import type { SearchEntry } from './context.ts'
+import { searchEntries } from './search-engine.ts'
+import { CourseContext } from '../../context.tsx'
+
+export interface SearchRootProps {
+  index: SearchEntry[]
+  children?: ComponentChildren
+}
+
+export function Root({ index, children }: SearchRootProps): VNode {
+  const [query, setQuery] = useState('')
+  const [isOpen, setIsOpen] = useState(false)
+
+  const courseCtx = useContext(CourseContext)
+
+  const open = useCallback(() => setIsOpen(true), [])
+  const close = useCallback(() => {
+    setIsOpen(false)
+    setQuery('')
+  }, [])
+
+  const results = useMemo(() => searchEntries(index, query), [index, query])
+
+  const navigateTo = useCallback(
+    (pageId: string) => {
+      if (courseCtx) {
+        courseCtx.runtime.navigateTo(pageId)
+      }
+      setIsOpen(false)
+      setQuery('')
+    },
+    [courseCtx],
+  )
+
+  // Ctrl+K / Cmd+K keyboard shortcut
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsOpen((v) => !v)
+      }
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [])
+
+  const ctxValue = useMemo(
+    () => ({ query, setQuery, results, isOpen, open, close, navigateTo }),
+    [query, results, isOpen, open, close, navigateTo],
+  )
+
+  return (
+    <SearchContext.Provider value={ctxValue}>
+      {children}
+    </SearchContext.Provider>
+  )
+}

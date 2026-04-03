@@ -17,6 +17,8 @@ import { Ordering, OrderingItem } from './components/Ordering.tsx'
 import { QuestionFeedback } from './components/QuestionFeedback.tsx'
 import { AudioPlayer } from './components/AudioPlayer.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
+import { Search, SearchButton, SearchModal } from './components/Search.tsx'
+import searchIndex from 'virtual:search-index'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
@@ -68,9 +70,11 @@ function quizPassed(): boolean {
 function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
+      <Search index={searchIndex}>
       <div class="h-screen flex flex-col bg-bg text-text font-sans">
         <Course>
           <ResumeDialog />
+          <SearchModal />
           <RuntimeRef />
           {/* Page 1: Úvod – completion="mount" (okamžitě po zobrazení) */}
           <Page id="intro" completion="mount">
@@ -327,8 +331,12 @@ function App() {
             />
           </Page>
         </Course>
-        <Navigation />
+        <div class="flex items-center justify-between gap-4 p-4 border-t border-border bg-bg-surface">
+          <SearchButton />
+          <Navigation />
+        </div>
       </div>
+      </Search>
     </CourseProvider>
   )
 }

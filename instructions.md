@@ -65,4 +65,4 @@
 | 30 | Learner notes — poznámky per stránka, persistence v suspend_data | [spec/30-learner-notes.md](spec/30-learner-notes.md) | `[x]` |
 | 31 | Assessment timer — časový limit, countdown, auto-submit | [spec/31-assessment-timer.md](spec/31-assessment-timer.md) | `[x]` |
 | 32 | xAPI adapter — xAPI statements, LRS komunikace, cmi5 packaging | [spec/32-xapi-adapter.md](spec/32-xapi-adapter.md) | `[x]` |
-| 33 | Fulltext search — build-time index, search UI, navigace na výsledek | [spec/33-fulltext-search.md](spec/33-fulltext-search.md) | `[ ]` |
+| 33 | Fulltext search — build-time index, search UI, navigace na výsledek | [spec/33-fulltext-search.md](spec/33-fulltext-search.md) | `[x]` |
