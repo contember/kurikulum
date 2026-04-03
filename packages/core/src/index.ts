@@ -1,6 +1,6 @@
 export const VERSION = '0.1.0';
 
-export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, AssessmentResult, AttemptRecord, AttemptAnswer, InteractionRecord, SuspendEnvelope } from './types.ts'
+export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, AssessmentResult, AttemptRecord, AttemptAnswer, InteractionRecord, SuspendEnvelope, RestoreInfo } from './types.ts'
 export { createCourseRuntime, CURRENT_SCHEMA_VERSION } from './runtime.ts'
 export {
   resolveCompletionStrategy,
@@ -19,7 +19,8 @@ export { CourseContext, createNotifier, CourseProvider } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // Hooks
-export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio } from './hooks/index.ts'
+export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio, useRestore } from './hooks/index.ts'
+export type { RestoreContext } from './hooks/index.ts'
 
 // Adapters
 export { createAdapter, createStandaloneAdapter, createScorm2004Adapter } from './adapters/index.ts'

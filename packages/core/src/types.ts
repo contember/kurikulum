@@ -44,6 +44,11 @@ export interface CourseState {
   totalTimeMs: number
 }
 
+export interface RestoreInfo {
+  restored: boolean
+  storedPage: string | null
+}
+
 export interface CourseRuntime {
   state: CourseState
 
@@ -66,7 +71,8 @@ export interface CourseRuntime {
 
   // Lifecycle
   suspend(): void
-  restore(): void
+  restore(): RestoreInfo
+  reset(): void
 }
 
 export type CompletionStrategy = 'mount' | 'timer' | 'scroll' | 'manual' | 'interactive'

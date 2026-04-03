@@ -55,6 +55,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
         return cond ? cond() : true
       })
     },
+    restoreInfo: { restored: false, storedPage: null },
+    restoreDismissed: false,
+    dismissRestore() { notify() },
   }
 }
 

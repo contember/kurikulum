@@ -91,6 +91,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     defaultCompletion: config.defaultCompletion ?? 'mount',
     pageConditions: {},
     getVisiblePages: () => [],
+    restoreInfo: { restored: false, storedPage: null },
+    restoreDismissed: false,
+    dismissRestore() { notify() },
   }
 }
 

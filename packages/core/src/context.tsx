@@ -1,7 +1,7 @@
 import { createContext } from 'preact'
 import type { ComponentChildren, VNode } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
-import type { CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter } from './types.ts'
+import type { CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, RestoreInfo } from './types.ts'
 import { createCourseRuntime } from './runtime.ts'
 
 export interface CourseContextValue {
@@ -12,6 +12,9 @@ export interface CourseContextValue {
   pageCompletions?: Record<string, CompletionStrategy>
   pageConditions: Record<string, () => boolean>
   getVisiblePages(): string[]
+  restoreInfo: RestoreInfo
+  restoreDismissed: boolean
+  dismissRestore(): void
 }
 
 export const CourseContext = createContext<CourseContextValue | null>(null)
@@ -111,6 +114,12 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
       defaultCompletion: config.defaultCompletion ?? 'mount',
       pageConditions,
       getVisiblePages,
+      restoreInfo: { restored: false, storedPage: null },
+      restoreDismissed: false,
+      dismissRestore() {
+        ref.current!.restoreDismissed = true
+        notify()
+      },
     }
   }
 
@@ -119,7 +128,8 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
 
   if (!initialized.current) {
     initialized.current = true
-    ctx.runtime.restore()
+    const info = ctx.runtime.restore()
+    ctx.restoreInfo = info
   }
 
   useEffect(() => {

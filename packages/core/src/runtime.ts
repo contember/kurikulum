@@ -1,4 +1,4 @@
-import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter, SuspendEnvelope } from './types.ts'
+import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter, RestoreInfo, SuspendEnvelope } from './types.ts'
 
 export const CURRENT_SCHEMA_VERSION = 1
 
@@ -136,22 +136,23 @@ export function createCourseRuntime(
       adapter.commit()
     },
 
-    restore() {
+    restore(): RestoreInfo {
+      const noRestore: RestoreInfo = { restored: false, storedPage: null }
       const data = adapter.getSuspendData()
-      if (!data) return
+      if (!data) return noRestore
 
       let parsed: unknown
       try {
         parsed = JSON.parse(data)
       } catch {
         console.warn('[kurikulum] Invalid suspend_data JSON, resetting')
-        return
+        return noRestore
       }
 
       // Old format (no envelope) — safely discard
       if (!parsed || typeof parsed !== 'object' || !('v' in parsed)) {
         console.warn('[kurikulum] Legacy suspend_data without envelope, resetting')
-        return
+        return noRestore
       }
 
       const envelope = parsed as SuspendEnvelope
@@ -159,7 +160,7 @@ export function createCourseRuntime(
       // Schema version mismatch → reset
       if (envelope.v !== CURRENT_SCHEMA_VERSION) {
         console.warn('[kurikulum] Incompatible suspend_data schema, resetting')
-        return
+        return noRestore
       }
 
       // Course version changed → try migration
@@ -173,11 +174,11 @@ export function createCourseRuntime(
             if (!config.pages.includes(state.currentPage)) {
               state.currentPage = config.pages[0] ?? ''
             }
-            return
+            return { restored: true, storedPage: state.currentPage }
           }
         }
         console.warn('[kurikulum] Course version changed, resetting progress')
-        return
+        return noRestore
       }
 
       // Same version → normal restore
@@ -188,6 +189,17 @@ export function createCourseRuntime(
       if (!pages.includes(state.currentPage)) {
         state.currentPage = pages[0] ?? ''
       }
+      return { restored: true, storedPage: state.currentPage }
+    },
+
+    reset() {
+      const initial = createInitialState(config)
+      Object.assign(state, initial)
+      adapter.setSuspendData('')
+      adapter.setLocation(state.currentPage)
+      adapter.setScore(0, 0)
+      adapter.setStatus('incomplete')
+      debouncedCommit()
     },
   }
 

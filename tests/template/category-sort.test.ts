@@ -79,6 +79,9 @@ function createTestContext(runtime: CourseRuntime, adapter?: DeliveryAdapter): C
     defaultCompletion: config.defaultCompletion ?? 'mount',
     pageConditions: {},
     getVisiblePages: () => [],
+    restoreInfo: { restored: false, storedPage: null },
+    restoreDismissed: false,
+    dismissRestore() { notify() },
   }
 }
 
