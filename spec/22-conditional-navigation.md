@@ -67,7 +67,7 @@ Navigace (`nextPage`, `prevPage`) přeskakuje stránky kde `when` vrací `false`
 ```typescript
 interface PageRootProps {
   // ... stávající ...
-  when?: () => boolean   // default: () => true
+  when?: (runtime: CourseRuntime) => boolean   // default: () => true
 }
 ```
 
@@ -92,7 +92,7 @@ Zobrazuje progress jen z viditelných stránek.
   </Page>
 
   <Page id="theory" completion="timer" completionTimer={10}
-        when={() => !runtime.isComplete('pre-test') || !runtime.state.passed}>
+        when={(rt) => !rt.isComplete('pre-test') || !rt.state.passed}>
     <Text>Teoretická část...</Text>
   </Page>
 
@@ -101,12 +101,12 @@ Zobrazuje progress jen z viditelných stránek.
   </Page>
 
   <Page id="certificate" completion="mount"
-        when={() => runtime.state.passed}>
+        when={(rt) => rt.state.passed}>
     <Text>Gratulujeme!</Text>
   </Page>
 
   <Page id="retry-info" completion="manual"
-        when={() => runtime.state.passed === false}>
+        when={(rt) => rt.state.passed === false}>
     <Text>Bohužel jste nesplnili...</Text>
   </Page>
 </Course>

@@ -10,7 +10,7 @@ export interface CourseContextValue {
   subscribe(listener: () => void): () => void
   defaultCompletion: CompletionStrategy
   pageCompletions?: Record<string, CompletionStrategy>
-  pageConditions: Record<string, () => boolean>
+  pageConditions: Record<string, (runtime: CourseRuntime) => boolean>
   getVisiblePages(): string[]
   restoreInfo: RestoreInfo
   restoreDismissed: boolean
@@ -68,12 +68,12 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
     const runtime = createCourseRuntime(config, resolvedAdapter)
     const { subscribe, notify } = createNotifier()
 
-    const pageConditions: Record<string, () => boolean> = {}
+    const pageConditions: Record<string, (runtime: CourseRuntime) => boolean> = {}
 
     function getVisiblePages(): string[] {
       return runtime.state.pages.filter(id => {
         const cond = pageConditions[id]
-        return cond ? cond() : true
+        return cond ? cond(runtime) : true
       })
     }
 

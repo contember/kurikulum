@@ -10,6 +10,7 @@ import {
   CompletableRegistry,
 } from '../../completion.ts'
 import type { CompletionStrategy, CompletionHandler } from '../../completion.ts'
+import type { CourseRuntime } from '../../types.ts'
 import { PageContext } from './context.ts'
 
 export interface PageRootProps {
@@ -17,7 +18,7 @@ export interface PageRootProps {
   completion?: CompletionStrategy
   completionTimer?: number
   active?: boolean
-  when?: () => boolean
+  when?: (runtime: CourseRuntime) => boolean
   children?: ComponentChildren
   class?: string
 }

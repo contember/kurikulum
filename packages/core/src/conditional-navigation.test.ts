@@ -33,7 +33,7 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
 
 function createTestContext(runtime: CourseRuntime): CourseContextValue & { notify: () => void } {
   const { subscribe, notify } = createNotifier()
-  const pageConditions: Record<string, () => boolean> = {}
+  const pageConditions: Record<string, (rt: CourseRuntime) => boolean> = {}
   return {
     runtime,
     adapter: createMockAdapter(),
@@ -44,7 +44,7 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages() {
       return runtime.state.pages.filter(id => {
         const cond = pageConditions[id]
-        return cond ? cond() : true
+        return cond ? cond(runtime) : true
       })
     },
     restoreInfo: { restored: false, storedPage: null },
@@ -222,7 +222,7 @@ describe('conditional navigation', () => {
 
   describe('condition based on runtime state', () => {
     it('condition can read runtime state', () => {
-      ctx.pageConditions['remedial'] = () => runtime.state.passed === false
+      ctx.pageConditions['remedial'] = (rt) => rt.state.passed === false
 
       // Initially passed is null, so remedial is hidden
       expect(ctx.getVisiblePages()).not.toContain('remedial')
@@ -233,7 +233,7 @@ describe('conditional navigation', () => {
     })
 
     it('condition based on completion', () => {
-      ctx.pageConditions['theory'] = () => !runtime.isComplete('intro')
+      ctx.pageConditions['theory'] = (rt) => !rt.isComplete('intro')
 
       // Theory visible initially (intro not complete)
       expect(ctx.getVisiblePages()).toContain('theory')

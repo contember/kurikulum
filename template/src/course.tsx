@@ -1,6 +1,6 @@
 import { render } from 'preact'
-import { CourseProvider, createAdapter, createXApiAdapter, useCourse } from '@kurikulum/core'
-import type { CourseConfig, CourseRuntime } from '@kurikulum/core'
+import { CourseProvider, createAdapter, createXApiAdapter } from '@kurikulum/core'
+import type { CourseConfig } from '@kurikulum/core'
 import { Course } from './components/Course.tsx'
 import { Page } from './components/Page.tsx'
 import { Navigation } from './components/Navigation.tsx'
@@ -64,20 +64,6 @@ const glossaryEntries = [
   { term: 'OWASP', definition: 'Open Web Application Security Project — nezisková organizace zaměřená na bezpečnost webových aplikací.' },
 ]
 
-// Runtime ref for conditional navigation — populated by RuntimeRef component
-let runtime: CourseRuntime | null = null
-
-function RuntimeRef() {
-  runtime = useCourse()
-  return null
-}
-
-function quizPassed(): boolean {
-  if (!runtime) return false
-  const result = runtime.state.assessments['quick-quiz']
-  return result?.passed === true
-}
-
 function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
@@ -90,7 +76,6 @@ function App() {
           <SearchModal />
           <GlossaryPanel />
           <NotesPanel />
-          <RuntimeRef />
           {/* Page 1: Úvod – completion="mount" (okamžitě po zobrazení) */}
           <Page id="intro" completion="mount">
             <Text>
@@ -295,7 +280,7 @@ function App() {
           </Page>
 
           {/* Page 7: Bonusová stránka – podmíněná navigace (viditelná jen po splnění kvízu) */}
-          <Page id="bonus" completion="mount" when={quizPassed}>
+          <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
             <Text>
               <h1>Bonusový materiál</h1>
               <p>

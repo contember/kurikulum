@@ -2,6 +2,7 @@ import type { ComponentChildren, VNode } from 'preact'
 import { toChildArray, cloneElement } from 'preact'
 import { useContext, useEffect } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import type { CourseRuntime } from '../../types.ts'
 import { useNavigation } from '../../hooks/index.ts'
 
 export interface CourseRootProps {
@@ -32,7 +33,7 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
     delete conditions[key]
   }
   for (const page of pages) {
-    const props = page.props as unknown as { id: string; when?: () => boolean }
+    const props = page.props as unknown as { id: string; when?: (runtime: CourseRuntime) => boolean }
     if (props.when) {
       conditions[props.id] = props.when
     }
@@ -63,10 +64,10 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
     <div class={className}>
       {nonPages}
       {pages.map((page) => {
-        const props = page.props as unknown as { id: string; when?: () => boolean }
+        const props = page.props as unknown as { id: string; when?: (runtime: CourseRuntime) => boolean }
         const id = props.id
         // Skip pages whose when condition returns false
-        if (props.when && !props.when()) return null
+        if (props.when && !props.when(ctx.runtime)) return null
         const active = id === currentPage
         return (
           <div key={id} style={active ? undefined : { display: 'none' }}>

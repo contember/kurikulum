@@ -1,13 +1,13 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { Page as P } from '@kurikulum/core'
-import type { CompletionStrategy } from '@kurikulum/core'
+import type { CompletionStrategy, CourseRuntime } from '@kurikulum/core'
 
 export interface PageProps {
   id: string
   completion?: CompletionStrategy
   completionTimer?: number
   active?: boolean
-  when?: () => boolean
+  when?: (runtime: CourseRuntime) => boolean
   children?: ComponentChildren
 }
 
