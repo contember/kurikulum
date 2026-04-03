@@ -61,7 +61,7 @@
 | 26 | Audio / narration — Audio compound component, completion integrace, template player | [spec/26-audio.md](spec/26-audio.md) | `[x]` |
 | 27 | Drag & Drop — DnD pro Ordering, nová CategorySort komponenta | [spec/27-drag-and-drop.md](spec/27-drag-and-drop.md) | `[x]` |
 | 28 | Resume dialog — volba pokračovat/začít znovu při restore | [spec/28-resume-dialog.md](spec/28-resume-dialog.md) | `[x]` |
-| 29 | Glossary — slovníček pojmů, inline term reference, panel s hledáním | [spec/29-glossary.md](spec/29-glossary.md) | `[ ]` |
+| 29 | Glossary — slovníček pojmů, inline term reference, panel s hledáním | [spec/29-glossary.md](spec/29-glossary.md) | `[x]` |
 | 30 | Learner notes — poznámky per stránka, persistence v suspend_data | [spec/30-learner-notes.md](spec/30-learner-notes.md) | `[ ]` |
 | 31 | Assessment timer — časový limit, countdown, auto-submit | [spec/31-assessment-timer.md](spec/31-assessment-timer.md) | `[ ]` |
 | 32 | xAPI adapter — xAPI statements, LRS komunikace, cmi5 packaging | [spec/32-xapi-adapter.md](spec/32-xapi-adapter.md) | `[ ]` |
