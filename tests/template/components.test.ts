@@ -1,6 +1,6 @@
-import { Window } from 'happy-dom'
+import { Window as HappyWindow } from 'happy-dom'
 
-const window = new Window()
+const window = new HappyWindow()
 globalThis.document = window.document as unknown as Document
 // Stub IntersectionObserver for scroll strategy tests
 globalThis.IntersectionObserver = class IntersectionObserver {

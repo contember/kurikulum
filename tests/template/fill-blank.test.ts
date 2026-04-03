@@ -1,6 +1,6 @@
-import { Window } from 'happy-dom'
+import { Window as HappyWindow } from 'happy-dom'
 
-const window = new Window()
+const window = new HappyWindow()
 globalThis.document = window.document as unknown as Document
 globalThis.IntersectionObserver = class IntersectionObserver {
   constructor(private callback: IntersectionObserverCallback, private options?: IntersectionObserverInit) {}
@@ -82,6 +82,8 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     subscribe,
     notify,
     defaultCompletion: config.defaultCompletion ?? 'mount',
+    pageConditions: {},
+    getVisiblePages: () => [],
   }
 }
 

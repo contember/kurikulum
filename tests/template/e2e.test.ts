@@ -41,7 +41,7 @@ describe('E2E: Standalone build', () => {
   it('index.html contains course content', () => {
     const html = readFileSync(resolve(distDir, 'standalone', 'index.html'), 'utf-8')
     // The JSX string literals get bundled into the output
-    expect(html).toContain('Testovac')
+    expect(html).toContain('webov')
   })
 
   it('index.html contains the app mount point', () => {

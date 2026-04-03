@@ -1,6 +1,6 @@
-import { Window } from 'happy-dom'
+import { Window as HappyWindow } from 'happy-dom'
 
-const window = new Window({ url: 'http://localhost' })
+const window = new HappyWindow({ url: 'http://localhost' })
 globalThis.document = window.document as unknown as Document
 
 // happy-dom + Bun: Window object is missing error constructors (SyntaxError, TypeError, Error)
@@ -84,6 +84,8 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     subscribe,
     notify,
     defaultCompletion: config.defaultCompletion ?? 'mount',
+    pageConditions: {},
+    getVisiblePages: () => [],
   }
 }
 

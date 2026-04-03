@@ -28,6 +28,7 @@ function createMockAdapter(): DeliveryAdapter & {
     },
     getLocation() { return this.location || null },
     setSessionTime() {},
+    recordInteraction() {},
     terminate() {},
   }
 }

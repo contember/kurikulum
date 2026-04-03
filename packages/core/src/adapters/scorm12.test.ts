@@ -1,6 +1,6 @@
-import { Window } from 'happy-dom'
+import { Window as HappyWindow } from 'happy-dom'
 
-const happyWindow = new Window()
+const happyWindow = new HappyWindow()
 globalThis.document = happyWindow.document as unknown as Document
 globalThis.localStorage = happyWindow.localStorage as unknown as Storage
 
