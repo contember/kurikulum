@@ -5,12 +5,20 @@ export interface AssessmentProps {
   id: string
   passThreshold?: number
   maxAttempts?: number
+  timeLimit?: number
+  onTimeExpired?: () => void
   children?: ComponentChildren
 }
 
-export function Assessment({ id, passThreshold, maxAttempts, children }: AssessmentProps): VNode {
+export function Assessment({ id, passThreshold, maxAttempts, timeLimit, onTimeExpired, children }: AssessmentProps): VNode {
   return (
-    <A.Root id={id} passThreshold={passThreshold} maxAttempts={maxAttempts}>
+    <A.Root id={id} passThreshold={passThreshold} maxAttempts={maxAttempts} timeLimit={timeLimit} onTimeExpired={onTimeExpired}>
+      {timeLimit != null && (
+        <A.Timer
+          warningThreshold={60}
+          class="mb-4 text-lg font-mono font-semibold text-text-primary data-[warning]:text-danger data-[warning]:animate-pulse data-[expired]:text-text-secondary"
+        />
+      )}
       {children}
       <A.Submit class="mt-4 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
         Odeslat

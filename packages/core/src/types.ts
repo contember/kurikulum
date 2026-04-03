@@ -48,6 +48,9 @@ export interface CourseState {
   // Notes
   notes: Note[]
 
+  // Assessment timers — remaining seconds per assessment ID
+  timers: Record<string, number>
+
   // Time
   sessionStart: number
   totalTimeMs: number

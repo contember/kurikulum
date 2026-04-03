@@ -19,7 +19,7 @@ export { CourseContext, createNotifier, CourseProvider } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // Hooks
-export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio, useRestore, useGlossary, useNotes } from './hooks/index.ts'
+export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio, useRestore, useGlossary, useNotes, useAssessmentTimer } from './hooks/index.ts'
 export type { RestoreContext } from './hooks/index.ts'
 
 // Adapters
@@ -27,7 +27,7 @@ export { createAdapter, createStandaloneAdapter, createScorm2004Adapter } from '
 
 // Components (headless)
 export {
-  Assessment, AssessmentContext,
+  Assessment, AssessmentContext, TimerContext,
   MCQ, MCQContext,
   MultiSelect, MultiSelectContext,
   FillBlank, FillBlankContext,
@@ -39,7 +39,7 @@ export {
   Glossary, GlossaryContext,
   Notes, NotesContext, MAX_NOTE_LENGTH, MAX_NOTES_COUNT,
 } from './components/index.ts'
-export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue, AudioContextValue, CategorySortContextValue, CategoryDef, CategoryItemDef, GlossaryContextValue, GlossaryEntry, NotesContextValue } from './components/index.ts'
+export type { AssessmentContextValue, TimerContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue, AudioContextValue, CategorySortContextValue, CategoryDef, CategoryItemDef, GlossaryContextValue, GlossaryEntry, NotesContextValue } from './components/index.ts'
 
 // SCORM packaging (types + manifest only; createScormPackage is Node-only,
 // import it directly from '@kurikulum/core/scorm/package' in build scripts)

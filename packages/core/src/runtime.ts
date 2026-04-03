@@ -13,6 +13,7 @@ function createInitialState(config: CourseConfig): CourseState {
     attempts: 0,
     assessments: {},
     notes: [],
+    timers: {},
     sessionStart: Date.now(),
     totalTimeMs: 0,
   }
