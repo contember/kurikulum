@@ -79,6 +79,7 @@ describe('CourseProvider', () => {
         assessments: {},
         sessionStart: Date.now(),
         totalTimeMs: 5000,
+        notes: [],
       },
     }
     adapter.suspendData = JSON.stringify(envelope)

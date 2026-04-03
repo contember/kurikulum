@@ -1,3 +1,9 @@
+export interface Note {
+  pageId: string
+  text: string
+  createdAt: number
+}
+
 export interface AttemptAnswer {
   response: string
   correct: boolean
@@ -38,6 +44,9 @@ export interface CourseState {
 
   // Per-assessment tracking
   assessments: Record<string, AssessmentResult>
+
+  // Notes
+  notes: Note[]
 
   // Time
   sessionStart: number

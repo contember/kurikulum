@@ -393,6 +393,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
+          notes: [],
         },
       }
       adapter.suspendData = JSON.stringify(envelope)
@@ -421,6 +422,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
+          notes: [],
         },
       }
       adapter.suspendData = JSON.stringify(envelope)
@@ -447,6 +449,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 3000,
+          notes: [],
         },
       }
       adapter.suspendData = JSON.stringify(envelope)
@@ -489,6 +492,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
+          notes: [],
         },
       }
       adapter.suspendData = JSON.stringify(envelope)
