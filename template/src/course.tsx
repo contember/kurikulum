@@ -15,6 +15,7 @@ import { FillBlank } from './components/FillBlank.tsx'
 import { Matching, MatchingPair } from './components/Matching.tsx'
 import { Ordering, OrderingItem } from './components/Ordering.tsx'
 import { QuestionFeedback } from './components/QuestionFeedback.tsx'
+import { AudioPlayer } from './components/AudioPlayer.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'

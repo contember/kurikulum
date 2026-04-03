@@ -19,7 +19,7 @@ export { CourseContext, createNotifier, CourseProvider } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // Hooks
-export { useCourse, useNavigation, useCompletion, useAssessment, usePage } from './hooks/index.ts'
+export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio } from './hooks/index.ts'
 
 // Adapters
 export { createAdapter, createStandaloneAdapter, createScorm2004Adapter } from './adapters/index.ts'
@@ -33,8 +33,9 @@ export {
   Matching, MatchingContext,
   Ordering, OrderingContext, OrderingItemContext,
   Page, Navigation, Course,
+  Audio, AudioContext,
 } from './components/index.ts'
-export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue } from './components/index.ts'
+export type { AssessmentContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue, AudioContextValue } from './components/index.ts'
 
 // SCORM packaging (types + manifest only; createScormPackage is Node-only,
 // import it directly from '@kurikulum/core/scorm/package' in build scripts)
