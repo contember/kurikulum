@@ -5,6 +5,7 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 
 export default defineConfig(({ mode }) => {
   const target = process.env.KURIKULUM_TARGET || 'standalone';
+  const xapiActivityId = process.env.KURIKULUM_XAPI_ACTIVITY_ID || 'https://example.com/courses/default';
 
   return {
     plugins: [
@@ -14,6 +15,7 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       'import.meta.env.KURIKULUM_TARGET': JSON.stringify(target),
+      'import.meta.env.KURIKULUM_XAPI_ACTIVITY_ID': JSON.stringify(xapiActivityId),
     },
     build: {
       target: 'es2020',

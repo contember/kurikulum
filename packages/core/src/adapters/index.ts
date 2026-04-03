@@ -2,6 +2,8 @@ export type { DeliveryAdapter } from './types.ts'
 export { createStandaloneAdapter } from './standalone.ts'
 export { createScorm12Adapter } from './scorm12.ts'
 export { createScorm2004Adapter } from './scorm2004.ts'
+export { createXApiAdapter } from './xapi.ts'
+export type { XApiConfig, XApiStatement } from './xapi.ts'
 
 import type { DeliveryAdapter } from './types.ts'
 import { createStandaloneAdapter } from './standalone.ts'

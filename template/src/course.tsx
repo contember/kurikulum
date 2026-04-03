@@ -1,5 +1,5 @@
 import { render } from 'preact'
-import { CourseProvider, createAdapter, useCourse } from '@kurikulum/core'
+import { CourseProvider, createAdapter, createXApiAdapter, useCourse } from '@kurikulum/core'
 import type { CourseConfig, CourseRuntime } from '@kurikulum/core'
 import { Course } from './components/Course.tsx'
 import { Page } from './components/Page.tsx'
@@ -20,8 +20,23 @@ import { ResumeDialog } from './components/ResumeDialog.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
-const adapterType = target === 'scorm-1.2' ? 'scorm-1.2' : target === 'scorm-2004' ? 'scorm-2004' : 'standalone'
-const adapter = createAdapter(adapterType)
+
+function createAdapterFromTarget() {
+  if (target === 'xapi') {
+    const params = new URLSearchParams(window.location.search)
+    return createXApiAdapter({
+      endpoint: params.get('endpoint') || '',
+      auth: params.get('auth') || '',
+      actor: params.get('actor') ? JSON.parse(params.get('actor')!) : {},
+      activityId: params.get('activityId') || window.location.href,
+      registration: params.get('registration') || undefined,
+    })
+  }
+  const adapterType = target === 'scorm-1.2' ? 'scorm-1.2' : target === 'scorm-2004' ? 'scorm-2004' : 'standalone'
+  return createAdapter(adapterType)
+}
+
+const adapter = createAdapterFromTarget()
 
 const config: CourseConfig = {
   title: 'Základy webové bezpečnosti',

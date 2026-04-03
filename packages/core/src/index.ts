@@ -23,7 +23,8 @@ export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAud
 export type { RestoreContext } from './hooks/index.ts'
 
 // Adapters
-export { createAdapter, createStandaloneAdapter, createScorm2004Adapter } from './adapters/index.ts'
+export { createAdapter, createStandaloneAdapter, createScorm2004Adapter, createXApiAdapter } from './adapters/index.ts'
+export type { XApiConfig, XApiStatement } from './adapters/index.ts'
 
 // Components (headless)
 export {
@@ -46,3 +47,9 @@ export type { AssessmentContextValue, TimerContextValue, MCQContextValue, MultiS
 export { generateManifest } from './scorm/manifest.ts'
 export type { ManifestOptions } from './scorm/manifest.ts'
 export type { PackageOptions } from './scorm/package.ts'
+
+// cmi5 packaging (types + manifest only; createCmi5Package is Node-only,
+// import it directly from '@kurikulum/core/cmi5/package' in build scripts)
+export { generateCmi5Manifest } from './cmi5/manifest.ts'
+export type { Cmi5ManifestOptions } from './cmi5/manifest.ts'
+export type { Cmi5PackageOptions } from './cmi5/package.ts'
