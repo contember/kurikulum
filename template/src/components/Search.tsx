@@ -44,13 +44,13 @@ export function SearchModal(): VNode | null {
   return (
     <div
       class="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) ctx.close()
-      }}
       role="presentation"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') ctx.close()
+      }}
     >
       {/* Backdrop */}
-      <div class="fixed inset-0 bg-black/50" aria-hidden="true" />
+      <div class="fixed inset-0 bg-black/50" aria-hidden="true" onClick={ctx.close} />
 
       {/* Modal */}
       <div
