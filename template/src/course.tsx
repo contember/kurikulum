@@ -20,7 +20,7 @@ import { CategorySort } from './components/CategorySort.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
 import { Glossary, GlossaryPanel, GlossaryToggle, GlossaryTerm } from './components/Glossary.tsx'
-import { Notes, NotesPanel, NotesToggle, NotesEditor } from './components/Notes.tsx'
+import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
 import searchIndex from 'virtual:search-index'
 import './styles.css'
 
@@ -139,7 +139,6 @@ function App() {
                 Obrana: <strong>CSRF tokeny</strong> a atribut <code>SameSite</code> u cookies.
               </p>
             </Text>
-            <NotesEditor />
           </Page>
 
           {/* Page 3: Multimédia – completion="scroll" (po doscrollování na konec) */}

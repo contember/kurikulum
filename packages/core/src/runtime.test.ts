@@ -393,7 +393,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
-          notes: [],
+          notepad: '',
           timers: {},
         },
       }
@@ -423,7 +423,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
-          notes: [],
+          notepad: '',
           timers: {},
         },
       }
@@ -451,7 +451,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 3000,
-          notes: [],
+          notepad: '',
           timers: {},
         },
       }
@@ -495,7 +495,7 @@ describe('createCourseRuntime', () => {
           assessments: {},
           sessionStart: 0,
           totalTimeMs: 5000,
-          notes: [],
+          notepad: '',
           timers: {},
         },
       }

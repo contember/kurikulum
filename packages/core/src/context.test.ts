@@ -79,7 +79,7 @@ describe('CourseProvider', () => {
         assessments: {},
         sessionStart: Date.now(),
         totalTimeMs: 5000,
-        notes: [],
+        notepad: '',
         timers: {},
       },
     }

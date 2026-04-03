@@ -12,7 +12,7 @@ import { CourseContext, createNotifier } from '../../context.tsx'
 import type { CourseContextValue } from '../../context.tsx'
 import { Notes } from './index.ts'
 import { useNotes } from '../../hooks/useNotes.ts'
-import { MAX_NOTE_LENGTH, MAX_NOTES_COUNT } from './context.ts'
+import { MAX_NOTEPAD_LENGTH } from './context.ts'
 
 function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData: string; location: string } {
   return {
@@ -99,7 +99,7 @@ describe('Notes.Root', () => {
     expect(container.getElementsByTagName('span')[0].textContent).toBe('Hello')
   })
 
-  it('provides notes context via useNotes', () => {
+  it('provides notepad context via useNotes', () => {
     let captured: ReturnType<typeof useNotes> | null = null
     function Capture() {
       captured = useNotes()
@@ -116,14 +116,11 @@ describe('Notes.Root', () => {
     )
 
     expect(captured).not.toBeNull()
-    expect(captured!.notes).toHaveLength(0)
-    expect(typeof captured!.addNote).toBe('function')
-    expect(typeof captured!.removeNote).toBe('function')
-    expect(typeof captured!.updateNote).toBe('function')
-    expect(typeof captured!.getNotesForPage).toBe('function')
+    expect(captured!.text).toBe('')
+    expect(typeof captured!.setText).toBe('function')
   })
 
-  it('adds a note', async () => {
+  it('sets notepad text', async () => {
     let captured: ReturnType<typeof useNotes> | null = null
     function Capture() {
       captured = useNotes()
@@ -137,17 +134,14 @@ describe('Notes.Root', () => {
     )
 
     render(tree, container)
-    captured!.addNote('page-1', 'My note')
+    captured!.setText('My notes')
     await flushEffects()
     render(tree, container)
 
-    expect(captured!.notes).toHaveLength(1)
-    expect(captured!.notes[0].pageId).toBe('page-1')
-    expect(captured!.notes[0].text).toBe('My note')
-    expect(captured!.notes[0].createdAt).toBeGreaterThan(0)
+    expect(captured!.text).toBe('My notes')
   })
 
-  it('removes a note', async () => {
+  it('truncates text exceeding max length', async () => {
     let captured: ReturnType<typeof useNotes> | null = null
     function Capture() {
       captured = useNotes()
@@ -161,25 +155,15 @@ describe('Notes.Root', () => {
     )
 
     render(tree, container)
-    captured!.addNote('page-1', 'Note A')
+    const longText = 'a'.repeat(MAX_NOTEPAD_LENGTH + 500)
+    captured!.setText(longText)
     await flushEffects()
     render(tree, container)
 
-    captured!.addNote('page-1', 'Note B')
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.notes).toHaveLength(2)
-
-    captured!.removeNote('page-1', 0)
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.notes).toHaveLength(1)
-    expect(captured!.notes[0].text).toBe('Note B')
+    expect(captured!.text).toHaveLength(MAX_NOTEPAD_LENGTH)
   })
 
-  it('updates a note', async () => {
+  it('syncs notepad to runtime state', async () => {
     let captured: ReturnType<typeof useNotes> | null = null
     function Capture() {
       captured = useNotes()
@@ -193,19 +177,14 @@ describe('Notes.Root', () => {
     )
 
     render(tree, container)
-    captured!.addNote('page-1', 'Original')
+    captured!.setText('Persisted text')
     await flushEffects()
     render(tree, container)
 
-    captured!.updateNote('page-1', 0, 'Updated')
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.notes).toHaveLength(1)
-    expect(captured!.notes[0].text).toBe('Updated')
+    expect(runtime.state.notepad).toBe('Persisted text')
   })
 
-  it('filters notes by page', async () => {
+  it('persists and restores notepad via suspend/restore', async () => {
     let captured: ReturnType<typeof useNotes> | null = null
     function Capture() {
       captured = useNotes()
@@ -219,140 +198,19 @@ describe('Notes.Root', () => {
     )
 
     render(tree, container)
-    captured!.addNote('page-1', 'Note on page 1')
+    captured!.setText('Survives restart')
     await flushEffects()
     render(tree, container)
 
-    captured!.addNote('page-2', 'Note on page 2')
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.getNotesForPage('page-1')).toHaveLength(1)
-    expect(captured!.getNotesForPage('page-2')).toHaveLength(1)
-    expect(captured!.getNotesForPage('page-3')).toHaveLength(0)
-  })
-
-  it('truncates notes exceeding max length', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
-
-    render(tree, container)
-    const longText = 'a'.repeat(300)
-    captured!.addNote('page-1', longText)
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.notes[0].text).toHaveLength(MAX_NOTE_LENGTH)
-  })
-
-  it('evicts oldest note when exceeding max count', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
-
-    render(tree, container)
-
-    for (let i = 0; i < MAX_NOTES_COUNT + 5; i++) {
-      captured!.addNote('page-1', `Note ${i}`)
-      await flushEffects()
-      render(tree, container)
-    }
-
-    expect(captured!.notes).toHaveLength(MAX_NOTES_COUNT)
-    expect(captured!.notes[0].text).toBe('Note 5')
-  })
-
-  it('ignores empty note text', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
-
-    render(tree, container)
-    captured!.addNote('page-1', '')
-    await flushEffects()
-    render(tree, container)
-
-    expect(captured!.notes).toHaveLength(0)
-  })
-
-  it('syncs notes to runtime state', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
-
-    render(tree, container)
-    captured!.addNote('page-1', 'Persisted note')
-    await flushEffects()
-    render(tree, container)
-
-    expect(runtime.state.notes).toHaveLength(1)
-    expect(runtime.state.notes[0].text).toBe('Persisted note')
-  })
-
-  it('persists and restores notes via suspend/restore', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
-
-    render(tree, container)
-    captured!.addNote('page-1', 'Survives restart')
-    await flushEffects()
-    render(tree, container)
-
-    // Suspend saves to adapter
     runtime.suspend()
     const savedData = adapter.suspendData
 
-    // Create new runtime and restore
     const adapter2 = createMockAdapter()
     adapter2.suspendData = savedData
     const runtime2 = createCourseRuntime(config, adapter2)
     runtime2.restore()
 
-    expect(runtime2.state.notes).toHaveLength(1)
-    expect(runtime2.state.notes[0].text).toBe('Survives restart')
-    expect(runtime2.state.notes[0].pageId).toBe('page-1')
+    expect(runtime2.state.notepad).toBe('Survives restart')
   })
 })
 
@@ -421,127 +279,6 @@ describe('Notes.Panel', () => {
     const dialog = findByRole(container, 'dialog')
     expect(dialog).not.toBeNull()
     expect(dialog!.getAttribute('aria-label')).toBe('Notes')
-  })
-})
-
-describe('Notes.Editor', () => {
-  let container: HTMLElement
-  let runtime: CourseRuntime
-  let ctx: ReturnType<typeof createTestContext>
-
-  beforeEach(() => {
-    container = document.createElement('div')
-    const adapter = createMockAdapter()
-    runtime = createCourseRuntime(config, adapter)
-    ctx = createTestContext(runtime)
-  })
-
-  it('throws outside Notes.Root', () => {
-    expect(() => {
-      render(h(Notes.Editor, null), container)
-    }).toThrow('Notes.Editor must be used within Notes.Root')
-  })
-
-  it('renders with render prop', () => {
-    let renderCalled = false
-    render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Notes.Editor, {
-            children: ({ notes, addNote }: any) => {
-              renderCalled = true
-              expect(notes).toHaveLength(0)
-              expect(typeof addNote).toBe('function')
-              return h('span', null, 'Custom editor')
-            },
-          }),
-        ),
-      ),
-      container,
-    )
-
-    expect(renderCalled).toBe(true)
-    expect(container.textContent).toContain('Custom editor')
-  })
-})
-
-describe('Notes.Indicator', () => {
-  let container: HTMLElement
-  let runtime: CourseRuntime
-  let ctx: ReturnType<typeof createTestContext>
-
-  beforeEach(() => {
-    container = document.createElement('div')
-    const adapter = createMockAdapter()
-    runtime = createCourseRuntime(config, adapter)
-    ctx = createTestContext(runtime)
-  })
-
-  it('throws outside Notes.Root', () => {
-    expect(() => {
-      render(h(Notes.Indicator, null), container)
-    }).toThrow('Notes.Indicator must be used within Notes.Root')
-  })
-
-  it('returns null when no notes for current page', () => {
-    render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Notes.Indicator, null),
-        ),
-      ),
-      container,
-    )
-    const spans = container.getElementsByTagName('span')
-    expect(spans.length).toBe(0)
-  })
-
-  it('shows count when page has notes', async () => {
-    let captured: ReturnType<typeof useNotes> | null = null
-    function Capture() {
-      captured = useNotes()
-      return null
-    }
-
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-        h(Notes.Indicator, null),
-      ),
-    )
-
-    render(tree, container)
-    captured!.addNote('page-1', 'A note')
-    await flushEffects()
-    render(tree, container)
-
-    const spans = container.getElementsByTagName('span')
-    expect(spans.length).toBeGreaterThanOrEqual(1)
-    expect(spans[0].textContent).toBe('1')
-  })
-
-  it('supports render prop', () => {
-    let hasNotes = false
-    let count = 0
-
-    render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Notes.Indicator, {
-            children: (has: boolean, c: number) => {
-              hasNotes = has
-              count = c
-              return h('span', null, has ? `${c} notes` : 'no notes')
-            },
-          }),
-        ),
-      ),
-      container,
-    )
-
-    expect(hasNotes).toBe(false)
-    expect(count).toBe(0)
-    expect(container.textContent).toContain('no notes')
   })
 })
 

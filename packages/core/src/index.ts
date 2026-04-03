@@ -1,6 +1,6 @@
 export const VERSION = '0.1.0';
 
-export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, AssessmentResult, AttemptRecord, AttemptAnswer, InteractionRecord, SuspendEnvelope, RestoreInfo, Note } from './types.ts'
+export type { CourseState, CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, AssessmentResult, AttemptRecord, AttemptAnswer, InteractionRecord, SuspendEnvelope, RestoreInfo } from './types.ts'
 export { createCourseRuntime, CURRENT_SCHEMA_VERSION } from './runtime.ts'
 export {
   resolveCompletionStrategy,
@@ -38,7 +38,7 @@ export {
   Audio, AudioContext,
   CategorySort, CategorySortContext,
   Glossary, GlossaryContext,
-  Notes, NotesContext, MAX_NOTE_LENGTH, MAX_NOTES_COUNT,
+  Notes, NotesContext, MAX_NOTEPAD_LENGTH,
   Search, SearchContext, normalize, extractSnippet, searchEntries,
 } from './components/index.ts'
 export type { AssessmentContextValue, TimerContextValue, MCQContextValue, MultiSelectContextValue, FillBlankContextValue, MatchingContextValue, OrderingContextValue, OrderingItemContextValue, AudioContextValue, CategorySortContextValue, CategoryDef, CategoryItemDef, GlossaryContextValue, GlossaryEntry, NotesContextValue, SearchContextValue, SearchEntry, SearchResult } from './components/index.ts'
