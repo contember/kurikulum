@@ -9,7 +9,7 @@ export interface AssessmentRootProps {
   passThreshold?: number
   maxAttempts?: number
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
 }
 

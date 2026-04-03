@@ -2,7 +2,7 @@ import type { ComponentChildren, VNode } from 'preact'
 import { Course as C } from '@kurikulum/core'
 
 export interface CourseProps {
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Course({ children }: CourseProps): VNode | null {

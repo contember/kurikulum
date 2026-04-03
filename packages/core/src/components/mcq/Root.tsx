@@ -8,7 +8,7 @@ import { MCQContext } from './context.ts'
 export interface MCQRootProps {
   id: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
   'aria-label'?: string
 }

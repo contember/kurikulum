@@ -5,7 +5,7 @@ export interface MCQProps {
   id: string
   question: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function MCQ({ id, question, weight, children }: MCQProps): VNode {

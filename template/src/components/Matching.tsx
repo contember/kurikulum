@@ -5,7 +5,7 @@ export interface MatchingProps {
   id: string
   question: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Matching({ id, question, weight, children }: MatchingProps): VNode {

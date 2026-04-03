@@ -7,7 +7,7 @@ export interface OrderingProps {
   id: string
   question: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Ordering({ id, question, weight, children }: OrderingProps): VNode {
@@ -31,7 +31,7 @@ export function Ordering({ id, question, weight, children }: OrderingProps): VNo
 
 export interface OrderingItemProps {
   order: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function OrderingItem({ order, children }: OrderingItemProps): VNode {

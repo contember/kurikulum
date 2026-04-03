@@ -8,7 +8,7 @@ import type { MatchingPairDef, MatchingContextValue } from './context.ts'
 
 export interface MatchingRootProps {
   id: string
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
   'aria-label'?: string
   weight?: number

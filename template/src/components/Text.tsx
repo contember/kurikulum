@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface TextProps {
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Text({ children }: TextProps): VNode {

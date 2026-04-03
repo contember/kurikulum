@@ -4,7 +4,7 @@ import { MCQContext, MCQItemContext } from './context.ts'
 
 export interface MCQItemProps {
   correct?: boolean
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
 }
 

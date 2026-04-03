@@ -8,7 +8,7 @@ export interface PageProps {
   completionTimer?: number
   active?: boolean
   when?: () => boolean
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Page({ id, completion = 'mount', completionTimer, active, when, children }: PageProps): VNode {

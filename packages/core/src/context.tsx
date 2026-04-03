@@ -54,7 +54,7 @@ function createNoopAdapter(): DeliveryAdapter {
 export interface CourseProviderProps {
   config: CourseConfig
   adapter?: DeliveryAdapter
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function CourseProvider({ config, adapter, children }: CourseProviderProps): VNode {

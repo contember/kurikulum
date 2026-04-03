@@ -10,7 +10,7 @@ export interface FillBlankRootProps {
   accept: string | string[] | RegExp
   caseSensitive?: boolean
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
   'aria-label'?: string
 }

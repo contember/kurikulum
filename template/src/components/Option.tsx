@@ -4,7 +4,7 @@ import { MCQ, MultiSelect, MCQContext, MultiSelectContext } from '@kurikulum/cor
 
 export interface OptionProps {
   correct?: boolean
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Option({ correct, children }: OptionProps): VNode {

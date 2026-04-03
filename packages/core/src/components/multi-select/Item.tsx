@@ -4,7 +4,7 @@ import { MultiSelectContext, MultiSelectItemContext } from './context.ts'
 
 export interface MultiSelectItemProps {
   correct?: boolean
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
 }
 

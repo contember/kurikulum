@@ -18,7 +18,7 @@ export interface PageRootProps {
   completionTimer?: number
   active?: boolean
   when?: () => boolean
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
 }
 

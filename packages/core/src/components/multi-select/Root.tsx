@@ -8,7 +8,7 @@ import { MultiSelectContext } from './context.ts'
 export interface MultiSelectRootProps {
   id: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
   'aria-label'?: string
 }

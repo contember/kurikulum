@@ -5,7 +5,7 @@ export interface AssessmentProps {
   id: string
   passThreshold?: number
   maxAttempts?: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Assessment({ id, passThreshold, maxAttempts, children }: AssessmentProps): VNode {

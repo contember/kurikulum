@@ -5,7 +5,7 @@ export interface MultiSelectProps {
   id: string
   question: string
   weight?: number
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function MultiSelect({ id, question, weight, children }: MultiSelectProps): VNode {

@@ -11,7 +11,7 @@ export function useCompletion(id: string) {
   const pageCtx = useContext(PageContext)
 
   const [, forceUpdate] = useReducer((c: number) => c + 1, 0)
-  useEffect(() => ctx.subscribe(forceUpdate), [ctx])
+  useEffect(() => ctx.subscribe(() => forceUpdate(0)), [ctx])
 
   // Register interactive children with the page's CompletableRegistry
   useEffect(() => {

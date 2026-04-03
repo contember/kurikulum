@@ -1,4 +1,5 @@
 import type { CompletionStrategy } from './types.ts'
+export type { CompletionStrategy }
 
 /**
  * Resolves which completion strategy to use for a page.

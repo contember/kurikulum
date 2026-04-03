@@ -8,7 +8,7 @@ import type { OrderingItemDef, OrderingContextValue } from './context.ts'
 
 export interface OrderingRootProps {
   id: string
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
   'aria-label'?: string
   weight?: number

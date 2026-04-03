@@ -8,7 +8,7 @@ export function useNavigation() {
   }
 
   const [, forceUpdate] = useReducer((c: number) => c + 1, 0)
-  useEffect(() => ctx.subscribe(forceUpdate), [ctx])
+  useEffect(() => ctx.subscribe(() => forceUpdate(0)), [ctx])
 
   const { runtime } = ctx
   const { state } = runtime

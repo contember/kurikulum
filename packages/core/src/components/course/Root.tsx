@@ -6,7 +6,7 @@ import { useNavigation } from '../../hooks/index.ts'
 
 export interface CourseRootProps {
   class?: string
-  children: ComponentChildren
+  children?: ComponentChildren
 }
 
 export function Root({ children, class: className }: CourseRootProps): VNode {
@@ -32,7 +32,7 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
     delete conditions[key]
   }
   for (const page of pages) {
-    const props = page.props as { id: string; when?: () => boolean }
+    const props = page.props as unknown as { id: string; when?: () => boolean }
     if (props.when) {
       conditions[props.id] = props.when
     }
@@ -63,7 +63,7 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
     <div class={className}>
       {nonPages}
       {pages.map((page) => {
-        const props = page.props as { id: string; when?: () => boolean }
+        const props = page.props as unknown as { id: string; when?: () => boolean }
         const id = props.id
         // Skip pages whose when condition returns false
         if (props.when && !props.when()) return null

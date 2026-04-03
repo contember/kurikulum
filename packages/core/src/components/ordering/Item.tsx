@@ -5,7 +5,7 @@ import type { OrderingItemContextValue } from './context.ts'
 
 export interface OrderingItemProps {
   order: number
-  children: ComponentChildren
+  children?: ComponentChildren
   class?: string
 }
 

@@ -9,7 +9,7 @@ export function usePage() {
   }
 
   const [, forceUpdate] = useReducer((c: number) => c + 1, 0)
-  useEffect(() => ctx.subscribe(forceUpdate), [ctx])
+  useEffect(() => ctx.subscribe(() => forceUpdate(0)), [ctx])
 
   const pageId = ctx.runtime.state.currentPage
   const completion = resolveCompletionStrategy(
