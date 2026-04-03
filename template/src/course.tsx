@@ -16,8 +16,11 @@ import { Matching, MatchingPair } from './components/Matching.tsx'
 import { Ordering, OrderingItem } from './components/Ordering.tsx'
 import { QuestionFeedback } from './components/QuestionFeedback.tsx'
 import { AudioPlayer } from './components/AudioPlayer.tsx'
+import { CategorySort } from './components/CategorySort.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
+import { Glossary, GlossaryPanel, GlossaryToggle, GlossaryTerm } from './components/Glossary.tsx'
+import { Notes, NotesPanel, NotesToggle, NotesEditor } from './components/Notes.tsx'
 import searchIndex from 'virtual:search-index'
 import './styles.css'
 
@@ -53,6 +56,14 @@ const config: CourseConfig = {
   },
 }
 
+const glossaryEntries = [
+  { term: 'XSS', definition: 'Cross-Site Scripting — útok vložením škodlivého skriptu do webové stránky.' },
+  { term: 'SQL Injection', definition: 'Útok vložením SQL kódu do vstupního pole aplikace za účelem manipulace s databází.' },
+  { term: 'CSRF', definition: 'Cross-Site Request Forgery — útok zneužívající autentizovanou session oběti k provedení nechtěné akce.' },
+  { term: 'CSP', definition: 'Content Security Policy — HTTP hlavička omezující zdroje, ze kterých může prohlížeč načítat obsah.' },
+  { term: 'OWASP', definition: 'Open Web Application Security Project — nezisková organizace zaměřená na bezpečnost webových aplikací.' },
+]
+
 // Runtime ref for conditional navigation — populated by RuntimeRef component
 let runtime: CourseRuntime | null = null
 
@@ -71,10 +82,14 @@ function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
       <Search index={searchIndex}>
+      <Glossary entries={glossaryEntries}>
+      <Notes>
       <div class="h-screen flex flex-col bg-bg text-text font-sans">
         <Course>
           <ResumeDialog />
           <SearchModal />
+          <GlossaryPanel />
+          <NotesPanel />
           <RuntimeRef />
           {/* Page 1: Úvod – completion="mount" (okamžitě po zobrazení) */}
           <Page id="intro" completion="mount">
@@ -101,9 +116,9 @@ function App() {
           <Page id="theory" completion="timer" completionTimer={5}>
             <Text>
               <h1>Nejčastější zranitelnosti</h1>
-              <h2>1. Cross-Site Scripting (XSS)</h2>
+              <h2>1. Cross-Site Scripting (<GlossaryTerm term="XSS">XSS</GlossaryTerm>)</h2>
               <p>
-                XSS umožňuje útočníkovi vložit škodlivý skript do stránky, který se spustí
+                <GlossaryTerm term="XSS">XSS</GlossaryTerm> umožňuje útočníkovi vložit škodlivý skript do stránky, který se spustí
                 v prohlížeči oběti. Rozlišujeme tři typy:
               </p>
               <ul>
@@ -111,19 +126,20 @@ function App() {
                 <li><strong>Stored XSS</strong> – skript je uložen v databázi (např. v komentáři)</li>
                 <li><strong>DOM-based XSS</strong> – manipulace probíhá čistě na straně klienta</li>
               </ul>
-              <h2>2. SQL Injection</h2>
+              <h2>2. <GlossaryTerm term="SQL Injection">SQL Injection</GlossaryTerm></h2>
               <p>
                 Útočník vloží SQL kód do vstupního pole, čímž může číst, měnit nebo mazat
                 data v databázi. Obrana spočívá v použití <strong>parametrizovaných dotazů</strong>
                 a ORM frameworků.
               </p>
-              <h2>3. Cross-Site Request Forgery (CSRF)</h2>
+              <h2>3. Cross-Site Request Forgery (<GlossaryTerm term="CSRF">CSRF</GlossaryTerm>)</h2>
               <p>
-                CSRF využívá důvěru serveru v autentizovaného uživatele. Útočník vytvoří
+                <GlossaryTerm term="CSRF">CSRF</GlossaryTerm> využívá důvěru serveru v autentizovaného uživatele. Útočník vytvoří
                 stránku, která odešle požadavek jménem přihlášeného uživatele.
                 Obrana: <strong>CSRF tokeny</strong> a atribut <code>SameSite</code> u cookies.
               </p>
             </Text>
+            <NotesEditor />
           </Page>
 
           {/* Page 3: Multimédia – completion="scroll" (po doscrollování na konec) */}
@@ -136,6 +152,9 @@ function App() {
               src="https://placehold.co/800x400/2d4a22/ffffff?text=SQL+Injection+Schema"
               alt="Schéma SQL injection útoku"
               caption="Obr. 1 – Průběh SQL injection útoku přes formulářové pole"
+            />
+            <AudioPlayer
+              src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
             />
             <Text>
               <h2>Jak funguje XSS útok?</h2>
@@ -222,6 +241,26 @@ function App() {
                 <OrderingItem order={3}>Injection</OrderingItem>
                 <OrderingItem order={4}>Insecure Design</OrderingItem>
               </Ordering>
+
+              <CategorySort
+                id="cat-attacks"
+                question="Roztřiďte obrany ke správnému typu útoku:"
+                weight={2}
+                categories={[
+                  { id: 'xss', label: 'XSS' },
+                  { id: 'sqli', label: 'SQL Injection' },
+                  { id: 'csrf', label: 'CSRF' },
+                ]}
+                items={[
+                  { id: 'csp', label: 'Content Security Policy', category: 'xss' },
+                  { id: 'escape', label: 'Escapování výstupu', category: 'xss' },
+                  { id: 'param', label: 'Parametrizované dotazy', category: 'sqli' },
+                  { id: 'orm', label: 'ORM framework', category: 'sqli' },
+                  { id: 'token', label: 'CSRF token', category: 'csrf' },
+                  { id: 'samesite', label: 'SameSite cookie', category: 'csrf' },
+                ]}
+                partialCredit
+              />
             </Assessment>
           </Page>
 
@@ -234,7 +273,7 @@ function App() {
                 Máte maximálně 3 pokusy.
               </p>
             </Text>
-            <Assessment id="final-test" passThreshold={0.66} maxAttempts={3}>
+            <Assessment id="final-test" passThreshold={0.66} maxAttempts={3} timeLimit={180}>
               <MCQ id="a-q1" question="Jaká je hlavní obrana proti SQL injection?">
                 <Option>Escapování HTML</Option>
                 <Option correct>Parametrizované dotazy</Option>
@@ -332,10 +371,16 @@ function App() {
           </Page>
         </Course>
         <div class="flex items-center justify-between gap-4 p-4 border-t border-border bg-bg-surface">
-          <SearchButton />
+          <div class="flex items-center gap-2">
+            <SearchButton />
+            <GlossaryToggle />
+            <NotesToggle />
+          </div>
           <Navigation />
         </div>
       </div>
+      </Notes>
+      </Glossary>
       </Search>
     </CourseProvider>
   )
