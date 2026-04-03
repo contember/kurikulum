@@ -369,14 +369,14 @@ function App() {
             />
           </Page>
         </Course>
-        <div class="flex items-center justify-between gap-4 p-4 border-t border-border bg-bg-surface">
-          <div class="flex items-center gap-2">
-            <SearchButton />
-            <GlossaryToggle />
-            <NotesToggle />
+        <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
+          <SearchButton />
+          <GlossaryToggle />
+          <NotesToggle />
+          <div class="ml-auto">
+            <Navigation />
           </div>
-          <Navigation />
-        </div>
+        </footer>
       </div>
       </Notes>
       </Glossary>
