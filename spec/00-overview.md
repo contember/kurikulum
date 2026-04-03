@@ -49,3 +49,14 @@ Opinionated SDK na tvorbu e-learningových kurzů v JSX (Preact). Autor kurzu p�
 23. [Historie pokusů](./23-attempt-history.md)
 24. [SCORM 2004 adapter](./24-scorm-2004.md)
 25. [Verzování suspend_data](./25-suspend-data-versioning.md)
+
+## Roadmap — v3
+
+26. [Audio / narration](./26-audio.md)
+27. [Drag & Drop interakce](./27-drag-and-drop.md)
+28. [Resume dialog](./28-resume-dialog.md)
+29. [Glossary / slovníček pojmů](./29-glossary.md)
+30. [Learner notes / záložky](./30-learner-notes.md)
+31. [Assessment timer / časový limit](./31-assessment-timer.md)
+32. [xAPI adapter](./32-xapi-adapter.md)
+33. [Fulltext search v obsahu](./33-fulltext-search.md)

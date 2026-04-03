@@ -53,3 +53,16 @@
 | 23 | Historie pokusů — log skóre per pokus, Assessment.History component | [spec/23-attempt-history.md](spec/23-attempt-history.md) | `[x]` |
 | 24 | SCORM 2004 adapter — API_1484_11, split status, ISO 8601, scaled score | [spec/24-scorm-2004.md](spec/24-scorm-2004.md) | `[x]` |
 | 25 | Verzování suspend_data — envelope s verzí, migrace, bezpečný reset | [spec/25-suspend-data-versioning.md](spec/25-suspend-data-versioning.md) | `[x]` |
+
+## Issues — v3
+
+| # | Issue | Spec | Status |
+|---|-------|------|--------|
+| 26 | Audio / narration — Audio compound component, completion integrace, template player | [spec/26-audio.md](spec/26-audio.md) | `[ ]` |
+| 27 | Drag & Drop — DnD pro Ordering, nová CategorySort komponenta | [spec/27-drag-and-drop.md](spec/27-drag-and-drop.md) | `[ ]` |
+| 28 | Resume dialog — volba pokračovat/začít znovu při restore | [spec/28-resume-dialog.md](spec/28-resume-dialog.md) | `[ ]` |
+| 29 | Glossary — slovníček pojmů, inline term reference, panel s hledáním | [spec/29-glossary.md](spec/29-glossary.md) | `[ ]` |
+| 30 | Learner notes — poznámky per stránka, persistence v suspend_data | [spec/30-learner-notes.md](spec/30-learner-notes.md) | `[ ]` |
+| 31 | Assessment timer — časový limit, countdown, auto-submit | [spec/31-assessment-timer.md](spec/31-assessment-timer.md) | `[ ]` |
+| 32 | xAPI adapter — xAPI statements, LRS komunikace, cmi5 packaging | [spec/32-xapi-adapter.md](spec/32-xapi-adapter.md) | `[ ]` |
+| 33 | Fulltext search — build-time index, search UI, navigace na výsledek | [spec/33-fulltext-search.md](spec/33-fulltext-search.md) | `[ ]` |
