@@ -12,6 +12,7 @@ export interface OrderingRootProps {
   class?: string
   'aria-label'?: string
   weight?: number
+  dragEnabled?: boolean
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -29,6 +30,7 @@ export function Root({
   class: className,
   'aria-label': ariaLabel,
   weight,
+  dragEnabled = true,
 }: OrderingRootProps): VNode {
   const assessmentCtx = useContext(AssessmentContext)
   const courseCtx = useContext(CourseContext)
@@ -127,6 +129,53 @@ export function Root({
     }
   }, [submitted])
 
+  // DnD state
+  const [draggedPosition, setDraggedPosition] = useState<number | null>(null)
+  const [dropTargetPosition, setDropTargetPosition] = useState<number | null>(null)
+
+  const onDragStart = useCallback((position: number) => {
+    if (submitted) return
+    setDraggedPosition(position)
+  }, [submitted])
+
+  const onDragOver = useCallback((position: number) => {
+    setDropTargetPosition(position)
+  }, [])
+
+  const onDragEnd = useCallback(() => {
+    setDraggedPosition(null)
+    setDropTargetPosition(null)
+  }, [])
+
+  const onDrop = useCallback((toPosition: number) => {
+    if (submitted) return
+    setCurrentOrder(prev => {
+      const dragPos = draggedPosition
+      if (dragPos === null || dragPos === toPosition) return prev
+      const next = [...prev]
+      const draggedItem = next[dragPos]
+      next.splice(dragPos, 1)
+      next.splice(toPosition, 0, draggedItem)
+      return next
+    })
+    setDraggedPosition(null)
+    setDropTargetPosition(null)
+  }, [submitted, draggedPosition])
+
+  const moveToPosition = useCallback((fromPosition: number, toPosition: number) => {
+    if (submitted) return
+    if (fromPosition === toPosition) return
+    setCurrentOrder(prev => {
+      if (fromPosition < 0 || fromPosition >= prev.length) return prev
+      if (toPosition < 0 || toPosition >= prev.length) return prev
+      const next = [...prev]
+      const item = next[fromPosition]
+      next.splice(fromPosition, 1)
+      next.splice(toPosition, 0, item)
+      return next
+    })
+  }, [submitted])
+
   const moveUp = useCallback((position: number) => {
     if (submitted) return
     if (position <= 0) return
@@ -158,6 +207,7 @@ export function Root({
     currentOrder,
     moveUp,
     moveDown,
+    moveToPosition,
     submitted,
     isStandalone: !assessmentCtx,
     submit,
@@ -165,7 +215,14 @@ export function Root({
     correct: isCorrect,
     score: scoreValue,
     registerItem,
-  }), [items, currentOrder, moveUp, moveDown, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerItem])
+    dragEnabled: dragEnabled && !submitted,
+    draggedPosition,
+    dropTargetPosition,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+    onDrop,
+  }), [items, currentOrder, moveUp, moveDown, moveToPosition, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerItem, dragEnabled, draggedPosition, dropTargetPosition, onDragStart, onDragOver, onDragEnd, onDrop])
 
   return (
     <OrderingContext.Provider value={ctxValue}>

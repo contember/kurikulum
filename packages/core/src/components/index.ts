@@ -15,3 +15,5 @@ export { Ordering, OrderingContext, OrderingItemContext } from './ordering/index
 export type { OrderingContextValue, OrderingItemContextValue } from './ordering/index.ts'
 export { Audio, AudioContext } from './audio/index.ts'
 export type { AudioContextValue } from './audio/index.ts'
+export { CategorySort, CategorySortContext } from './category-sort/index.ts'
+export type { CategorySortContextValue, CategoryDef, CategoryItemDef } from './category-sort/index.ts'

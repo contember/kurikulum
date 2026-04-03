@@ -7,16 +7,17 @@ export interface OrderingProps {
   id: string
   question: string
   weight?: number
+  dragEnabled?: boolean
   children?: ComponentChildren
 }
 
-export function Ordering({ id, question, weight, children }: OrderingProps): VNode {
+export function Ordering({ id, question, weight, dragEnabled, children }: OrderingProps): VNode {
   const allChildren = toChildArray(children)
   const items = allChildren.filter(c => typeof c === 'object' && c !== null && (c as any).type === OrderingItem)
   const rest = allChildren.filter(c => !items.includes(c))
 
   return (
-    <O.Root id={id} weight={weight} aria-label={question}>
+    <O.Root id={id} weight={weight} dragEnabled={dragEnabled} aria-label={question}>
       <O.Label class="font-semibold mb-2">{question}</O.Label>
       <O.List class="space-y-2 mt-2">
         {items}
@@ -36,9 +37,9 @@ export interface OrderingItemProps {
 
 export function OrderingItem({ order, children }: OrderingItemProps): VNode {
   return (
-    <O.Item order={order} class="flex items-center gap-2 p-3 border border-border rounded-default bg-surface">
+    <O.Item order={order} class="flex items-center gap-2 p-3 border border-border rounded-default bg-surface transition-all duration-150 data-[dragging]:opacity-50 data-[drag-over]:border-primary data-[drag-over]:border-2 cursor-grab data-[dragging]:cursor-grabbing">
       <ItemControls />
-      <span class="flex-1">{children}</span>
+      <span class="flex-1 select-none">{children}</span>
     </O.Item>
   )
 }

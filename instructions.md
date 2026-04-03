@@ -59,7 +59,7 @@
 | # | Issue | Spec | Status |
 |---|-------|------|--------|
 | 26 | Audio / narration — Audio compound component, completion integrace, template player | [spec/26-audio.md](spec/26-audio.md) | `[x]` |
-| 27 | Drag & Drop — DnD pro Ordering, nová CategorySort komponenta | [spec/27-drag-and-drop.md](spec/27-drag-and-drop.md) | `[ ]` |
+| 27 | Drag & Drop — DnD pro Ordering, nová CategorySort komponenta | [spec/27-drag-and-drop.md](spec/27-drag-and-drop.md) | `[x]` |
 | 28 | Resume dialog — volba pokračovat/začít znovu při restore | [spec/28-resume-dialog.md](spec/28-resume-dialog.md) | `[ ]` |
 | 29 | Glossary — slovníček pojmů, inline term reference, panel s hledáním | [spec/29-glossary.md](spec/29-glossary.md) | `[ ]` |
 | 30 | Learner notes — poznámky per stránka, persistence v suspend_data | [spec/30-learner-notes.md](spec/30-learner-notes.md) | `[ ]` |
