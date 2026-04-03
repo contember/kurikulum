@@ -22,7 +22,22 @@ export function Root({ index, children }: SearchRootProps): VNode {
     setQuery('')
   }, [])
 
-  const results = useMemo(() => searchEntries(index, query), [index, query])
+  const allResults = useMemo(() => searchEntries(index, query), [index, query])
+
+  // Filter results to only include pages the user has already reached
+  const results = useMemo(() => {
+    if (!courseCtx) return allResults
+    const { state } = courseCtx.runtime
+    const currentIdx = state.pages.indexOf(state.currentPage)
+    const completedIndices = state.pages
+      .map((p, i) => state.completions[p] ? i : -1)
+      .filter(i => i >= 0)
+    const maxReached = Math.max(currentIdx, ...completedIndices, 0)
+    return allResults.filter(r => {
+      const idx = state.pages.indexOf(r.pageId)
+      return idx >= 0 && idx <= maxReached
+    })
+  }, [allResults, courseCtx])
 
   const navigateTo = useCallback(
     (pageId: string) => {
