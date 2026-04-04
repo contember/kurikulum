@@ -84,6 +84,24 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
     touchElementRef.current = null
   }, [ctx.dropTargetCategoryId, ctx.onDropOnCategory, ctx.onDragEnd])
 
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (ctx.submitted) return
+
+    // Number keys 1-9 assign to category at that index
+    const num = parseInt(e.key, 10)
+    if (num >= 1 && num <= ctx.categories.length) {
+      e.preventDefault()
+      ctx.assign(itemId, ctx.categories[num - 1].id)
+      return
+    }
+
+    // Backspace/Delete to unassign
+    if ((e.key === 'Backspace' || e.key === 'Delete') && isAssigned) {
+      e.preventDefault()
+      ctx.unassign(itemId)
+    }
+  }, [itemId, ctx.submitted, ctx.categories, ctx.assign, ctx.unassign, isAssigned])
+
   return (
     <div
       class={className}
@@ -92,8 +110,11 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
       data-assigned={isAssigned || undefined}
       data-correct={isCorrect !== null ? String(isCorrect) : undefined}
       aria-grabbed={isDragging}
+      aria-label={`${item.label}${isAssigned && assignedCategory ? `, assigned to ${ctx.categories.find(c => c.id === assignedCategory)?.label ?? assignedCategory}` : ', unassigned'}. Use keys 1-${ctx.categories.length} to assign.`}
       role="listitem"
+      tabIndex={0}
       draggable={!ctx.submitted}
+      onKeyDown={onKeyDown}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onTouchStart={onTouchStart}

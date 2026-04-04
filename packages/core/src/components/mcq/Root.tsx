@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback } from 'preact/hooks'
+import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
 import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
@@ -94,7 +94,31 @@ export function Root({ id, weight, children, class: className, 'aria-label': ari
     if (selected !== null) setLocalSubmitted(true)
   }, [selected])
 
-  const ctxValue = {
+  const fieldsetRef = useRef<HTMLFieldSetElement>(null)
+
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (submitted) return
+    const isArrow = e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowLeft'
+    if (!isArrow) return
+
+    const radios = fieldsetRef.current?.querySelectorAll<HTMLInputElement>('input[type="radio"]')
+    if (!radios?.length) return
+
+    const currentIdx = Array.from(radios).indexOf(document.activeElement as HTMLInputElement)
+    if (currentIdx === -1) return
+
+    e.preventDefault()
+    let nextIdx: number
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      nextIdx = (currentIdx + 1) % radios.length
+    } else {
+      nextIdx = (currentIdx - 1 + radios.length) % radios.length
+    }
+    radios[nextIdx].focus()
+    select(nextIdx)
+  }, [submitted, select])
+
+  const ctxValue = useMemo(() => ({
     registerItem,
     selected,
     select,
@@ -103,16 +127,19 @@ export function Root({ id, weight, children, class: className, 'aria-label': ari
     submit,
     id,
     correct: isCorrect,
-  }
+    itemCount: counterRef.current,
+  }), [registerItem, selected, select, submitted, assessmentCtx, submit, id, isCorrect])
 
   return (
     <MCQContext.Provider value={ctxValue}>
       <fieldset
+        ref={fieldsetRef}
         role="radiogroup"
         aria-label={ariaLabel}
         class={className}
         data-submitted={submitted || undefined}
         data-correct={submitted ? String(isCorrect) : undefined}
+        onKeyDown={onKeyDown}
       >
         {children}
       </fieldset>

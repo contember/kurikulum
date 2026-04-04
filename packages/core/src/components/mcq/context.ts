@@ -9,6 +9,7 @@ export interface MCQContextValue {
   submit(): void
   id: string
   correct: boolean | null
+  itemCount: number
 }
 
 export const MCQContext = createContext<MCQContextValue | null>(null)

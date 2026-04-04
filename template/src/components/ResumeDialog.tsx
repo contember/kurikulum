@@ -1,13 +1,18 @@
 import type { VNode } from 'preact'
-import { useRestore } from '@kurikulum/core'
+import { useRef } from 'preact/hooks'
+import { useRestore, useFocusTrap } from '@kurikulum/core'
 
 export function ResumeDialog(): VNode | null {
   const { hasStoredState, storedPage, resume, restart } = useRestore()
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap(dialogRef, hasStoredState)
 
   if (!hasStoredState) return null
 
   return (
     <div
+      ref={dialogRef}
       class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       role="dialog"
       aria-modal="true"

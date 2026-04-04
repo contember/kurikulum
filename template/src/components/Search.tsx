@@ -1,5 +1,6 @@
 import type { VNode } from 'preact'
-import { Search as S, useSearch } from '@kurikulum/core'
+import { useRef } from 'preact/hooks'
+import { Search as S, useSearch, useFocusTrap } from '@kurikulum/core'
 import type { SearchEntry } from '@kurikulum/core'
 
 export interface SearchProps {
@@ -38,11 +39,15 @@ export function SearchButton(): VNode {
 
 export function SearchModal(): VNode | null {
   const ctx = useSearch()
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap(modalRef, ctx.isOpen)
 
   if (!ctx.isOpen) return null
 
   return (
     <div
+      ref={modalRef}
       class="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]"
       role="presentation"
       onKeyDown={(e) => {
@@ -84,6 +89,11 @@ function SearchResultsList(): VNode | null {
 
   return (
     <div class="max-h-80 overflow-y-auto">
+      <div aria-live="polite" role="status" class="sr-only">
+        {ctx.results.length > 0
+          ? `${ctx.results.length} results found`
+          : `No results found for "${ctx.query}"`}
+      </div>
       {ctx.results.length > 0 ? (
         <ul role="listbox" class="py-2">
           {ctx.results.map((result) => (

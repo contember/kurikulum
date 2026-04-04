@@ -19,7 +19,7 @@ export { CourseContext, createNotifier, CourseProvider } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // Hooks
-export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio, useRestore, useGlossary, useNotes, useAssessmentTimer, useSearch } from './hooks/index.ts'
+export { useCourse, useNavigation, useCompletion, useAssessment, usePage, useAudio, useRestore, useGlossary, useNotes, useAssessmentTimer, useSearch, useFocusTrap } from './hooks/index.ts'
 export type { RestoreContext } from './hooks/index.ts'
 
 // Adapters

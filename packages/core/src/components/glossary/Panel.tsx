@@ -1,5 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext, useEffect, useRef } from 'preact/hooks'
+import { useFocusTrap } from '../../hooks/useFocusTrap.ts'
 import { GlossaryContext } from './context.ts'
 
 export interface GlossaryPanelProps {
@@ -12,6 +13,8 @@ export function Panel({ class: className, children }: GlossaryPanelProps): VNode
   if (!ctx) throw new Error('Glossary.Panel must be used within Glossary.Root')
 
   const panelRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap(panelRef, ctx.isOpen)
 
   useEffect(() => {
     if (!ctx.isOpen) return
@@ -34,7 +37,7 @@ export function Panel({ class: className, children }: GlossaryPanelProps): VNode
   if (!ctx.isOpen) return null
 
   return (
-    <div ref={panelRef} class={className} role="dialog" aria-label="Glossary" aria-modal="false">
+    <div ref={panelRef} class={className} role="dialog" aria-label="Glossary" aria-modal="true">
       {children ?? (
         <>
           <dl>

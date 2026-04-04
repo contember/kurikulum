@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback } from 'preact/hooks'
+import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
 import { CourseContext } from '../../context.tsx'
 import { AssessmentContext } from '../assessment/context.ts'
@@ -129,23 +129,50 @@ export function Root({ id, weight, children, class: className, 'aria-label': ari
     setLocalSubmitted(true)
   }, [])
 
+  const fieldsetRef = useRef<HTMLFieldSetElement>(null)
+
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (submitted) return
+    const isArrow = e.key === 'ArrowDown' || e.key === 'ArrowUp'
+    if (!isArrow) return
+
+    const checkboxes = fieldsetRef.current?.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+    if (!checkboxes?.length) return
+
+    const currentIdx = Array.from(checkboxes).indexOf(document.activeElement as HTMLInputElement)
+    if (currentIdx === -1) return
+
+    e.preventDefault()
+    let nextIdx: number
+    if (e.key === 'ArrowDown') {
+      nextIdx = (currentIdx + 1) % checkboxes.length
+    } else {
+      nextIdx = (currentIdx - 1 + checkboxes.length) % checkboxes.length
+    }
+    checkboxes[nextIdx].focus()
+  }, [submitted])
+
+  const ctxValue = useMemo(() => ({
+    registerItem,
+    selected,
+    toggle,
+    submitted,
+    isStandalone: !assessmentCtx,
+    submit,
+    id,
+    correct: isCorrect,
+  }), [registerItem, selected, toggle, submitted, assessmentCtx, submit, id, isCorrect])
+
   return (
-    <MultiSelectContext.Provider value={{
-      registerItem,
-      selected,
-      toggle,
-      submitted,
-      isStandalone: !assessmentCtx,
-      submit,
-      id,
-      correct: isCorrect,
-    }}>
+    <MultiSelectContext.Provider value={ctxValue}>
       <fieldset
+        ref={fieldsetRef}
         role="group"
         aria-label={ariaLabel}
         class={className}
         data-submitted={submitted || undefined}
         data-correct={submitted ? String(isCorrect) : undefined}
+        onKeyDown={onKeyDown}
       >
         {children}
       </fieldset>

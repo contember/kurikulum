@@ -132,18 +132,44 @@ export function Item({ order, children, class: className }: OrderingItemProps): 
     },
   }), [itemIndex, order, position, isCorrect, ctx.submitted, ctx.currentOrder.length, ctx.moveUp, ctx.moveDown, ctx.dragEnabled, isDragging, isDragOver, onDragStartHandler, onDragOverHandler, onDragEndHandler, onDropHandler, onDragEnterHandler, onDragLeaveHandler, onTouchStartHandler, onTouchMoveHandler, onTouchEndHandler])
 
+  const onKeyDownHandler = useCallback((e: KeyboardEvent) => {
+    if (ctx.submitted) return
+    if (!e.altKey) return
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      ctx.moveUp(position)
+      // Focus follows the moved item after rerender
+      requestAnimationFrame(() => {
+        const parent = (e.target as HTMLElement).closest('fieldset')
+        const items = parent?.querySelectorAll<HTMLElement>('[role="listitem"]')
+        if (items && position > 0) items[position - 1]?.focus()
+      })
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      ctx.moveDown(position)
+      requestAnimationFrame(() => {
+        const parent = (e.target as HTMLElement).closest('fieldset')
+        const items = parent?.querySelectorAll<HTMLElement>('[role="listitem"]')
+        if (items && position < ctx.currentOrder.length - 1) items[position + 1]?.focus()
+      })
+    }
+  }, [position, ctx.submitted, ctx.moveUp, ctx.moveDown, ctx.currentOrder.length])
+
   return (
     <OrderingItemContext.Provider value={itemCtx}>
       <div
         class={className}
         style={{ order: position }}
+        tabIndex={0}
         data-correct={ctx.submitted ? String(isCorrect) : undefined}
         data-dragging={isDragging || undefined}
         data-drag-over={isDragOver || undefined}
         aria-grabbed={ctx.dragEnabled ? isDragging : undefined}
         aria-dropeffect={ctx.dragEnabled && ctx.draggedPosition !== null && !isDragging ? 'move' : undefined}
+        aria-label={`Item ${position + 1} of ${ctx.currentOrder.length}`}
         role="listitem"
         draggable={ctx.dragEnabled}
+        onKeyDown={onKeyDownHandler}
         onDragStart={onDragStartHandler}
         onDragOver={onDragOverHandler}
         onDragEnd={onDragEndHandler}

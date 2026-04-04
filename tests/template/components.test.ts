@@ -101,15 +101,15 @@ describe('Course', () => {
     expect(container.textContent).toContain('Page 2 content')
     expect(container.textContent).toContain('Page 3 content')
 
-    // Find page wrappers by data-page-id on the main divs
-    const divs = Array.from(container.getElementsByTagName('div'))
-    const pageDivs = divs.filter(d => d.getAttribute('data-page-id'))
-    expect(pageDivs.length).toBe(3)
+    // Find page wrappers by data-page-id on the main elements
+    const mains = Array.from(container.getElementsByTagName('main'))
+    const pageMains = mains.filter(d => d.getAttribute('data-page-id'))
+    expect(pageMains.length).toBe(3)
 
     // Inactive pages have display:none on their wrapper parent
-    expect(pageDivs[0].parentElement!.style.display).not.toBe('none') // page-1 active
-    expect(pageDivs[1].parentElement!.style.display).toBe('none')     // page-2 hidden
-    expect(pageDivs[2].parentElement!.style.display).toBe('none')     // page-3 hidden
+    expect(pageMains[0].parentElement!.style.display).not.toBe('none') // page-1 active
+    expect(pageMains[1].parentElement!.style.display).toBe('none')     // page-2 hidden
+    expect(pageMains[2].parentElement!.style.display).toBe('none')     // page-3 hidden
   })
 
   it('switches visible page after navigation', () => {
@@ -129,8 +129,8 @@ describe('Course', () => {
 
     render(h(App, null), container)
     const getPageWrappers = () => {
-      const divs = Array.from(container.getElementsByTagName('div'))
-      return divs.filter(d => d.getAttribute('data-page-id')).map(d => d.parentElement!)
+      const mains = Array.from(container.getElementsByTagName('main'))
+      return mains.filter(d => d.getAttribute('data-page-id')).map(d => d.parentElement!)
     }
 
     // page-1 visible, page-2 hidden
@@ -184,10 +184,10 @@ describe('Course', () => {
     )
 
     // The page is rendered but hidden
-    const divs = Array.from(container.getElementsByTagName('div'))
-    const pageDiv = divs.find(d => d.getAttribute('data-page-id') === 'nonexistent')
-    expect(pageDiv).toBeDefined()
-    expect(pageDiv!.parentElement!.style.display).toBe('none')
+    const mains = Array.from(container.getElementsByTagName('main'))
+    const pageMain = mains.find(d => d.getAttribute('data-page-id') === 'nonexistent')
+    expect(pageMain).toBeDefined()
+    expect(pageMain!.parentElement!.style.display).toBe('none')
   })
 })
 
@@ -208,7 +208,7 @@ describe('Page', () => {
     expect(container.textContent).toContain('Hello from page')
   })
 
-  it('has role="main" and tabindex for focus management', () => {
+  it('uses semantic <main> element with tabindex for focus management', () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
@@ -221,8 +221,7 @@ describe('Page', () => {
       container,
     )
 
-    const divs = Array.from(container.getElementsByTagName('div'))
-    const mainEl = divs.find(d => d.getAttribute('role') === 'main')
+    const mainEl = container.getElementsByTagName('main')[0]
     expect(mainEl).toBeDefined()
     expect(mainEl!.getAttribute('tabindex')).toBe('-1')
     expect(mainEl!.getAttribute('id')).toBe('page-content')

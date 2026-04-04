@@ -29,7 +29,7 @@ export function Root({ id, completion = 'mount', completionTimer, active = true,
   const ctx = useContext(CourseContext)!
   const sentinelRef = useRef<HTMLDivElement>(null)
   const handlerRef = useRef<CompletionHandler | null>(null)
-  const mainRef = useRef<HTMLDivElement>(null)
+  const mainRef = useRef<HTMLElement>(null)
   const registry = useMemo(() => new CompletableRegistry(), [id])
 
   useEffect(() => {
@@ -71,17 +71,16 @@ export function Root({ id, completion = 'mount', completionTimer, active = true,
 
   return (
     <PageContext.Provider value={{ sentinelRef, id, completion, registry }}>
-      <div
+      <main
         ref={mainRef}
         tabIndex={-1}
-        role="main"
         id="page-content"
         class={className}
         data-page-id={id}
         data-complete={isComplete || undefined}
       >
         {children}
-      </div>
+      </main>
     </PageContext.Provider>
   )
 }
