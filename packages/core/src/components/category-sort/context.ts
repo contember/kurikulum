@@ -29,6 +29,11 @@ export interface CategorySortContextValue {
   onDragOverCategory(categoryId: string): void
   onDragEnd(): void
   onDropOnCategory(categoryId: string): void
+
+  // Click-to-assign
+  selectedItemId: string | null
+  toggleSelectItem(itemId: string): void
+  assignSelectedToCategory(categoryId: string): void
 }
 
 export const CategorySortContext = createContext<CategorySortContextValue | null>(null)

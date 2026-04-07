@@ -2,6 +2,8 @@ import type { ComponentChildren, VNode } from 'preact'
 import { useContext, useCallback, useRef } from 'preact/hooks'
 import { CategorySortContext } from './context.ts'
 
+const DRAG_THRESHOLD = 8 // px of movement before touch becomes a drag
+
 export interface CategorySortItemProps {
   id: string
   children?: ComponentChildren
@@ -22,6 +24,7 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
 
   const touchStartRef = useRef<{ x: number, y: number } | null>(null)
   const touchElementRef = useRef<HTMLElement | null>(null)
+  const touchDragStartedRef = useRef(false)
 
   const onDragStart = useCallback((e: DragEvent) => {
     if (ctx.submitted) return
@@ -39,18 +42,26 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
     const touch = e.touches[0]
     touchStartRef.current = { x: touch.clientX, y: touch.clientY }
     touchElementRef.current = e.currentTarget as HTMLElement
-    ctx.onDragStart(itemId)
-  }, [itemId, ctx.submitted, ctx.onDragStart])
+    touchDragStartedRef.current = false
+  }, [ctx.submitted])
 
   const onTouchMove = useCallback((e: TouchEvent) => {
     if (!touchStartRef.current) return
-    e.preventDefault()
     const touch = e.touches[0]
+    const dx = touch.clientX - touchStartRef.current.x
+    const dy = touch.clientY - touchStartRef.current.y
+
+    // Start drag only after exceeding threshold
+    if (!touchDragStartedRef.current) {
+      if (Math.abs(dx) + Math.abs(dy) < DRAG_THRESHOLD) return
+      touchDragStartedRef.current = true
+      ctx.onDragStart(itemId)
+    }
+
+    e.preventDefault()
 
     // Visual feedback
     if (touchElementRef.current) {
-      const dx = touch.clientX - touchStartRef.current.x
-      const dy = touch.clientY - touchStartRef.current.y
       touchElementRef.current.style.transform = `translate(${dx}px, ${dy}px)`
       touchElementRef.current.style.zIndex = '1000'
       touchElementRef.current.style.opacity = '0.8'
@@ -65,7 +76,7 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
         if (catId) ctx.onDragOverCategory(catId)
       }
     }
-  }, [ctx.onDragOverCategory])
+  }, [itemId, ctx.onDragStart, ctx.onDragOverCategory])
 
   const onTouchEnd = useCallback((_e: TouchEvent) => {
     if (!touchStartRef.current) return
@@ -75,17 +86,36 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
       touchElementRef.current.style.zIndex = ''
       touchElementRef.current.style.opacity = ''
     }
-    if (ctx.dropTargetCategoryId) {
-      ctx.onDropOnCategory(ctx.dropTargetCategoryId)
-    } else {
-      ctx.onDragEnd()
+    if (touchDragStartedRef.current) {
+      // Was a real drag — complete drop or cancel
+      if (ctx.dropTargetCategoryId) {
+        ctx.onDropOnCategory(ctx.dropTargetCategoryId)
+      } else {
+        ctx.onDragEnd()
+      }
     }
+    // If drag never started, let the click event handle it
     touchStartRef.current = null
     touchElementRef.current = null
+    touchDragStartedRef.current = false
   }, [ctx.dropTargetCategoryId, ctx.onDropOnCategory, ctx.onDragEnd])
+
+  const isSelected = ctx.selectedItemId === itemId
+
+  const onClick = useCallback(() => {
+    if (ctx.submitted) return
+    ctx.toggleSelectItem(itemId)
+  }, [itemId, ctx.submitted, ctx.toggleSelectItem])
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {
     if (ctx.submitted) return
+
+    // Space/Enter: toggle selection
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault()
+      ctx.toggleSelectItem(itemId)
+      return
+    }
 
     // Number keys 1-9 assign to category at that index
     const num = parseInt(e.key, 10)
@@ -100,13 +130,14 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
       e.preventDefault()
       ctx.unassign(itemId)
     }
-  }, [itemId, ctx.submitted, ctx.categories, ctx.assign, ctx.unassign, isAssigned])
+  }, [itemId, ctx.submitted, ctx.toggleSelectItem, ctx.categories, ctx.assign, ctx.unassign, isAssigned])
 
   return (
     <div
       class={className}
       data-item={itemId}
       data-dragging={isDragging || undefined}
+      data-selected={isSelected || undefined}
       data-assigned={isAssigned || undefined}
       data-correct={isCorrect !== null ? String(isCorrect) : undefined}
       aria-grabbed={isDragging}
@@ -114,6 +145,7 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
       role="listitem"
       tabIndex={0}
       draggable={!ctx.submitted}
+      onClick={onClick}
       onKeyDown={onKeyDown}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}

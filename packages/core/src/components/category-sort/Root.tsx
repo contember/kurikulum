@@ -41,6 +41,9 @@ export function Root({
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null)
   const [dropTargetCategoryId, setDropTargetCategoryId] = useState<string | null>(null)
 
+  // Click-to-assign state
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
+
   // Evaluate: correctAssignments / totalItems
   const evaluate = useCallback((): number => {
     const sel = assignmentsRef.current
@@ -164,6 +167,26 @@ export function Root({
     setDropTargetCategoryId(null)
   }, [submitted, draggedItemId])
 
+  const toggleSelectItem = useCallback((itemId: string) => {
+    if (submitted) return
+    setSelectedItemId(prev => prev === itemId ? null : itemId)
+  }, [submitted])
+
+  const selectedItemIdRef = useRef(selectedItemId)
+  selectedItemIdRef.current = selectedItemId
+
+  const assignSelectedToCategory = useCallback((categoryId: string) => {
+    if (submitted) return
+    const itemId = selectedItemIdRef.current
+    if (!itemId) return
+    setAssignments(prev => {
+      const next = new Map(prev)
+      next.set(itemId, categoryId)
+      return next
+    })
+    setSelectedItemId(null)
+  }, [submitted])
+
   const ctxValue: CategorySortContextValue = useMemo(() => ({
     categories,
     items,
@@ -182,7 +205,10 @@ export function Root({
     onDragOverCategory,
     onDragEnd,
     onDropOnCategory,
-  }), [categories, items, assignments, assign, unassign, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, draggedItemId, dropTargetCategoryId, onDragStart, onDragOverCategory, onDragEnd, onDropOnCategory])
+    selectedItemId,
+    toggleSelectItem,
+    assignSelectedToCategory,
+  }), [categories, items, assignments, assign, unassign, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, draggedItemId, dropTargetCategoryId, onDragStart, onDragOverCategory, onDragEnd, onDropOnCategory, selectedItemId, toggleSelectItem, assignSelectedToCategory])
 
   return (
     <CategorySortContext.Provider value={ctxValue}>

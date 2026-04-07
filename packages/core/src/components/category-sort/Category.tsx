@@ -46,17 +46,26 @@ export function Category({ id: categoryId, children, class: className }: Categor
     ctx.assign(itemId, categoryId)
   }, [categoryId, ctx.assign, ctx.submitted])
 
+  const onClick = useCallback(() => {
+    if (ctx.submitted) return
+    if (ctx.selectedItemId) {
+      ctx.assignSelectedToCategory(categoryId)
+    }
+  }, [categoryId, ctx.submitted, ctx.selectedItemId, ctx.assignSelectedToCategory])
+
   return (
     <div
       class={className}
       data-category={categoryId}
       data-drag-over={isDragOver || undefined}
+      data-has-selected-item={ctx.selectedItemId !== null || undefined}
       aria-dropeffect={ctx.draggedItemId !== null ? 'move' : undefined}
       aria-label={`Category: ${category.label}`}
       onDragOver={onDragOver}
       onDragEnter={onDragEnter}
       onDrop={onDrop}
       onDragLeave={onDragLeave}
+      onClick={onClick}
     >
       {typeof children === 'function'
         ? (children as any)({ category, assignedItems, isDragOver, onSelect })
