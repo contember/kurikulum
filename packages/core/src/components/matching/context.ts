@@ -17,6 +17,24 @@ export interface MatchingContextValue {
   correct: boolean | null
   score: number | null
   registerPair(prompt: string, response: string): number
+  unplacedResponses: string[]
+
+  // DnD state
+  draggedResponse: string | null
+  dropTargetPairIndex: number | null
+  onDragStartResponse(response: string): void
+  onDragOverPair(pairIndex: number): void
+  onDragEnd(): void
+  onDropOnPair(pairIndex: number): void
+
+  // Click-to-assign state
+  selectedResponse: string | null
+  toggleSelectResponse(response: string): void
+  assignSelectedToPair(pairIndex: number): void
+
+  // Assign/unassign with dedup
+  assignResponse(pairIndex: number, response: string): void
+  unassign(pairIndex: number): void
 }
 
 export const MatchingContext = createContext<MatchingContextValue | null>(null)

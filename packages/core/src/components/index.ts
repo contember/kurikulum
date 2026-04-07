@@ -10,7 +10,7 @@ export type { AssessmentContextValue, TimerContextValue } from './assessment/ind
 export { FillBlank, FillBlankContext } from './fill-blank/index.ts'
 export type { FillBlankContextValue } from './fill-blank/index.ts'
 export { Matching, MatchingContext } from './matching/index.ts'
-export type { MatchingContextValue } from './matching/index.ts'
+export type { MatchingContextValue, MatchingSlotRenderProps } from './matching/index.ts'
 export { Ordering, OrderingContext, OrderingItemContext } from './ordering/index.ts'
 export type { OrderingContextValue, OrderingItemContextValue } from './ordering/index.ts'
 export { Audio, AudioContext } from './audio/index.ts'

@@ -143,11 +143,109 @@ export function Root({
     })
   }, [submitted])
 
+  // Assign with dedup: clears any other pair that had the same response
+  const assignResponse = useCallback((pairIndex: number, response: string) => {
+    if (submitted) return
+    setSelections(prev => {
+      const next = new Map(prev)
+      for (const [idx, sel] of next.entries()) {
+        if (sel === response && idx !== pairIndex) {
+          next.delete(idx)
+        }
+      }
+      next.set(pairIndex, response)
+      return next
+    })
+  }, [submitted])
+
+  const unassign = useCallback((pairIndex: number) => {
+    if (submitted) return
+    setSelections(prev => {
+      const next = new Map(prev)
+      next.delete(pairIndex)
+      return next
+    })
+  }, [submitted])
+
   const submit = useCallback(() => {
     if (selectionsRef.current.size >= pairsRef.current.length) {
       setLocalSubmitted(true)
     }
   }, [])
+
+  // DnD state
+  const [draggedResponse, setDraggedResponse] = useState<string | null>(null)
+  const [dropTargetPairIndex, setDropTargetPairIndex] = useState<number | null>(null)
+
+  // Click-to-assign state
+  const [selectedResponse, setSelectedResponse] = useState<string | null>(null)
+
+  const onDragStartResponse = useCallback((response: string) => {
+    if (submitted) return
+    setDraggedResponse(response)
+  }, [submitted])
+
+  const onDragOverPair = useCallback((pairIndex: number) => {
+    setDropTargetPairIndex(pairIndex)
+  }, [])
+
+  const onDragEnd = useCallback(() => {
+    setDraggedResponse(null)
+    setDropTargetPairIndex(null)
+  }, [])
+
+  const draggedResponseRef = useRef(draggedResponse)
+  draggedResponseRef.current = draggedResponse
+
+  const onDropOnPair = useCallback((pairIndex: number) => {
+    if (submitted) return
+    const response = draggedResponseRef.current
+    if (response) {
+      setSelections(prev => {
+        const next = new Map(prev)
+        for (const [idx, sel] of next.entries()) {
+          if (sel === response && idx !== pairIndex) {
+            next.delete(idx)
+          }
+        }
+        next.set(pairIndex, response)
+        return next
+      })
+    }
+    setDraggedResponse(null)
+    setDropTargetPairIndex(null)
+  }, [submitted])
+
+  const toggleSelectResponse = useCallback((response: string) => {
+    if (submitted) return
+    setSelectedResponse(prev => prev === response ? null : response)
+  }, [submitted])
+
+  const selectedResponseRef = useRef(selectedResponse)
+  selectedResponseRef.current = selectedResponse
+
+  const assignSelectedToPair = useCallback((pairIndex: number) => {
+    if (submitted) return
+    const response = selectedResponseRef.current
+    if (!response) return
+    setSelections(prev => {
+      const next = new Map(prev)
+      for (const [idx, sel] of next.entries()) {
+        if (sel === response && idx !== pairIndex) {
+          next.delete(idx)
+        }
+      }
+      next.set(pairIndex, response)
+      return next
+    })
+    setSelectedResponse(null)
+  }, [submitted])
+
+  // Computed: unplaced responses
+  const unplacedResponses = useMemo(() => {
+    const placed = new Set(selections.values())
+    return responses.filter(r => !placed.has(r))
+  }, [responses, selections])
 
   const ctxValue: MatchingContextValue = useMemo(() => ({
     pairs,
@@ -161,7 +259,19 @@ export function Root({
     correct: isCorrect,
     score: scoreValue,
     registerPair,
-  }), [pairs, responses, selections, select, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerPair])
+    unplacedResponses,
+    draggedResponse,
+    dropTargetPairIndex,
+    onDragStartResponse,
+    onDragOverPair,
+    onDragEnd,
+    onDropOnPair,
+    selectedResponse,
+    toggleSelectResponse,
+    assignSelectedToPair,
+    assignResponse,
+    unassign,
+  }), [pairs, responses, selections, select, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerPair, unplacedResponses, draggedResponse, dropTargetPairIndex, onDragStartResponse, onDragOverPair, onDragEnd, onDropOnPair, selectedResponse, toggleSelectResponse, assignSelectedToPair, assignResponse, unassign])
 
   return (
     <MatchingContext.Provider value={ctxValue}>
