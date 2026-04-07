@@ -13,6 +13,7 @@ export interface SearchRootProps {
 export function Root({ index, children }: SearchRootProps): VNode {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
 
   const courseCtx = useContext(CourseContext)
 
@@ -20,6 +21,7 @@ export function Root({ index, children }: SearchRootProps): VNode {
   const close = useCallback(() => {
     setIsOpen(false)
     setQuery('')
+    setActiveIndex(-1)
   }, [])
 
   const allResults = useMemo(() => searchEntries(index, query), [index, query])
@@ -38,6 +40,11 @@ export function Root({ index, children }: SearchRootProps): VNode {
       return idx >= 0 && idx <= maxReached
     })
   }, [allResults, courseCtx])
+
+  // Reset active index when results change
+  useEffect(() => {
+    setActiveIndex(-1)
+  }, [results])
 
   const navigateTo = useCallback(
     (pageId: string) => {
@@ -63,8 +70,8 @@ export function Root({ index, children }: SearchRootProps): VNode {
   }, [])
 
   const ctxValue = useMemo(
-    () => ({ query, setQuery, results, isOpen, open, close, navigateTo }),
-    [query, results, isOpen, open, close, navigateTo],
+    () => ({ query, setQuery, results, isOpen, open, close, navigateTo, activeIndex, setActiveIndex }),
+    [query, results, isOpen, open, close, navigateTo, activeIndex],
   )
 
   return (

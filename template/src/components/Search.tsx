@@ -1,5 +1,5 @@
 import type { VNode } from 'preact'
-import { useRef } from 'preact/hooks'
+import { useRef, useEffect } from 'preact/hooks'
 import { Search as S, useSearch, useFocusTrap } from '@kurikulum/core'
 import type { SearchEntry } from '@kurikulum/core'
 
@@ -95,20 +95,10 @@ function SearchResultsList(): VNode | null {
           : `No results found for "${ctx.query}"`}
       </div>
       {ctx.results.length > 0 ? (
-        <ul role="listbox" class="py-2">
-          {ctx.results.map((result) => (
+        <ul role="listbox" id="search-results-listbox" class="py-2">
+          {ctx.results.map((result, i) => (
             <li key={result.pageId}>
-              <button
-                type="button"
-                class="w-full text-left px-4 py-3 hover:bg-bg-muted focus:bg-bg-muted focus:outline-none cursor-pointer"
-                role="option"
-                onClick={() => ctx.navigateTo(result.pageId)}
-              >
-                <div class="font-medium text-text">{result.title}</div>
-                <div class="text-sm text-text-secondary mt-1 line-clamp-2">
-                  <Highlight text={result.snippet} query={ctx.query} />
-                </div>
-              </button>
+              <SearchResultItem result={result} index={i} />
             </li>
           ))}
         </ul>
@@ -118,6 +108,36 @@ function SearchResultsList(): VNode | null {
         </div>
       )}
     </div>
+  )
+}
+
+function SearchResultItem({ result, index }: { result: { pageId: string; title: string; snippet: string }; index: number }): VNode {
+  const ctx = useSearch()
+  const isActive = index === ctx.activeIndex
+  const ref = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (isActive && ref.current) {
+      ref.current.scrollIntoView({ block: 'nearest' })
+    }
+  }, [isActive])
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      id={`search-result-${index}`}
+      class={`w-full text-left px-4 py-3 hover:bg-bg-muted focus:outline-none cursor-pointer ${isActive ? 'bg-bg-muted' : ''}`}
+      role="option"
+      aria-selected={isActive}
+      onClick={() => ctx.navigateTo(result.pageId)}
+      onMouseEnter={() => ctx.setActiveIndex(index)}
+    >
+      <div class="font-medium text-text">{result.title}</div>
+      <div class="text-sm text-text-secondary mt-1 line-clamp-2">
+        <Highlight text={result.snippet} query={ctx.query} />
+      </div>
+    </button>
   )
 }
 

@@ -1,5 +1,5 @@
 import type { VNode } from 'preact'
-import { useContext, useRef, useEffect } from 'preact/hooks'
+import { useContext, useRef, useEffect, useCallback } from 'preact/hooks'
 import { SearchContext } from './context.ts'
 
 export interface SearchInputProps {
@@ -19,6 +19,22 @@ export function Input({ class: className, placeholder = 'Search...' }: SearchInp
     }
   }, [ctx.isOpen])
 
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    const len = ctx.results.length
+    if (len === 0) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      ctx.setActiveIndex(ctx.activeIndex < len - 1 ? ctx.activeIndex + 1 : 0)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      ctx.setActiveIndex(ctx.activeIndex > 0 ? ctx.activeIndex - 1 : len - 1)
+    } else if (e.key === 'Enter' && ctx.activeIndex >= 0 && ctx.activeIndex < len) {
+      e.preventDefault()
+      ctx.navigateTo(ctx.results[ctx.activeIndex].pageId)
+    }
+  }, [ctx])
+
   return (
     <input
       ref={inputRef}
@@ -27,8 +43,13 @@ export function Input({ class: className, placeholder = 'Search...' }: SearchInp
       placeholder={placeholder}
       value={ctx.query}
       onInput={(e) => ctx.setQuery((e.target as HTMLInputElement).value)}
+      onKeyDown={onKeyDown}
       aria-label="Search course content"
-      role="searchbox"
+      role="combobox"
+      aria-expanded={ctx.results.length > 0}
+      aria-controls="search-results-listbox"
+      aria-activedescendant={ctx.activeIndex >= 0 ? `search-result-${ctx.activeIndex}` : undefined}
+      aria-autocomplete="list"
     />
   )
 }

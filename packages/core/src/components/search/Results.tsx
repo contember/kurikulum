@@ -14,14 +14,16 @@ export function Results({ class: className, children }: SearchResultsProps): VNo
   if (!ctx.isOpen) return null
 
   return (
-    <div class={className} role="listbox" aria-label="Search results">
+    <div class={className} role="listbox" id="search-results-listbox" aria-label="Search results">
       {children ?? (
         ctx.results.length > 0
-          ? ctx.results.map((r) => (
+          ? ctx.results.map((r, i) => (
               <div
                 key={r.pageId}
+                id={`search-result-${i}`}
                 role="option"
-                tabIndex={0}
+                tabIndex={-1}
+                aria-selected={i === ctx.activeIndex}
                 onClick={() => ctx.navigateTo(r.pageId)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {

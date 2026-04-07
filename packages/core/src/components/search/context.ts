@@ -21,6 +21,8 @@ export interface SearchContextValue {
   open: () => void
   close: () => void
   navigateTo: (pageId: string) => void
+  activeIndex: number
+  setActiveIndex: (index: number) => void
 }
 
 export const SearchContext = createContext<SearchContextValue | null>(null)
