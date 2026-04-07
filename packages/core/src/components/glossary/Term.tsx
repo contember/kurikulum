@@ -34,6 +34,7 @@ export function Term({ term, class: className, children }: GlossaryTermProps): V
   return (
     <span
       class={className}
+      style={{ position: 'relative' }}
       role="button"
       tabIndex={0}
       aria-describedby={showTooltip ? `glossary-tooltip-${entry.term}` : undefined}
@@ -57,6 +58,11 @@ export function Term({ term, class: className, children }: GlossaryTermProps): V
           style={{
             position: 'absolute',
             zIndex: 50,
+            left: 0,
+            top: '100%',
+            whiteSpace: 'nowrap',
+            fontSize: '0.875rem',
+            fontWeight: 'normal',
           }}
         >
           <strong>{entry.term}</strong>: {entry.definition}

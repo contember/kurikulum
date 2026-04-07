@@ -61,7 +61,7 @@ export function GlossaryTerm({ term, children }: { term: string; children?: prea
   return (
     <G.Term
       term={term}
-      class="relative inline-block border-b border-dashed border-primary text-primary cursor-pointer"
+      class="inline-block border-b border-dashed border-primary text-primary cursor-pointer"
     >
       {children}
     </G.Term>
