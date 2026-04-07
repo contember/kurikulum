@@ -19,23 +19,25 @@ export function Assessment({ id, passThreshold, maxAttempts, timeLimit, onTimeEx
           class="mb-4 text-lg font-mono font-semibold text-text-primary data-[warning]:text-danger data-[warning]:animate-pulse data-[expired]:text-text-secondary"
         />
       )}
-      {children}
-      <A.Submit class="mt-4 px-4 py-2 bg-primary text-white rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+      <div class="space-y-8">
+        {children}
+      </div>
+      <A.Submit class="mt-8 px-6 py-3 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
         Odeslat
       </A.Submit>
       <A.Status class="mt-4 outline-none">
         {({ score, maxScore, passed }) => (
           <>
-            <p>Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}</p>
-            {passed === true ? <p class="text-success">✓ Splněno!</p> : null}
-            {passed === false ? <p class="text-danger">✗ Nesplněno.</p> : null}
+            <p class="text-sm">Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}</p>
+            {passed === true ? <p class="text-success font-medium">✓ Splněno!</p> : null}
+            {passed === false ? <p class="text-danger font-medium">✗ Nesplněno.</p> : null}
           </>
         )}
       </A.Status>
-      <A.Retry class="mt-2 px-4 py-2 bg-text-secondary text-white rounded-default hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+      <A.Retry class="mt-2 px-5 py-2.5 bg-text-secondary text-white text-sm font-medium rounded-default hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
         Zkusit znovu
       </A.Retry>
-      <A.AttemptsExhausted class="text-text-secondary">
+      <A.AttemptsExhausted class="text-text-secondary text-sm">
         Vyčerpány všechny pokusy.
       </A.AttemptsExhausted>
       <A.History class="mt-4 text-sm text-text-secondary" />
