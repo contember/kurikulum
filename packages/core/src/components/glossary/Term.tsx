@@ -5,10 +5,11 @@ import { GlossaryContext } from './context.ts'
 export interface GlossaryTermProps {
   term: string
   class?: string
+  tooltipClass?: string
   children?: ComponentChildren
 }
 
-export function Term({ term, class: className, children }: GlossaryTermProps): VNode {
+export function Term({ term, class: className, tooltipClass, children }: GlossaryTermProps): VNode {
   const ctx = useContext(GlossaryContext)
   if (!ctx) throw new Error('Glossary.Term must be used within Glossary.Root')
 
@@ -55,14 +56,13 @@ export function Term({ term, class: className, children }: GlossaryTermProps): V
         <span
           id={`glossary-tooltip-${entry.term}`}
           role="tooltip"
+          class={tooltipClass}
           style={{
             position: 'absolute',
             zIndex: 50,
-            left: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
             top: '100%',
-            whiteSpace: 'nowrap',
-            fontSize: '0.875rem',
-            fontWeight: 'normal',
           }}
         >
           <strong>{entry.term}</strong>: {entry.definition}

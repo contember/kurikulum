@@ -62,6 +62,7 @@ export function GlossaryTerm({ term, children }: { term: string; children?: prea
     <G.Term
       term={term}
       class="inline-block border-b border-dashed border-primary text-primary cursor-pointer"
+      tooltipClass="mt-1.5 px-3 py-2 rounded-lg bg-bg border border-border text-text text-sm font-normal shadow-lg w-64 whitespace-normal"
     >
       {children}
     </G.Term>
