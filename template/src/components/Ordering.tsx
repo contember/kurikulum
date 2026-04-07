@@ -20,7 +20,7 @@ export function Ordering({ id, question, weight, dragEnabled, children }: Orderi
   return (
     <O.Root id={id} weight={weight} dragEnabled={dragEnabled} aria-label={question}>
       <O.Label class="text-base font-semibold text-text mb-4">{question}</O.Label>
-      <O.List class="space-y-2 mt-2">
+      <O.List class="gap-2 mt-2">
         {items}
       </O.List>
       {rest}

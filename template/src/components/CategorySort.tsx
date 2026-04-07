@@ -45,7 +45,7 @@ function CategorySortItems(): VNode | null {
           <CS.Item
             key={item.id}
             id={item.id}
-            class="px-3.5 py-2 border border-border rounded-lg bg-surface text-sm font-medium text-text cursor-grab select-none transition-all duration-150 hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm data-[dragging]:opacity-40 data-[dragging]:cursor-grabbing active:cursor-grabbing"
+            class="px-3.5 py-2 border border-border rounded-lg bg-surface text-sm font-medium text-text cursor-grab select-none transition-all duration-150 hover:border-primary/40 hover:bg-primary/5 hover:shadow-sm data-[dragging]:opacity-40 data-[dragging]:cursor-grabbing active:cursor-grabbing data-[selected]:border-primary data-[selected]:bg-primary/10 data-[selected]:text-primary data-[selected]:ring-2 data-[selected]:ring-primary/20"
           >
             {item.label}
           </CS.Item>
@@ -65,7 +65,7 @@ function CategorySortCategories(): VNode | null {
         <CS.Category
           key={cat.id}
           id={cat.id}
-          class="rounded-lg border-2 border-dashed border-border overflow-hidden min-h-[120px] data-[drag-over]:border-primary data-[drag-over]:bg-primary/5 transition-colors"
+          class="rounded-lg border-2 border-dashed border-border overflow-hidden min-h-[120px] data-[drag-over]:border-primary data-[drag-over]:bg-primary/5 data-[has-selected-item]:cursor-pointer data-[has-selected-item]:hover:border-primary/60 transition-colors"
         >
           {({ assignedItems }: { assignedItems: CategoryItemDef[] }) => (
             <>
