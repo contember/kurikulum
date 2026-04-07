@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'bun:test'
+import { writeFileSync, mkdirSync, rmSync } from 'fs'
+import { join } from 'path'
 import { extractSearchEntries } from './search-index-plugin.ts'
 
 describe('extractSearchEntries', () => {
@@ -91,5 +93,60 @@ describe('extractSearchEntries', () => {
     const entries = extractSearchEntries(source)
     expect(entries).toHaveLength(1)
     expect(entries[0].pageId).toBe('quoted')
+  })
+
+  describe('component references', () => {
+    const tmpDir = join(import.meta.dir, '__test_tmp__')
+    const courseFile = join(tmpDir, 'course.tsx')
+    const pageFile = join(tmpDir, 'pages', 'IntroPage.tsx')
+
+    it('resolves content from imported component files', () => {
+      mkdirSync(join(tmpDir, 'pages'), { recursive: true })
+      try {
+        writeFileSync(
+          pageFile,
+          `export function IntroPage() {
+  return (
+    <>
+      <h1>Welcome</h1>
+      <p>This is the introduction.</p>
+    </>
+  )
+}`,
+        )
+
+        const source = `
+import { IntroPage } from './pages/IntroPage.tsx'
+
+function App() {
+  return (
+    <Page id="intro" completion="mount">
+      <IntroPage />
+    </Page>
+  )
+}
+`
+        const entries = extractSearchEntries(source, courseFile)
+        expect(entries).toHaveLength(1)
+        expect(entries[0].pageId).toBe('intro')
+        expect(entries[0].title).toBe('Welcome')
+        expect(entries[0].content).toContain('introduction')
+      } finally {
+        rmSync(tmpDir, { recursive: true, force: true })
+      }
+    })
+
+    it('falls back to inline content when import cannot be resolved', () => {
+      const source = `
+        <Page id="test" completion="mount">
+          <h1>Inline Title</h1>
+          <p>Inline content.</p>
+        </Page>
+      `
+      const entries = extractSearchEntries(source, '/nonexistent/file.tsx')
+      expect(entries).toHaveLength(1)
+      expect(entries[0].title).toBe('Inline Title')
+      expect(entries[0].content).toContain('Inline content')
+    })
   })
 })
