@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
+  "files": ["src"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/kurikulum",
+    "directory": "packages/core"
+  },
   "peerDependencies": {
     "preact": "^10.0.0"
   },
