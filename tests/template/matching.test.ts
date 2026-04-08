@@ -16,43 +16,55 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier, Matching as M } from '@kurikulum/core'
+import type { CourseContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-  Matching as M,
-} from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
+import { Assessment } from '../../template/src/components/Assessment.tsx'
 import { Matching, MatchingPair } from '../../template/src/components/Matching.tsx'
 import { QuestionFeedback } from '../../template/src/components/QuestionFeedback.tsx'
-import { Assessment } from '../../template/src/components/Assessment.tsx'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
 }
 
-const HappyEvent = window.Event as unknown as typeof Event
+function getSlots(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('[data-matching-slot]'))
+}
 
-function fireChange(select: HTMLSelectElement, value: string) {
-  select.value = value
-  select.dispatchEvent(new HappyEvent('change', { bubbles: true }))
+function getResponseChips(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>('[data-response]'))
+}
+
+function assignToSlot(container: HTMLElement, rerender: () => void, response: string, slotIndex: number) {
+  const chip = container.querySelector<HTMLElement>(`[data-response="${response}"]`)
+  if (!chip) throw new Error(`Response chip "${response}" not found`)
+  chip.click()
+  rerender() // flush state so slot sees selectedResponse
+  const slot = getSlots(container)[slotIndex]
+  if (!slot) throw new Error(`Slot ${slotIndex} not found`)
+  slot.click()
 }
 
 function createMockAdapter(): DeliveryAdapter & { committed: number } {
   return {
     committed: 0,
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -72,10 +84,12 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -88,7 +102,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -105,66 +121,63 @@ function renderWithContext(
   return { container, rerender: () => render(h(App, null), container) }
 }
 
-function getSelects(container: HTMLElement): HTMLSelectElement[] {
-  return Array.from(container.getElementsByTagName('select'))
-}
-
 describe('Matching', () => {
-  it('renders prompts and select dropdowns', async () => {
+  it('renders prompts and drop slots', async () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match the items:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(MatchingPair, { prompt: 'B', response: '2' }),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match the items:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(MatchingPair, { prompt: 'B', response: '2' }),
+        ),
     )
 
     await flushEffects()
 
-    const legend = container.getElementsByTagName('legend')[0]
-    expect(legend.textContent).toBe('Match the items:')
+    expect(container.textContent).toContain('Match the items:')
 
-    const selects = getSelects(container)
-    expect(selects.length).toBe(2)
+    const slots = getSlots(container)
+    expect(slots.length).toBe(2)
 
-    // Each select should have options (placeholder + responses)
-    expect(selects[0].options.length).toBe(3) // — + 1 + 2
+    const chips = getResponseChips(container)
+    expect(chips.length).toBe(2)
   })
 
-  it('responses are available in all selects', async () => {
+  it('responses are available as chips', async () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'XSS', response: 'Script injection' }),
-        h(MatchingPair, { prompt: 'CSRF', response: 'Session abuse' }),
-        h(MatchingPair, { prompt: 'SQLi', response: 'DB manipulation' }),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'XSS', response: 'Script injection' }),
+          h(MatchingPair, { prompt: 'CSRF', response: 'Session abuse' }),
+          h(MatchingPair, { prompt: 'SQLi', response: 'DB manipulation' }),
+        ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    expect(selects.length).toBe(3)
+    const slots = getSlots(container)
+    expect(slots.length).toBe(3)
 
-    // Each select should have 4 options (placeholder + 3 responses)
-    for (const select of selects) {
-      expect(select.options.length).toBe(4)
-    }
+    const chips = getResponseChips(container)
+    expect(chips.length).toBe(3)
 
-    // Collect all option values from first select (excluding placeholder)
-    const optionValues = new Set<string>()
-    for (let i = 1; i < selects[0].options.length; i++) {
-      optionValues.add(selects[0].options[i].value)
-    }
-    expect(optionValues.has('Script injection')).toBe(true)
-    expect(optionValues.has('Session abuse')).toBe(true)
-    expect(optionValues.has('DB manipulation')).toBe(true)
+    const chipValues = new Set(chips.map(c => c.getAttribute('data-response')))
+    expect(chipValues.has('Script injection')).toBe(true)
+    expect(chipValues.has('Session abuse')).toBe(true)
+    expect(chipValues.has('DB manipulation')).toBe(true)
   })
 
   it('evaluates all correct as score 1', async () => {
@@ -172,19 +185,22 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(MatchingPair, { prompt: 'B', response: '2' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(MatchingPair, { prompt: 'B', response: '2' }),
+        ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1')
+    assignToSlot(container, rerender, '1', 0)
     rerender()
-    fireChange(selects[1], '2')
+    assignToSlot(container, rerender, '2', 1)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -201,19 +217,23 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(MatchingPair, { prompt: 'B', response: '2' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(MatchingPair, { prompt: 'B', response: '2' }),
+        ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1') // correct
+    // Assign wrong: '2' → slot 0 (A), '1' → slot 1 (B)
+    assignToSlot(container, rerender, '2', 0)
     rerender()
-    fireChange(selects[1], '1') // incorrect
+    assignToSlot(container, rerender, '1', 1)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -226,31 +246,33 @@ describe('Matching', () => {
     expect(fieldset.getAttribute('data-submitted')).toBe('true')
   })
 
-  it('data-correct on individual pairs after submit', async () => {
+  it('data-correct on individual slots after submit', async () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(M.Root, { id: 'q1', 'aria-label': 'Match:' },
-        h(M.Pair, { prompt: 'A', response: '1' },
-          h(M.Prompt, null),
-          h(M.Response, null),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          M.Root,
+          { id: 'q1', 'aria-label': 'Match:' },
+          h(M.Pair, { prompt: 'A', response: '1' }),
+          h(M.Pair, { prompt: 'B', response: '2' }),
+          h(M.Slot, { pairIndex: 0 }),
+          h(M.Slot, { pairIndex: 1 }),
+          h(M.ResponseChip, { response: '1' }),
+          h(M.ResponseChip, { response: '2' }),
+          h(M.Submit, null, 'Submit'),
         ),
-        h(M.Pair, { prompt: 'B', response: '2' },
-          h(M.Prompt, null),
-          h(M.Response, null),
-        ),
-        h(M.Submit, null, 'Submit'),
-      ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1') // correct
+    // Assign '2' to slot 0 (wrong for A) and '1' to slot 1 (wrong for B)
+    assignToSlot(container, rerender, '2', 0)
     rerender()
-    fireChange(selects[1], '1') // incorrect
+    assignToSlot(container, rerender, '1', 1)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -258,32 +280,34 @@ describe('Matching', () => {
     rerender()
     await flushEffects()
 
-    const divs = container.querySelectorAll('[data-correct]')
-    // fieldset + 2 pair divs = 3 elements with data-correct
-    const pairDivs = Array.from(divs).filter(el => el.tagName === 'DIV')
-    expect(pairDivs.length).toBe(2)
-    expect(pairDivs[0].getAttribute('data-correct')).toBe('true')
-    expect(pairDivs[1].getAttribute('data-correct')).toBe('false')
+    const slots = getSlots(container)
+    // slot 0 has '2' (correct is '1') → false
+    expect(slots[0].getAttribute('data-correct')).toBe('false')
+    // slot 1 has '1' (correct is '2') → false
+    expect(slots[1].getAttribute('data-correct')).toBe('false')
   })
 
-  it('disables selects after submit', async () => {
+  it('hides response chips after submit', async () => {
     const adapter = createMockAdapter()
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(MatchingPair, { prompt: 'B', response: '2' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(MatchingPair, { prompt: 'B', response: '2' }),
+        ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1')
+    assignToSlot(container, rerender, '1', 0)
     rerender()
-    fireChange(selects[1], '2')
+    assignToSlot(container, rerender, '2', 1)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -291,9 +315,9 @@ describe('Matching', () => {
     rerender()
     await flushEffects()
 
-    for (const select of getSelects(container)) {
-      expect(select.disabled).toBe(true)
-    }
+    // Unplaced chip pool should be empty after submit
+    const chips = getResponseChips(container)
+    expect(chips.length).toBe(0)
     // Submit button should be hidden
     expect(container.getElementsByTagName('button').length).toBe(0)
   })
@@ -303,11 +327,15 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(MatchingPair, { prompt: 'B', response: '2' }),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(MatchingPair, { prompt: 'B', response: '2' }),
+        ),
     )
 
     await flushEffects()
@@ -321,21 +349,26 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(Matching, { id: 'q1', question: 'Match:' },
-          h(MatchingPair, { prompt: 'A', response: '1' }),
-          h(MatchingPair, { prompt: 'B', response: '2' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            Matching,
+            { id: 'q1', question: 'Match:' },
+            h(MatchingPair, { prompt: 'A', response: '1' }),
+            h(MatchingPair, { prompt: 'B', response: '2' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1')
+    assignToSlot(container, rerender, '1', 0)
     rerender()
-    fireChange(selects[1], '2')
+    assignToSlot(container, rerender, '2', 1)
     rerender()
 
     // Click Assessment submit
@@ -362,22 +395,27 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5, maxAttempts: 3 },
-        h(Matching, { id: 'q1', question: 'Match:' },
-          h(MatchingPair, { prompt: 'A', response: '1' }),
-          h(MatchingPair, { prompt: 'B', response: '2' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5, maxAttempts: 3 },
+          h(
+            Matching,
+            { id: 'q1', question: 'Match:' },
+            h(MatchingPair, { prompt: 'A', response: '1' }),
+            h(MatchingPair, { prompt: 'B', response: '2' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
 
-    // Select wrong answers and submit
-    const selects = getSelects(container)
-    fireChange(selects[0], '2')
+    // Assign wrong answers and submit
+    assignToSlot(container, rerender, '2', 0)
     rerender()
-    fireChange(selects[1], '1')
+    assignToSlot(container, rerender, '1', 1)
     rerender()
 
     const buttons = container.getElementsByTagName('button')
@@ -406,12 +444,13 @@ describe('Matching', () => {
     rerender()
     await flushEffects()
 
-    // Selects should be re-enabled and reset
-    const resetSelects = getSelects(container)
-    for (const select of resetSelects) {
-      expect(select.disabled).toBe(false)
-      expect(select.value).toBe('')
+    // Slots should be empty and response chips should reappear
+    const slots = getSlots(container)
+    for (const slot of slots) {
+      expect(slot.getAttribute('data-has-selection')).toBeNull()
     }
+    const chips = getResponseChips(container)
+    expect(chips.length).toBe(2)
   })
 
   it('marks interactive completion on submit', async () => {
@@ -419,18 +458,16 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Matching, { id: 'q1', question: 'Match:' }, h(MatchingPair, { prompt: 'A', response: '1' })),
     )
 
     await flushEffects()
 
     expect(runtime.isComplete('q1')).toBe(false)
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1')
+    assignToSlot(container, rerender, '1', 0)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -446,11 +483,15 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Matching, { id: 'q1', question: 'Match:' },
-        h(MatchingPair, { prompt: 'A', response: '1' }),
-        h(QuestionFeedback, { correct: 'All correct!', incorrect: 'Try again!' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Matching,
+          { id: 'q1', question: 'Match:' },
+          h(MatchingPair, { prompt: 'A', response: '1' }),
+          h(QuestionFeedback, { correct: 'All correct!', incorrect: 'Try again!' }),
+        ),
     )
 
     await flushEffects()
@@ -459,8 +500,7 @@ describe('Matching', () => {
     expect(container.textContent).not.toContain('All correct!')
     expect(container.textContent).not.toContain('Try again!')
 
-    const selects = getSelects(container)
-    fireChange(selects[0], '1')
+    assignToSlot(container, rerender, '1', 0)
     rerender()
 
     const button = container.getElementsByTagName('button')[0]
@@ -476,13 +516,14 @@ describe('Matching', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(M.Root, { id: 'q1', 'aria-label': 'Match:' },
-        h(M.Pair, { prompt: 'XSS', response: 'Script injection' },
-          h(M.Prompt, null),
-          h(M.Response, null),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          M.Root,
+          { id: 'q1', 'aria-label': 'Match:' },
+          h(M.Pair, { prompt: 'XSS', response: 'Script injection' }, h(M.Prompt, null), h(M.Response, null)),
         ),
-      ),
     )
 
     await flushEffects()
