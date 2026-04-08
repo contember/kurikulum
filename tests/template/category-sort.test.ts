@@ -14,10 +14,10 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
-import { Assessment as A, CategorySort as CS, CategorySortContext, CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
-import type { CategorySortContextValue, CourseContextValue } from '@kurikulum/core'
 import { describe, expect, it } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from 'kurikulum'
+import { Assessment as A, CategorySort as CS, CategorySortContext, CourseContext, createCourseRuntime, createNotifier } from 'kurikulum'
+import type { CategorySortContextValue, CourseContextValue } from 'kurikulum'
 import { h } from 'preact'
 import { render } from 'preact'
 import { useContext } from 'preact/hooks'

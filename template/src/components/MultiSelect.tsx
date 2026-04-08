@@ -1,4 +1,4 @@
-import { MultiSelect as MS } from '@kurikulum/core'
+import { MultiSelect as MS } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface MultiSelectProps {

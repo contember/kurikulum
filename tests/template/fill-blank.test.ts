@@ -9,11 +9,11 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
-import { CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
-import { FillBlank as FB } from '@kurikulum/core'
 import { describe, expect, it } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from 'kurikulum'
+import { CourseContext, createCourseRuntime, createNotifier } from 'kurikulum'
+import type { CourseContextValue } from 'kurikulum'
+import { FillBlank as FB } from 'kurikulum'
 import { h } from 'preact'
 import { render } from 'preact'
 import { Assessment } from '../../template/src/components/Assessment.tsx'

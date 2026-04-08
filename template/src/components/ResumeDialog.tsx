@@ -1,4 +1,4 @@
-import { useFocusTrap, useRestore } from '@kurikulum/core'
+import { useFocusTrap, useRestore } from 'kurikulum'
 import type { VNode } from 'preact'
 import { useRef } from 'preact/hooks'
 

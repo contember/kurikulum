@@ -1,5 +1,5 @@
-import { Glossary as G, useGlossary } from '@kurikulum/core'
-import type { GlossaryEntry } from '@kurikulum/core'
+import { Glossary as G, useGlossary } from 'kurikulum'
+import type { GlossaryEntry } from 'kurikulum'
 import type { VNode } from 'preact'
 
 export interface GlossaryProps {

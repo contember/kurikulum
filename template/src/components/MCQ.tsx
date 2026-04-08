@@ -1,4 +1,4 @@
-import { MCQ as M } from '@kurikulum/core'
+import { MCQ as M } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface MCQProps {

@@ -56,6 +56,6 @@ jobs:
             fs.writeFileSync(p, JSON.stringify(pkg, null, '\t') + '\n');
           "
 
-      - name: Publish @kurikulum/core
+      - name: Publish kurikulum
         working-directory: packages/core
         run: npm publish --provenance --access public

@@ -1,5 +1,5 @@
-import { Matching as M, MatchingContext } from '@kurikulum/core'
-import type { MatchingSlotRenderProps } from '@kurikulum/core'
+import { Matching as M, MatchingContext } from 'kurikulum'
+import type { MatchingSlotRenderProps } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
 import { CheckIcon, CrossIcon } from './Icons.tsx'

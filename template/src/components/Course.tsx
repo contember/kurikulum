@@ -1,4 +1,4 @@
-import { Course as C } from '@kurikulum/core'
+import { Course as C } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface CourseProps {

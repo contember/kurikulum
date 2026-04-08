@@ -1,4 +1,4 @@
-import { Assessment as A } from '@kurikulum/core'
+import { Assessment as A } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface AssessmentProps {

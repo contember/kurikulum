@@ -1,4 +1,4 @@
-import { MCQ, MCQContext, MultiSelect, MultiSelectContext } from '@kurikulum/core'
+import { MCQ, MCQContext, MultiSelect, MultiSelectContext } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
 

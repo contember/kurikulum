@@ -4,7 +4,7 @@ Headless core + styled template (Radix + shadcn/ui pattern).
 
 ## Two Layers
 
-**`@kurikulum/core`** (npm package, don't edit):
+**`kurikulum`** (npm package, don't edit):
 
 - Compound components (Assessment, MCQ, MultiSelect, FillBlank, Matching, Ordering, CategorySort, Page, Navigation, Course, Audio, Glossary, Notes, Search)
 - Hooks (`use*` — see `docs/hooks.md`)

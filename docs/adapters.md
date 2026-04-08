@@ -5,7 +5,7 @@ Adapters handle persistence and LMS communication.
 ## Available Adapters
 
 ```typescript
-import { createAdapter, createXApiAdapter } from '@kurikulum/core'
+import { createAdapter, createXApiAdapter } from 'kurikulum'
 
 createAdapter('standalone') // localStorage (dev + standalone web)
 createAdapter('scorm-1.2') // SCORM 1.2 RTE (falls back to standalone)

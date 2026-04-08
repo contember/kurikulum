@@ -1,5 +1,5 @@
-import { CategorySort as CS, CategorySortContext } from '@kurikulum/core'
-import type { CategoryDef, CategoryItemDef } from '@kurikulum/core'
+import { CategorySort as CS, CategorySortContext } from 'kurikulum'
+import type { CategoryDef, CategoryItemDef } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
 

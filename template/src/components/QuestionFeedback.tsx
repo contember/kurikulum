@@ -9,7 +9,7 @@ import {
   MultiSelectContext,
   Ordering,
   OrderingContext,
-} from '@kurikulum/core'
+} from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
 

@@ -1,5 +1,5 @@
-import { CourseProvider, createAdapter, createXApiAdapter } from '@kurikulum/core'
-import type { CourseConfig } from '@kurikulum/core'
+import { CourseProvider, createAdapter, createXApiAdapter } from 'kurikulum'
+import type { CourseConfig } from 'kurikulum'
 import { render } from 'preact'
 import searchIndex from 'virtual:search-index'
 import { Course } from './components/Course.tsx'

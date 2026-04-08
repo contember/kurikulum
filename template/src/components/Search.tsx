@@ -1,5 +1,5 @@
-import { Search as S, useFocusTrap, useSearch } from '@kurikulum/core'
-import type { SearchEntry } from '@kurikulum/core'
+import { Search as S, useFocusTrap, useSearch } from 'kurikulum'
+import type { SearchEntry } from 'kurikulum'
 import type { VNode } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
 

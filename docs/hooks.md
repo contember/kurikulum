@@ -1,6 +1,6 @@
 # Hooks
 
-All exported from `@kurikulum/core`. Read source for full API.
+All exported from `kurikulum`. Read source for full API.
 
 - `useCourse()` — full `CourseRuntime` (state, navigation, completion, assessment). Requires `CourseProvider`.
 - `useNavigation()` — `currentPage`, `canGoNext/Prev`, `next()`, `prev()`, `goTo()`. Requires `CourseProvider`.

@@ -1,5 +1,5 @@
-import { Page as P } from '@kurikulum/core'
-import type { CompletionStrategy, CourseRuntime } from '@kurikulum/core'
+import { Page as P } from 'kurikulum'
+import type { CompletionStrategy, CourseRuntime } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface PageProps {

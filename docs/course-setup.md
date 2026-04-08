@@ -5,8 +5,8 @@ Configure and compose a course in `src/course.tsx`.
 ## Minimal course.tsx
 
 ```tsx
-import { CourseProvider, createAdapter } from '@kurikulum/core'
-import type { CourseConfig } from '@kurikulum/core'
+import { CourseProvider, createAdapter } from 'kurikulum'
+import type { CourseConfig } from 'kurikulum'
 import { render } from 'preact'
 import { Course } from './components/Course.tsx'
 import { Navigation } from './components/Navigation.tsx'

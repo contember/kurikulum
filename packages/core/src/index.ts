@@ -108,7 +108,7 @@ export type {
 } from './components/index.ts'
 
 // SCORM packaging (types + manifest only; createScormPackage is Node-only,
-// import it directly from '@kurikulum/core/scorm/package' in build scripts)
+// import it directly from 'kurikulum/scorm/package' in build scripts)
 export { generateManifest } from './scorm/manifest.ts'
 export type { ManifestOptions } from './scorm/manifest.ts'
 export type { PackageOptions } from './scorm/package.ts'
@@ -118,7 +118,7 @@ export { extractSearchEntries, searchIndexPlugin } from './vite/search-index-plu
 export type { SearchIndexPluginOptions } from './vite/search-index-plugin.ts'
 
 // cmi5 packaging (types + manifest only; createCmi5Package is Node-only,
-// import it directly from '@kurikulum/core/cmi5/package' in build scripts)
+// import it directly from 'kurikulum/cmi5/package' in build scripts)
 export { generateCmi5Manifest } from './cmi5/manifest.ts'
 export type { Cmi5ManifestOptions } from './cmi5/manifest.ts'
 export type { Cmi5PackageOptions } from './cmi5/package.ts'

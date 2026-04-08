@@ -1,4 +1,4 @@
-import { Ordering as O, OrderingContext, OrderingItemContext } from '@kurikulum/core'
+import { Ordering as O, OrderingContext, OrderingItemContext } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { toChildArray } from 'preact'
 import { useContext } from 'preact/hooks'

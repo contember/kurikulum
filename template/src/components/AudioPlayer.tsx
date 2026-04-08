@@ -1,4 +1,4 @@
-import { Audio } from '@kurikulum/core'
+import { Audio } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface AudioPlayerProps {

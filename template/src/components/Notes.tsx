@@ -1,4 +1,4 @@
-import { Notes as N, useNotes } from '@kurikulum/core'
+import { Notes as N, useNotes } from 'kurikulum'
 import type { VNode } from 'preact'
 
 export interface NotesProps {
