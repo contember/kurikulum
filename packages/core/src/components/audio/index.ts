@@ -1,6 +1,6 @@
-import { Root } from './Root.tsx'
 import { Play } from './Play.tsx'
 import { Progress } from './Progress.tsx'
+import { Root } from './Root.tsx'
 import { Time } from './Time.tsx'
 import { Volume } from './Volume.tsx'
 

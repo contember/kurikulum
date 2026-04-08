@@ -6,7 +6,7 @@ export interface AudioContextValue {
   currentTime: number
   duration: number
   progress: number // 0–1
-  volume: number   // 0–1
+  volume: number // 0–1
   play: () => void
   pause: () => void
   toggle: () => void

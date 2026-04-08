@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll } from 'bun:test'
-import { existsSync, readFileSync, rmSync } from 'fs'
-import { resolve } from 'path'
+import { beforeAll, describe, expect, it } from 'bun:test'
 import JSZip from 'jszip'
+import { existsSync, readFileSync, rmSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 const templateDir = resolve(import.meta.dir, '../../template')
 const distDir = resolve(templateDir, 'dist')

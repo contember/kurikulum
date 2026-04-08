@@ -3,12 +3,12 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import { Glossary } from './index.ts'
 import { useGlossary } from '../../hooks/useGlossary.ts'
 import type { GlossaryEntry } from './context.ts'
+import { Glossary } from './index.ts'
 
 const entries: GlossaryEntry[] = [
   { term: 'BOZP', definition: 'Bezpečnost a ochrana zdraví při práci', aliases: ['bezpečnost práce'] },
@@ -37,9 +37,7 @@ describe('Glossary.Root', () => {
 
   it('renders children', () => {
     render(
-      h(Glossary.Root, { entries },
-        h('span', null, 'Hello'),
-      ),
+      h(Glossary.Root, { entries }, h('span', null, 'Hello')),
       container,
     )
     expect(container.getElementsByTagName('span').length).toBe(1)
@@ -55,9 +53,7 @@ describe('Glossary.Root', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -81,9 +77,7 @@ describe('Glossary.Panel', () => {
 
   it('is hidden when glossary is closed', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Panel, null),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Panel, null)),
       container,
     )
     const dialog = findByRole(container, 'dialog')
@@ -99,10 +93,7 @@ describe('Glossary.Panel', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Opener, null),
-        h(Glossary.Panel, null),
-      ),
+      h(Glossary.Root, { entries }, h(Opener, null), h(Glossary.Panel, null)),
       container,
     )
 
@@ -123,10 +114,7 @@ describe('Glossary.Panel', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Opener, null),
-        h(Glossary.Panel, null),
-      ),
+      h(Glossary.Root, { entries }, h(Opener, null), h(Glossary.Panel, null)),
       container,
     )
 
@@ -156,9 +144,7 @@ describe('Glossary.Term', () => {
 
   it('renders term text', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Term, { term: 'BOZP' }),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Term, { term: 'BOZP' })),
       container,
     )
     const spans = container.getElementsByTagName('span')
@@ -168,9 +154,7 @@ describe('Glossary.Term', () => {
 
   it('renders custom children', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Term, { term: 'BOZP' }, 'Custom text'),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Term, { term: 'BOZP' }, 'Custom text')),
       container,
     )
     const spans = container.getElementsByTagName('span')
@@ -179,9 +163,7 @@ describe('Glossary.Term', () => {
 
   it('is keyboard accessible with role="button" and tabIndex', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Term, { term: 'BOZP' }),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Term, { term: 'BOZP' })),
       container,
     )
     const btn = findByRole(container, 'button')
@@ -191,9 +173,7 @@ describe('Glossary.Term', () => {
 
   it('renders as plain span for unknown term', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Term, { term: 'Unknown' }),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Term, { term: 'Unknown' })),
       container,
     )
     const btn = findByRole(container, 'button')
@@ -217,9 +197,7 @@ describe('Glossary.Search', () => {
 
   it('renders search input with aria-label', () => {
     render(
-      h(Glossary.Root, { entries },
-        h(Glossary.Search, null),
-      ),
+      h(Glossary.Root, { entries }, h(Glossary.Search, null)),
       container,
     )
     const inputs = Array.from(container.getElementsByTagName('input')) as HTMLInputElement[]
@@ -233,7 +211,10 @@ describe('useGlossary hook', () => {
   it('throws outside Glossary.Root', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useGlossary(); return null }
+      function Bad() {
+        useGlossary()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useGlossary must be used within a Glossary.Root')
   })
@@ -248,9 +229,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -273,9 +252,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -294,9 +271,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -315,9 +290,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -336,9 +309,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -356,9 +327,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -377,9 +346,7 @@ describe('useGlossary hook', () => {
     }
 
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 
@@ -389,9 +356,7 @@ describe('useGlossary hook', () => {
 
     // Re-capture after state update
     render(
-      h(Glossary.Root, { entries },
-        h(Capture, null),
-      ),
+      h(Glossary.Root, { entries }, h(Capture, null)),
       container,
     )
 

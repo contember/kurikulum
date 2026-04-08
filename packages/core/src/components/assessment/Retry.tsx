@@ -1,7 +1,7 @@
 import type { VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { AssessmentContext } from './context.ts'
 import type { HeadlessPartProps } from '../types.ts'
+import { AssessmentContext } from './context.ts'
 
 export function Retry({ children, class: className }: HeadlessPartProps): VNode | null {
   const ctx = useContext(AssessmentContext)

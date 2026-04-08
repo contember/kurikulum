@@ -3,13 +3,13 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import { h, options } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime, SuspendEnvelope } from './types.ts'
 import { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 import { useCourse } from './hooks/useCourse.ts'
 import { CURRENT_SCHEMA_VERSION } from './runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter, SuspendEnvelope } from './types.ts'
 
 /** Flush Preact's pending effects */
 function flushEffects(): Promise<void> {
@@ -22,13 +22,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -52,9 +62,7 @@ describe('CourseProvider', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Child, null),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Child, null)),
       container,
     )
 
@@ -93,9 +101,7 @@ describe('CourseProvider', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Child, null),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Child, null)),
       container,
     )
 
@@ -114,9 +120,7 @@ describe('CourseProvider', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Child, null),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Child, null)),
       container,
     )
 
@@ -142,9 +146,7 @@ describe('CourseProvider', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseProvider, { config } as any,
-        h(Child, null),
-      ),
+      h(CourseProvider, { config } as any, h(Child, null)),
       container,
     )
 
@@ -157,7 +159,10 @@ describe('CourseProvider', () => {
   it('hooks throw outside provider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useCourse(); return null }
+      function Bad() {
+        useCourse()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useCourse must be used within a CourseProvider')
   })
@@ -171,9 +176,7 @@ describe('CourseProvider', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Child, null),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Child, null)),
       container,
     )
 
@@ -201,8 +204,12 @@ describe('createNotifier', () => {
     const { subscribe, notify } = createNotifier()
     let count1 = 0
     let count2 = 0
-    subscribe(() => { count1++ })
-    subscribe(() => { count2++ })
+    subscribe(() => {
+      count1++
+    })
+    subscribe(() => {
+      count2++
+    })
     notify()
     expect(count1).toBe(1)
     expect(count2).toBe(1)
@@ -211,7 +218,9 @@ describe('createNotifier', () => {
   it('unsubscribe removes listener', () => {
     const { subscribe, notify } = createNotifier()
     let count = 0
-    const unsub = subscribe(() => { count++ })
+    const unsub = subscribe(() => {
+      count++
+    })
     notify()
     expect(count).toBe(1)
     unsub()

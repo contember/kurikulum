@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { AssessmentContext } from './context.ts'
 import type { AttemptRecord } from '../../types.ts'
+import { AssessmentContext } from './context.ts'
 
 export interface HistoryProps {
   class?: string

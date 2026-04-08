@@ -1,7 +1,7 @@
-import type { VNode } from 'preact'
-import { useRef, useEffect } from 'preact/hooks'
-import { Search as S, useSearch, useFocusTrap } from '@kurikulum/core'
+import { Search as S, useFocusTrap, useSearch } from '@kurikulum/core'
 import type { SearchEntry } from '@kurikulum/core'
+import type { VNode } from 'preact'
+import { useEffect, useRef } from 'preact/hooks'
 
 export interface SearchProps {
   index: SearchEntry[]
@@ -27,7 +27,17 @@ export function SearchButton(): VNode {
       aria-label="Search course content (Ctrl+K)"
     >
       <span class="flex items-center gap-2">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
@@ -94,19 +104,21 @@ function SearchResultsList(): VNode | null {
           ? `${ctx.results.length} results found`
           : `No results found for "${ctx.query}"`}
       </div>
-      {ctx.results.length > 0 ? (
-        <ul role="listbox" id="search-results-listbox" class="py-2">
-          {ctx.results.map((result, i) => (
-            <li key={result.pageId}>
-              <SearchResultItem result={result} index={i} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div class="px-4 py-8 text-center text-text-secondary" role="status">
-          No results found for "{ctx.query}"
-        </div>
-      )}
+      {ctx.results.length > 0
+        ? (
+          <ul role="listbox" id="search-results-listbox" class="py-2">
+            {ctx.results.map((result, i) => (
+              <li key={result.pageId}>
+                <SearchResultItem result={result} index={i} />
+              </li>
+            ))}
+          </ul>
+        )
+        : (
+          <div class="px-4 py-8 text-center text-text-secondary" role="status">
+            No results found for "{ctx.query}"
+          </div>
+        )}
     </div>
   )
 }

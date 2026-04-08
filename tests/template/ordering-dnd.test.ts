@@ -14,20 +14,13 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier, Ordering as O, OrderingContext, OrderingItemContext } from '@kurikulum/core'
+import type { CourseContextValue, OrderingContextValue, OrderingItemContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
 import { useContext } from 'preact/hooks'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-  Ordering as O,
-  OrderingContext,
-  OrderingItemContext,
-} from '@kurikulum/core'
-import type { CourseContextValue, OrderingContextValue, OrderingItemContextValue } from '@kurikulum/core'
 import { Ordering, OrderingItem } from '../../template/src/components/Ordering.tsx'
 
 function flushEffects(): Promise<void> {
@@ -38,13 +31,19 @@ function createMockAdapter(): DeliveryAdapter & { committed: number } {
   return {
     committed: 0,
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -64,10 +63,12 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -80,7 +81,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -97,7 +100,7 @@ function renderWithContext(
   return { container, rerender: () => render(h(App, null), container) }
 }
 
-function getOrderedItems(container: HTMLElement): { el: HTMLElement, text: string, order: number }[] {
+function getOrderedItems(container: HTMLElement): { el: HTMLElement; text: string; order: number }[] {
   const listItems = Array.from(container.querySelectorAll('[role="list"] > div')) as HTMLElement[]
   return listItems
     .map(el => {
@@ -129,11 +132,9 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
@@ -149,11 +150,9 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:', dragEnabled: false },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:', dragEnabled: false }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
@@ -170,11 +169,9 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
@@ -190,15 +187,15 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(O.Root, { id: 'q1', 'aria-label': 'Sort' },
-        h(ContextCapture, null),
-        h(O.List, null,
-          h(O.Item, { order: 0 }, 'A'),
-          h(O.Item, { order: 1 }, 'B'),
-          h(O.Item, { order: 2 }, 'C'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          O.Root,
+          { id: 'q1', 'aria-label': 'Sort' },
+          h(ContextCapture, null),
+          h(O.List, null, h(O.Item, { order: 0 }, 'A'), h(O.Item, { order: 1 }, 'B'), h(O.Item, { order: 2 }, 'C')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -228,16 +225,14 @@ describe('Ordering DnD', () => {
       return null
     }
 
-    const { container } = renderWithContext(ctx, () =>
-      h(O.Root, { id: 'q1', 'aria-label': 'Sort' },
-        h(O.List, null,
-          h(O.Item, { order: 0 },
-            h(CaptureItemCtx, null),
-            'A',
-          ),
-          h(O.Item, { order: 1 }, 'B'),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          O.Root,
+          { id: 'q1', 'aria-label': 'Sort' },
+          h(O.List, null, h(O.Item, { order: 0 }, h(CaptureItemCtx, null), 'A'), h(O.Item, { order: 1 }, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -259,12 +254,16 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-        h(OrderingItem, { order: 2 }, 'C'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort:' },
+          h(OrderingItem, { order: 0 }, 'A'),
+          h(OrderingItem, { order: 1 }, 'B'),
+          h(OrderingItem, { order: 2 }, 'C'),
+        ),
     )
 
     await flushEffects()
@@ -288,18 +287,16 @@ describe('Ordering DnD', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
 
     // Submit
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()

@@ -1,8 +1,8 @@
 import type { VNode } from 'preact'
-import { Text } from '../components/Text.tsx'
-import { Image } from '../components/Image.tsx'
-import { Video } from '../components/Video.tsx'
 import { AudioPlayer } from '../components/AudioPlayer.tsx'
+import { Image } from '../components/Image.tsx'
+import { Text } from '../components/Text.tsx'
+import { Video } from '../components/Video.tsx'
 
 export function MediaPage(): VNode {
   return (
@@ -16,14 +16,11 @@ export function MediaPage(): VNode {
         alt="Schéma SQL injection útoku"
         caption="Obr. 1 – Průběh SQL injection útoku přes formulářové pole"
       />
-      <AudioPlayer
-        src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
-      />
+      <AudioPlayer src="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3" />
       <Text>
         <h2>Jak funguje XSS útok?</h2>
         <p>
-          Na následujícím videu se můžete podívat na demonstraci reflected XSS útoku
-          a jeho mitigaci pomocí Content Security Policy.
+          Na následujícím videu se můžete podívat na demonstraci reflected XSS útoku a jeho mitigaci pomocí Content Security Policy.
         </p>
       </Text>
       <Video
@@ -36,7 +33,9 @@ export function MediaPage(): VNode {
         caption="Obr. 2 – Schéma CSRF útoku s ukázkou obranného CSRF tokenu"
       />
       <Text>
-        <p><em>Doscrollujte na konec stránky pro dokončení této sekce.</em></p>
+        <p>
+          <em>Doscrollujte na konec stránky pro dokončení této sekce.</em>
+        </p>
       </Text>
     </>
   )

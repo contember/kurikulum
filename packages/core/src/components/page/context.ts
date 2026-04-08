@@ -1,7 +1,7 @@
 import type { RefObject } from 'preact'
 import { createContext } from 'preact'
-import type { CompletionStrategy } from '../../types.ts'
 import type { CompletableRegistry } from '../../completion.ts'
+import type { CompletionStrategy } from '../../types.ts'
 
 export interface PageContextValue {
   sentinelRef: RefObject<HTMLDivElement>

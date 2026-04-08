@@ -1,7 +1,7 @@
-import type { ComponentChildren, VNode } from 'preact'
-import { useContext } from 'preact/hooks'
 import { Matching as M, MatchingContext } from '@kurikulum/core'
 import type { MatchingSlotRenderProps } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
+import { useContext } from 'preact/hooks'
 import { CheckIcon, CrossIcon } from './Icons.tsx'
 
 export interface MatchingProps {
@@ -52,14 +52,13 @@ function MatchingUI(): VNode | null {
               class="flex-1 min-h-[42px] rounded-lg border-2 border-dashed px-3 py-2 transition-all duration-150 flex items-center border-border/60 bg-bg-muted data-[drag-over]:border-primary data-[drag-over]:bg-primary/5 data-[has-selection]:border-border data-[has-selection]:bg-surface data-[has-selected-response]:border-primary/30 data-[has-selected-response]:cursor-pointer data-[has-selected-response]:hover:border-primary/60 data-[correct=true]:border-success/40 data-[correct=true]:bg-success/5 data-[correct=false]:border-danger/40 data-[correct=false]:bg-danger/5"
             >
               {({ selection, isCorrect, hasSelectedResponse }: MatchingSlotRenderProps) =>
-                selection ? (
-                  <PlacedChip pairIndex={idx} selection={selection} isCorrect={isCorrect} />
-                ) : (
-                  <span class="text-sm text-text-muted select-none">
-                    {hasSelectedResponse ? 'Klikněte pro přiřazení' : 'Přetáhněte odpověď…'}
-                  </span>
-                )
-              }
+                selection
+                  ? <PlacedChip pairIndex={idx} selection={selection} isCorrect={isCorrect} />
+                  : (
+                    <span class="text-sm text-text-muted select-none">
+                      {hasSelectedResponse ? 'Klikněte pro přiřazení' : 'Přetáhněte odpověď…'}
+                    </span>
+                  )}
             </M.Slot>
           </div>
         ))}

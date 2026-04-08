@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useContext, useCallback } from 'preact/hooks'
+import { useCallback, useContext } from 'preact/hooks'
 import { MatchingContext } from './context.ts'
 
 export interface MatchingSlotProps {
@@ -72,8 +72,8 @@ export function Slot({ pairIndex, children, class: className }: MatchingSlotProp
   const stateDesc = selection
     ? `přiřazeno: ${selection}${ctx.submitted && isCorrect !== null ? (isCorrect ? ' (správně)' : ' (špatně)') : '. Delete pro odebrání.'}`
     : ctx.selectedResponse
-      ? `Enter pro přiřazení "${ctx.selectedResponse}"`
-      : 'prázdné'
+    ? `Enter pro přiřazení "${ctx.selectedResponse}"`
+    : 'prázdné'
 
   const renderProps: MatchingSlotRenderProps = {
     selection,

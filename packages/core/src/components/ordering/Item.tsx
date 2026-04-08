@@ -1,5 +1,6 @@
+// biome-ignore-all lint/correctness/useHookAtTopLevel: early return after useMemo is intentional — unregistered items skip rendering
 import type { ComponentChildren, VNode } from 'preact'
-import { useContext, useMemo, useRef, useCallback } from 'preact/hooks'
+import { useCallback, useContext, useMemo, useRef } from 'preact/hooks'
 import { OrderingContext, OrderingItemContext } from './context.ts'
 import type { OrderingItemContextValue } from './context.ts'
 
@@ -62,7 +63,7 @@ export function Item({ order, children, class: className }: OrderingItemProps): 
     if (ctx.submitted || !ctx.dragEnabled) return
     const touch = e.touches[0]
     touchStartY.current = touch.clientY
-    const el = (e.currentTarget as HTMLElement)
+    const el = e.currentTarget as HTMLElement
     touchElementRef.current = el as HTMLDivElement
     touchItemHeight.current = el.getBoundingClientRect().height + 8 // include gap
     ctx.onDragStart(position)
@@ -130,7 +131,28 @@ export function Item({ order, children, class: className }: OrderingItemProps): 
       onTouchMove: onTouchMoveHandler,
       onTouchEnd: onTouchEndHandler,
     },
-  }), [itemIndex, order, position, isCorrect, ctx.submitted, ctx.currentOrder.length, ctx.moveUp, ctx.moveDown, ctx.dragEnabled, isDragging, isDragOver, onDragStartHandler, onDragOverHandler, onDragEndHandler, onDropHandler, onDragEnterHandler, onDragLeaveHandler, onTouchStartHandler, onTouchMoveHandler, onTouchEndHandler])
+  }), [
+    itemIndex,
+    order,
+    position,
+    isCorrect,
+    ctx.submitted,
+    ctx.currentOrder.length,
+    ctx.moveUp,
+    ctx.moveDown,
+    ctx.dragEnabled,
+    isDragging,
+    isDragOver,
+    onDragStartHandler,
+    onDragOverHandler,
+    onDragEndHandler,
+    onDropHandler,
+    onDragEnterHandler,
+    onDragLeaveHandler,
+    onTouchStartHandler,
+    onTouchMoveHandler,
+    onTouchEndHandler,
+  ])
 
   const onKeyDownHandler = useCallback((e: KeyboardEvent) => {
     if (ctx.submitted) return

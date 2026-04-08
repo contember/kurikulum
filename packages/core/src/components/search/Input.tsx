@@ -1,5 +1,5 @@
 import type { VNode } from 'preact'
-import { useContext, useRef, useEffect, useCallback } from 'preact/hooks'
+import { useCallback, useContext, useEffect, useRef } from 'preact/hooks'
 import { SearchContext } from './context.ts'
 
 export interface SearchInputProps {

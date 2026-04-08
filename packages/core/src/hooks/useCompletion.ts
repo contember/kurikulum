@@ -1,6 +1,6 @@
 import { useContext, useEffect, useReducer } from 'preact/hooks'
-import { CourseContext } from '../context.tsx'
 import { PageContext } from '../components/page/context.ts'
+import { CourseContext } from '../context.tsx'
 
 export function useCompletion(id: string) {
   const ctx = useContext(CourseContext)
@@ -17,7 +17,9 @@ export function useCompletion(id: string) {
   useEffect(() => {
     if (!pageCtx || pageCtx.completion !== 'interactive' || id === pageCtx.id) return
     pageCtx.registry.register(pageCtx.id, id)
-    return () => { pageCtx.registry.unregister(pageCtx.id, id) }
+    return () => {
+      pageCtx.registry.unregister(pageCtx.id, id)
+    }
   }, [pageCtx, id])
 
   const { runtime } = ctx

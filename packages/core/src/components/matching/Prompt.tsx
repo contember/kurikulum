@@ -1,7 +1,7 @@
 import type { VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { MatchingPairContext } from './context.ts'
 import type { HeadlessPartProps } from '../types.ts'
+import { MatchingPairContext } from './context.ts'
 
 export function Prompt({ children, class: className }: HeadlessPartProps): VNode {
   const ctx = useContext(MatchingPairContext)

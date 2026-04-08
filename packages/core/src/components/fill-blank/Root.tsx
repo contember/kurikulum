@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback } from 'preact/hooks'
-import { useCompletion } from '../../hooks/index.ts'
+import { useCallback, useContext, useEffect, useRef, useState } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import { useCompletion } from '../../hooks/index.ts'
 import { AssessmentContext } from '../assessment/context.ts'
 import { FillBlankContext } from './context.ts'
 
@@ -21,9 +21,7 @@ function evaluate(value: string, accept: string | string[] | RegExp, caseSensiti
     return accept.test(trimmed)
   }
   if (Array.isArray(accept)) {
-    return accept.some(a =>
-      caseSensitive ? trimmed === a : trimmed.toLowerCase() === a.toLowerCase()
-    )
+    return accept.some(a => caseSensitive ? trimmed === a : trimmed.toLowerCase() === a.toLowerCase())
   }
   return caseSensitive ? trimmed === accept : trimmed.toLowerCase() === accept.toLowerCase()
 }

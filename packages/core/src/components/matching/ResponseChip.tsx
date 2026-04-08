@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useContext, useCallback, useRef } from 'preact/hooks'
+import { useCallback, useContext, useRef } from 'preact/hooks'
 import { MatchingContext } from './context.ts'
 
 const DRAG_THRESHOLD = 8 // px of movement before touch becomes a drag
@@ -17,7 +17,7 @@ export function ResponseChip({ response, children, class: className }: MatchingR
   const isDragging = ctx.draggedResponse === response
   const isSelected = ctx.selectedResponse === response
 
-  const touchStartRef = useRef<{ x: number, y: number } | null>(null)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const touchElementRef = useRef<HTMLElement | null>(null)
   const touchDragStartedRef = useRef(false)
 

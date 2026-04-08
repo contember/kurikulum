@@ -1,7 +1,7 @@
+import archiver from 'archiver'
+import { createWriteStream } from 'node:fs'
 import { readdir, stat } from 'node:fs/promises'
 import { join, relative } from 'node:path'
-import { createWriteStream } from 'node:fs'
-import archiver from 'archiver'
 import { generateManifest } from './manifest.ts'
 
 export interface PackageOptions {

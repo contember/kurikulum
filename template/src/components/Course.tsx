@@ -1,5 +1,5 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { Course as C } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface CourseProps {
   children?: ComponentChildren

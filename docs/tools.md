@@ -36,7 +36,11 @@ import searchIndex from 'virtual:search-index'
 
 ```tsx
 const glossaryEntries = [
-  { term: 'XSS', definition: 'Cross-Site Scripting.', aliases: ['cross-site scripting'] },
+  {
+    term: 'XSS',
+    definition: 'Cross-Site Scripting.',
+    aliases: ['cross-site scripting'],
+  },
   { term: 'CSRF', definition: 'Cross-Site Request Forgery.' },
 ]
 ```

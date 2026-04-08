@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useContext, useCallback } from 'preact/hooks'
+import { useCallback, useContext } from 'preact/hooks'
 import { CategorySortContext } from './context.ts'
 
 export interface CategorySortCategoryProps {

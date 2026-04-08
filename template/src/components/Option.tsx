@@ -1,6 +1,6 @@
+import { MCQ, MCQContext, MultiSelect, MultiSelectContext } from '@kurikulum/core'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { MCQ, MultiSelect, MCQContext, MultiSelectContext } from '@kurikulum/core'
 
 export interface OptionProps {
   correct?: boolean

@@ -1,9 +1,9 @@
 import type { VNode } from 'preact'
-import { Text } from '../components/Text.tsx'
 import { Assessment } from '../components/Assessment.tsx'
 import { MCQ } from '../components/MCQ.tsx'
 import { MultiSelect } from '../components/MultiSelect.tsx'
 import { Option } from '../components/Option.tsx'
+import { Text } from '../components/Text.tsx'
 
 export function AssessmentPage(): VNode {
   return (
@@ -11,8 +11,7 @@ export function AssessmentPage(): VNode {
       <Text>
         <h1>Závěrečný test</h1>
         <p>
-          Pro úspěšné absolvování musíte získat alespoň <strong>66 % bodů</strong>.
-          Máte maximálně 3 pokusy.
+          Pro úspěšné absolvování musíte získat alespoň <strong>66 % bodů</strong>. Máte maximálně 3 pokusy.
         </p>
       </Text>
       <Assessment id="final-test" passThreshold={0.66} maxAttempts={3} timeLimit={180}>

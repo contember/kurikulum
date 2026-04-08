@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useContext, useCallback, useRef } from 'preact/hooks'
+import { useCallback, useContext, useRef } from 'preact/hooks'
 import { CategorySortContext } from './context.ts'
 
 const DRAG_THRESHOLD = 8 // px of movement before touch becomes a drag
@@ -22,7 +22,7 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
   const assignedCategory = ctx.assignments.get(itemId)
   const isCorrect = ctx.submitted && assignedCategory ? item.category === assignedCategory : null
 
-  const touchStartRef = useRef<{ x: number, y: number } | null>(null)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const touchElementRef = useRef<HTMLElement | null>(null)
   const touchDragStartedRef = useRef(false)
 
@@ -141,7 +141,11 @@ export function Item({ id: itemId, children, class: className }: CategorySortIte
       data-assigned={isAssigned || undefined}
       data-correct={isCorrect !== null ? String(isCorrect) : undefined}
       aria-grabbed={isDragging}
-      aria-label={`${item.label}${isAssigned && assignedCategory ? `, assigned to ${ctx.categories.find(c => c.id === assignedCategory)?.label ?? assignedCategory}` : ', unassigned'}. Use keys 1-${ctx.categories.length} to assign.`}
+      aria-label={`${item.label}${
+        isAssigned && assignedCategory
+          ? `, assigned to ${ctx.categories.find(c => c.id === assignedCategory)?.label ?? assignedCategory}`
+          : ', unassigned'
+      }. Use keys 1-${ctx.categories.length} to assign.`}
       role="listitem"
       tabIndex={0}
       draggable={!ctx.submitted}

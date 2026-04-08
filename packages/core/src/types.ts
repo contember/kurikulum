@@ -72,7 +72,14 @@ export interface CourseRuntime {
   submitScore(score: number, max: number, passThreshold?: number): void
 
   // Assessment — per-assessment
-  submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number, answers?: Record<string, AttemptAnswer>): void
+  submitAssessmentScore(
+    assessmentId: string,
+    score: number,
+    max: number,
+    threshold?: number,
+    weight?: number,
+    answers?: Record<string, AttemptAnswer>,
+  ): void
   getAssessmentResult(assessmentId: string): AssessmentResult | null
 
   // Lifecycle
@@ -104,7 +111,7 @@ export interface InteractionRecord {
   studentResponse: string
   correctResponse: string
   result: 'correct' | 'wrong' | 'neutral'
-  latency?: number       // ms
+  latency?: number // ms
   weighting?: number
 }
 

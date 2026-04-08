@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'bun:test'
-import { writeFileSync, mkdirSync, rmSync } from 'fs'
-import { join } from 'path'
+import { describe, expect, it } from 'bun:test'
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { extractSearchEntries } from './search-index-plugin.ts'
 
 describe('extractSearchEntries', () => {

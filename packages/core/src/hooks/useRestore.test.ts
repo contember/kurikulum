@@ -3,13 +3,13 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseRuntime, CourseConfig, DeliveryAdapter } from '../types.ts'
-import { createCourseRuntime, CURRENT_SCHEMA_VERSION } from '../runtime.ts'
 import { CourseContext, createNotifier } from '../context.tsx'
 import type { CourseContextValue } from '../context.tsx'
+import { createCourseRuntime, CURRENT_SCHEMA_VERSION } from '../runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '../types.ts'
 import { useRestore } from './useRestore.ts'
 import type { RestoreContext } from './useRestore.ts'
 
@@ -19,13 +19,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -39,7 +49,10 @@ const config: CourseConfig = {
   defaultCompletion: 'manual',
 }
 
-function createTestContext(runtime: CourseRuntime, restoreInfo = { restored: false, storedPage: null as string | null }): CourseContextValue & { notify: () => void } {
+function createTestContext(
+  runtime: CourseRuntime,
+  restoreInfo = { restored: false, storedPage: null as string | null },
+): CourseContextValue & { notify: () => void } {
   const { subscribe, notify } = createNotifier()
   const pageConditions: Record<string, () => boolean> = {}
   let dismissed = false
@@ -57,8 +70,12 @@ function createTestContext(runtime: CourseRuntime, restoreInfo = { restored: fal
       })
     },
     restoreInfo,
-    get restoreDismissed() { return dismissed },
-    set restoreDismissed(v: boolean) { dismissed = v },
+    get restoreDismissed() {
+      return dismissed
+    },
+    set restoreDismissed(v: boolean) {
+      dismissed = v
+    },
     dismissRestore() {
       dismissed = true
       notify()

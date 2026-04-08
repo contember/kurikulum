@@ -3,14 +3,14 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseRuntime, CourseConfig, DeliveryAdapter } from './types.ts'
-import { createCourseRuntime } from './runtime.ts'
 import { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 import type { CourseContextValue } from './context.tsx'
 import { useNavigation } from './hooks/useNavigation.ts'
+import { createCourseRuntime } from './runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from './types.ts'
 
 function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData: string; location: string } {
   return {
@@ -18,13 +18,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -49,7 +59,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     },
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -63,9 +75,7 @@ function renderHook<T>(hookFn: () => T, ctx: CourseContextValue): { get: () => T
   }
 
   render(
-    h(CourseContext.Provider, { value: ctx },
-      h(TestComponent, null),
-    ),
+    h(CourseContext.Provider, { value: ctx }, h(TestComponent, null)),
     container,
   )
 
@@ -95,18 +105,18 @@ describe('conditional navigation', () => {
     })
 
     it('filters out pages where when returns false', () => {
-      ctx.pageConditions['remedial'] = () => false
+      ctx.pageConditions.remedial = () => false
       expect(ctx.getVisiblePages()).toEqual(['intro', 'theory', 'quiz', 'summary'])
     })
 
     it('includes pages where when returns true', () => {
-      ctx.pageConditions['remedial'] = () => true
+      ctx.pageConditions.remedial = () => true
       expect(ctx.getVisiblePages()).toEqual(['intro', 'theory', 'quiz', 'remedial', 'summary'])
     })
 
     it('re-evaluates conditions dynamically', () => {
       let showRemedial = false
-      ctx.pageConditions['remedial'] = () => showRemedial
+      ctx.pageConditions.remedial = () => showRemedial
 
       expect(ctx.getVisiblePages()).toEqual(['intro', 'theory', 'quiz', 'summary'])
 
@@ -115,8 +125,8 @@ describe('conditional navigation', () => {
     })
 
     it('can filter multiple pages', () => {
-      ctx.pageConditions['theory'] = () => false
-      ctx.pageConditions['remedial'] = () => false
+      ctx.pageConditions.theory = () => false
+      ctx.pageConditions.remedial = () => false
 
       expect(ctx.getVisiblePages()).toEqual(['intro', 'quiz', 'summary'])
     })
@@ -124,13 +134,13 @@ describe('conditional navigation', () => {
 
   describe('useNavigation with conditions', () => {
     it('totalPages reflects visible pages only', () => {
-      ctx.pageConditions['remedial'] = () => false
+      ctx.pageConditions.remedial = () => false
       const { get } = renderHook(() => useNavigation(), ctx)
       expect(get().totalPages).toBe(4)
     })
 
     it('pageIndex is based on visible pages', () => {
-      ctx.pageConditions['theory'] = () => false
+      ctx.pageConditions.theory = () => false
       runtime.navigateTo('quiz')
       const { get } = renderHook(() => useNavigation(), ctx)
       // visible: intro, quiz, remedial, summary — quiz is index 1
@@ -147,7 +157,7 @@ describe('conditional navigation', () => {
   describe('navigation skips invisible pages', () => {
     it('nextPage skips hidden pages', () => {
       // Hide theory (index 1)
-      ctx.pageConditions['theory'] = () => false
+      ctx.pageConditions.theory = () => false
 
       // Wire up nextPage/prevPage to use visible pages (simulating what CourseProvider does)
       runtime.nextPage = () => {
@@ -164,7 +174,7 @@ describe('conditional navigation', () => {
     })
 
     it('prevPage skips hidden pages', () => {
-      ctx.pageConditions['theory'] = () => false
+      ctx.pageConditions.theory = () => false
 
       runtime.prevPage = () => {
         const visible = ctx.getVisiblePages()
@@ -181,7 +191,7 @@ describe('conditional navigation', () => {
     })
 
     it('nextPage does nothing on last visible page', () => {
-      ctx.pageConditions['summary'] = () => false
+      ctx.pageConditions.summary = () => false
 
       runtime.nextPage = () => {
         const visible = ctx.getVisiblePages()
@@ -208,9 +218,7 @@ describe('conditional navigation', () => {
       }
 
       render(
-        h(CourseProvider, { config, adapter } as any,
-          h(Child, null),
-        ),
+        h(CourseProvider, { config, adapter } as any, h(Child, null)),
         container,
       )
 
@@ -222,7 +230,7 @@ describe('conditional navigation', () => {
 
   describe('condition based on runtime state', () => {
     it('condition can read runtime state', () => {
-      ctx.pageConditions['remedial'] = (rt) => rt.state.passed === false
+      ctx.pageConditions.remedial = (rt) => rt.state.passed === false
 
       // Initially passed is null, so remedial is hidden
       expect(ctx.getVisiblePages()).not.toContain('remedial')
@@ -233,7 +241,7 @@ describe('conditional navigation', () => {
     })
 
     it('condition based on completion', () => {
-      ctx.pageConditions['theory'] = (rt) => !rt.isComplete('intro')
+      ctx.pageConditions.theory = (rt) => !rt.isComplete('intro')
 
       // Theory visible initially (intro not complete)
       expect(ctx.getVisiblePages()).toContain('theory')

@@ -1,6 +1,6 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { Page as P } from '@kurikulum/core'
 import type { CompletionStrategy, CourseRuntime } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface PageProps {
   id: string

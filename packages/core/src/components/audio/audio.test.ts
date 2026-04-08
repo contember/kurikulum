@@ -4,14 +4,14 @@ const window = new Window()
 globalThis.document = window.document as unknown as Document
 const HappyEvent = window.Event
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseRuntime, CourseConfig, DeliveryAdapter } from '../../types.ts'
-import { createCourseRuntime } from '../../runtime.ts'
 import { CourseContext, createNotifier } from '../../context.tsx'
 import type { CourseContextValue } from '../../context.tsx'
 import { useAudio } from '../../hooks/useAudio.ts'
+import { createCourseRuntime } from '../../runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '../../types.ts'
 import { Audio } from './index.ts'
 
 function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData: string; location: string } {
@@ -20,13 +20,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -57,7 +67,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     },
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -80,9 +92,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Root renders an audio element with src', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' })),
       container,
     )
     const audios = container.getElementsByTagName('audio')
@@ -92,9 +102,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Root renders with role="group" and aria-label', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' })),
       container,
     )
     const divs = container.getElementsByTagName('div')
@@ -105,11 +113,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Root renders children', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h('span', null, 'Hello'),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h('span', null, 'Hello'))),
       container,
     )
     const spans = container.getElementsByTagName('span')
@@ -119,9 +123,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Root sets preload="metadata"', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' })),
       container,
     )
     const audios = container.getElementsByTagName('audio')
@@ -130,11 +132,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Play renders a button with aria-label', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Audio.Play, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h(Audio.Play, null))),
       container,
     )
     const btns = container.getElementsByTagName('button')
@@ -150,11 +148,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Progress renders a range input with aria-label Seek', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Audio.Progress, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h(Audio.Progress, null))),
       container,
     )
     const inputs = Array.from(container.getElementsByTagName('input')) as HTMLInputElement[]
@@ -171,11 +165,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Time renders time display', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Audio.Time, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h(Audio.Time, null))),
       container,
     )
     const spans = container.getElementsByTagName('span')
@@ -191,11 +181,7 @@ describe('Audio compound component', () => {
 
   it('Audio.Volume renders a range input with aria-label Volume', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Audio.Volume, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h(Audio.Volume, null))),
       container,
     )
     const inputs = Array.from(container.getElementsByTagName('input')) as HTMLInputElement[]
@@ -214,7 +200,10 @@ describe('useAudio hook', () => {
   it('throws outside Audio.Root', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useAudio(); return null }
+      function Bad() {
+        useAudio()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useAudio must be used within an Audio.Root')
   })
@@ -232,11 +221,7 @@ describe('useAudio hook', () => {
     }
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3' }, h(Capture, null))),
       container,
     )
 
@@ -262,10 +247,10 @@ describe('Audio.Play render prop', () => {
     const container = document.createElement('div')
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3' },
-          h(Audio.Play, null, (playing: boolean) => playing ? 'Pause' : 'Play'),
-        ),
+      h(
+        CourseContext.Provider,
+        { value: ctx },
+        h(Audio.Root, { src: 'test.mp3' }, h(Audio.Play, null, (playing: boolean) => playing ? 'Pause' : 'Play')),
       ),
       container,
     )
@@ -283,9 +268,7 @@ describe('Audio completeOnEnd', () => {
     const container = document.createElement('div')
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: true }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: true })),
       container,
     )
 
@@ -299,9 +282,7 @@ describe('Audio completeOnEnd', () => {
     const container = document.createElement('div')
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: true }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: true })),
       container,
     )
 
@@ -321,9 +302,7 @@ describe('Audio completeOnEnd', () => {
     const container = document.createElement('div')
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: false }),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Audio.Root, { src: 'test.mp3', id: 'narration', completeOnEnd: false })),
       container,
     )
 

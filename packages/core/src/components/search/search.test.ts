@@ -3,18 +3,27 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import { Search } from './index.ts'
 import { useSearch } from '../../hooks/useSearch.ts'
-import { normalize, extractSnippet, searchEntries } from './search-engine.ts'
-import type { SearchEntry, SearchContextValue } from './context.ts'
+import type { SearchContextValue, SearchEntry } from './context.ts'
+import { Search } from './index.ts'
+import { extractSnippet, normalize, searchEntries } from './search-engine.ts'
 
 const index: SearchEntry[] = [
   { pageId: 'intro', title: 'Úvod do kurzu', content: 'Vítejte v kurzu zaměřeném na bezpečnost webových aplikací.' },
-  { pageId: 'theory', title: 'Nejčastější zranitelnosti', content: 'XSS umožňuje útočníkovi vložit škodlivý skript do stránky. SQL Injection je další hrozba.' },
-  { pageId: 'summary', title: 'Shrnutí', content: 'V tomto kurzu jste se naučili rozpoznat a bránit se proti útokům.', keywords: ['bezpečnost', 'OWASP'] },
+  {
+    pageId: 'theory',
+    title: 'Nejčastější zranitelnosti',
+    content: 'XSS umožňuje útočníkovi vložit škodlivý skript do stránky. SQL Injection je další hrozba.',
+  },
+  {
+    pageId: 'summary',
+    title: 'Shrnutí',
+    content: 'V tomto kurzu jste se naučili rozpoznat a bránit se proti útokům.',
+    keywords: ['bezpečnost', 'OWASP'],
+  },
 ]
 
 function flushEffects(): Promise<void> {
@@ -124,9 +133,7 @@ describe('Search.Root', () => {
 
   it('renders children', () => {
     render(
-      h(Search.Root, { index },
-        h('span', null, 'Hello'),
-      ),
+      h(Search.Root, { index }, h('span', null, 'Hello')),
       container,
     )
     expect(container.getElementsByTagName('span').length).toBe(1)
@@ -141,9 +148,7 @@ describe('Search.Root', () => {
     }
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -173,9 +178,7 @@ describe('Search.Input', () => {
 
   it('renders search input with aria-label', () => {
     render(
-      h(Search.Root, { index },
-        h(Search.Input, null),
-      ),
+      h(Search.Root, { index }, h(Search.Input, null)),
       container,
     )
     const inputs = Array.from(container.getElementsByTagName('input')) as HTMLInputElement[]
@@ -200,9 +203,7 @@ describe('Search.Results', () => {
 
   it('is hidden when search is closed', () => {
     render(
-      h(Search.Root, { index },
-        h(Search.Results, null),
-      ),
+      h(Search.Root, { index }, h(Search.Results, null)),
       container,
     )
     const listbox = findByRole(container, 'listbox')
@@ -217,10 +218,7 @@ describe('Search.Results', () => {
     }
 
     render(
-      h(Search.Root, { index },
-        h(Controller, null),
-        h(Search.Results, null),
-      ),
+      h(Search.Root, { index }, h(Controller, null), h(Search.Results, null)),
       container,
     )
 
@@ -230,10 +228,7 @@ describe('Search.Results', () => {
 
     // Re-render to capture state changes
     render(
-      h(Search.Root, { index },
-        h(Controller, null),
-        h(Search.Results, null),
-      ),
+      h(Search.Root, { index }, h(Controller, null), h(Search.Results, null)),
       container,
     )
 
@@ -259,9 +254,7 @@ describe('Search.Result', () => {
 
   it('renders with role option', () => {
     render(
-      h(Search.Root, { index },
-        h(Search.Result, { pageId: 'intro' }, 'Result text'),
-      ),
+      h(Search.Root, { index }, h(Search.Result, { pageId: 'intro' }, 'Result text')),
       container,
     )
     const option = findByRole(container, 'option')
@@ -274,7 +267,10 @@ describe('useSearch hook', () => {
   it('throws outside Search.Root', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useSearch(); return null }
+      function Bad() {
+        useSearch()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useSearch must be used within a Search.Root')
   })
@@ -289,9 +285,7 @@ describe('useSearch hook', () => {
     }
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -311,9 +305,7 @@ describe('useSearch hook', () => {
     }
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -322,9 +314,7 @@ describe('useSearch hook', () => {
     await flushEffects()
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -334,9 +324,7 @@ describe('useSearch hook', () => {
     await flushEffects()
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -355,9 +343,7 @@ describe('useSearch hook', () => {
     }
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 
@@ -365,9 +351,7 @@ describe('useSearch hook', () => {
     await flushEffects()
 
     render(
-      h(Search.Root, { index },
-        h(Capture, null),
-      ),
+      h(Search.Root, { index }, h(Capture, null)),
       container,
     )
 

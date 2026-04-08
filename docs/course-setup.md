@@ -5,12 +5,12 @@ Configure and compose a course in `src/course.tsx`.
 ## Minimal course.tsx
 
 ```tsx
-import { render } from 'preact'
 import { CourseProvider, createAdapter } from '@kurikulum/core'
 import type { CourseConfig } from '@kurikulum/core'
+import { render } from 'preact'
 import { Course } from './components/Course.tsx'
-import { Page } from './components/Page.tsx'
 import { Navigation } from './components/Navigation.tsx'
+import { Page } from './components/Page.tsx'
 import { MyIntro } from './pages/MyIntro.tsx'
 import { MyQuiz } from './pages/MyQuiz.tsx'
 import './styles.css'
@@ -52,30 +52,30 @@ render(<App />, document.getElementById('app')!)
 ```tsx
 <CourseProvider config={config} adapter={adapter}>
   <Search index={searchIndex}>
-  <Glossary entries={glossaryEntries}>
-  <Notes>
-    <div class="h-screen flex flex-col bg-bg text-text font-sans">
-      <Course>
-        <ResumeDialog />
-        <SearchModal />
-        <GlossaryPanel />
-        <NotesPanel />
+    <Glossary entries={glossaryEntries}>
+      <Notes>
+        <div class="h-screen flex flex-col bg-bg text-text font-sans">
+          <Course>
+            <ResumeDialog />
+            <SearchModal />
+            <GlossaryPanel />
+            <NotesPanel />
 
-        <Page id="intro" completion="mount">...</Page>
-        <Page id="theory" completion="timer" completionTimer={5}>...</Page>
-        <Page id="quiz" completion="interactive">...</Page>
-      </Course>
-      <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
-        <SearchButton />
-        <GlossaryToggle />
-        <NotesToggle />
-        <div class="ml-auto">
-          <Navigation />
+            <Page id="intro" completion="mount">...</Page>
+            <Page id="theory" completion="timer" completionTimer={5}>...</Page>
+            <Page id="quiz" completion="interactive">...</Page>
+          </Course>
+          <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
+            <SearchButton />
+            <GlossaryToggle />
+            <NotesToggle />
+            <div class="ml-auto">
+              <Navigation />
+            </div>
+          </footer>
         </div>
-      </footer>
-    </div>
-  </Notes>
-  </Glossary>
+      </Notes>
+    </Glossary>
   </Search>
 </CourseProvider>
 ```
@@ -92,8 +92,8 @@ const config: CourseConfig = {
   pages: ['intro', 'new-page', 'quiz'],
   version: '2',
   onMigrate(old, oldVersion) {
-    if (oldVersion === '1') return old  // Compatible
-    return null                          // Reset
+    if (oldVersion === '1') return old // Compatible
+    return null // Reset
   },
 }
 ```

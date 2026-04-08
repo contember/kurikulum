@@ -4,7 +4,7 @@ import { TimerContext } from './timerContext.ts'
 
 export interface TimerProps {
   class?: string
-  warningThreshold?: number  // seconds — changes style when time is low (default 60)
+  warningThreshold?: number // seconds — changes style when time is low (default 60)
   children?: (remaining: number, isWarning: boolean) => ComponentChildren
 }
 

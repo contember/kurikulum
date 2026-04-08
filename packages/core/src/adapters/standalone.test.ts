@@ -4,9 +4,9 @@ const window = new Window()
 globalThis.document = window.document as unknown as Document
 globalThis.localStorage = window.localStorage as unknown as Storage
 
-import { describe, it, expect, beforeEach, spyOn } from 'bun:test'
-import { createStandaloneAdapter } from './standalone.ts'
+import { beforeEach, describe, expect, it, spyOn } from 'bun:test'
 import { createAdapter } from './index.ts'
+import { createStandaloneAdapter } from './standalone.ts'
 
 beforeEach(() => {
   localStorage.clear()

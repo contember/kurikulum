@@ -14,21 +14,21 @@ globalThis.IntersectionObserver = class IntersectionObserver {
 // Patch it to a simple property so Preact can set checked without crashing.
 const inputProto = (window as any).HTMLInputElement.prototype
 Object.defineProperty(inputProto, 'checked', {
-  get() { return this._checked ?? false },
-  set(value: boolean) { this._checked = !!value },
+  get() {
+    return this._checked ?? false
+  },
+  set(value: boolean) {
+    this._checked = !!value
+  },
   configurable: true,
 })
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
+import type { CourseContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-} from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
 import { Assessment } from '../../template/src/components/Assessment.tsx'
 import { MCQ } from '../../template/src/components/MCQ.tsx'
 import { MultiSelect } from '../../template/src/components/MultiSelect.tsx'
@@ -51,13 +51,19 @@ function createMockAdapter(): DeliveryAdapter & { committed: number } {
   return {
     committed: 0,
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -77,10 +83,12 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -93,7 +101,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -123,12 +133,9 @@ describe('MCQ', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(MCQ, { id: 'q1', question: 'What is 1+1?' },
-        h(Option, { correct: true }, '2'),
-        h(Option, null, '3'),
-        h(Option, null, '4'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(MCQ, { id: 'q1', question: 'What is 1+1?' }, h(Option, { correct: true }, '2'), h(Option, null, '3'), h(Option, null, '4')),
     )
 
     await flushEffects()
@@ -149,11 +156,9 @@ describe('MCQ', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(MCQ, { id: 'q1', question: 'Q?' },
-        h(Option, { correct: true }, 'A'),
-        h(Option, null, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(MCQ, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
     )
 
     await flushEffects()
@@ -175,13 +180,14 @@ describe('MCQ', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -205,12 +211,7 @@ describe('MCQ', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(MCQ, { id: 'q1', question: 'Q?' },
-        h(Option, { correct: true }, 'A'),
-        h(Option, null, 'B'),
-      ),
-    )
+    const { container } = renderWithContext(ctx, () => h(MCQ, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')))
 
     await flushEffects()
 
@@ -226,12 +227,16 @@ describe('MultiSelect', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(MultiSelect, { id: 'q2', question: 'Select languages:' },
-        h(Option, { correct: true }, 'Python'),
-        h(Option, { correct: true }, 'JS'),
-        h(Option, null, 'HTML'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          MultiSelect,
+          { id: 'q2', question: 'Select languages:' },
+          h(Option, { correct: true }, 'Python'),
+          h(Option, { correct: true }, 'JS'),
+          h(Option, null, 'HTML'),
+        ),
     )
 
     await flushEffects()
@@ -249,12 +254,9 @@ describe('MultiSelect', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(MultiSelect, { id: 'q2', question: 'Q?' },
-        h(Option, { correct: true }, 'A'),
-        h(Option, { correct: true }, 'B'),
-        h(Option, null, 'C'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(MultiSelect, { id: 'q2', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, { correct: true }, 'B'), h(Option, null, 'C')),
     )
 
     await flushEffects()
@@ -275,11 +277,9 @@ describe('MultiSelect', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(MultiSelect, { id: 'q2', question: 'Q?' },
-        h(Option, { correct: true }, 'A'),
-        h(Option, null, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(MultiSelect, { id: 'q2', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
     )
 
     await flushEffects()
@@ -301,14 +301,20 @@ describe('QuestionFeedback', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Capital of CZ?' },
-          h(Option, { correct: true }, 'Prague'),
-          h(Option, null, 'Brno'),
-          h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong answer.' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MCQ,
+            { id: 'q1', question: 'Capital of CZ?' },
+            h(Option, { correct: true }, 'Prague'),
+            h(Option, null, 'Brno'),
+            h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong answer.' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -337,14 +343,20 @@ describe('QuestionFeedback', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Capital of CZ?' },
-          h(Option, { correct: true }, 'Prague'),
-          h(Option, null, 'Brno'),
-          h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong answer.' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MCQ,
+            { id: 'q1', question: 'Capital of CZ?' },
+            h(Option, { correct: true }, 'Prague'),
+            h(Option, null, 'Brno'),
+            h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong answer.' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -372,17 +384,15 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
+          h(MCQ, { id: 'q2', question: 'Q2' }, h(Option, null, 'Wrong'), h(Option, { correct: true }, 'Right')),
         ),
-        h(MCQ, { id: 'q2', question: 'Q2' },
-          h(Option, null, 'Wrong'),
-          h(Option, { correct: true }, 'Right'),
-        ),
-      ),
     )
 
     await flushEffects()
@@ -411,13 +421,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -442,17 +453,15 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1.0 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1.0 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
+          h(MCQ, { id: 'q2', question: 'Q2' }, h(Option, null, 'Wrong'), h(Option, { correct: true }, 'Right')),
         ),
-        h(MCQ, { id: 'q2', question: 'Q2' },
-          h(Option, null, 'Wrong'),
-          h(Option, { correct: true }, 'Right'),
-        ),
-      ),
     )
 
     await flushEffects()
@@ -479,13 +488,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1.0, maxAttempts: 1 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, null, 'Wrong'),
-          h(Option, { correct: true }, 'Right'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1.0, maxAttempts: 1 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, null, 'Wrong'), h(Option, { correct: true }, 'Right')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -511,13 +521,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1.0, maxAttempts: 2 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, null, 'Wrong'),
-          h(Option, { correct: true }, 'Right'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1.0, maxAttempts: 2 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, null, 'Wrong'), h(Option, { correct: true }, 'Right')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -570,15 +581,21 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Select languages:' },
-          h(Option, { correct: true }, 'Python'),
-          h(Option, { correct: true }, 'JavaScript'),
-          h(Option, null, 'HTML'),
-          h(Option, null, 'Photoshop'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MultiSelect,
+            { id: 'q1', question: 'Select languages:' },
+            h(Option, { correct: true }, 'Python'),
+            h(Option, { correct: true }, 'JavaScript'),
+            h(Option, null, 'HTML'),
+            h(Option, null, 'Photoshop'),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -606,14 +623,20 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1.0 },
-        h(MultiSelect, { id: 'q1', question: 'Select languages:' },
-          h(Option, { correct: true }, 'Python'),
-          h(Option, { correct: true }, 'JavaScript'),
-          h(Option, null, 'HTML'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1.0 },
+          h(
+            MultiSelect,
+            { id: 'q1', question: 'Select languages:' },
+            h(Option, { correct: true }, 'Python'),
+            h(Option, { correct: true }, 'JavaScript'),
+            h(Option, null, 'HTML'),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -642,13 +665,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, null, 'B'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -675,12 +699,9 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz' },
-        h(MCQ, { id: 'q1', question: 'Test question' },
-          h(Option, { correct: true }, 'A'),
-        ),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(Assessment, { id: 'quiz' }, h(MCQ, { id: 'q1', question: 'Test question' }, h(Option, { correct: true }, 'A'))),
     )
 
     await flushEffects()
@@ -700,13 +721,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, null, 'B'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -732,13 +754,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -762,13 +785,14 @@ describe('Assessment', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1.0 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1.0 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -794,11 +818,9 @@ describe('MultiSelect a11y', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(MultiSelect, { id: 'q1', question: 'Select:' },
-        h(Option, { correct: true }, 'A'),
-        h(Option, null, 'B'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(MultiSelect, { id: 'q1', question: 'Select:' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
     )
 
     await flushEffects()
@@ -813,13 +835,14 @@ describe('MultiSelect a11y', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, null, 'B'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MultiSelect, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -847,14 +870,20 @@ describe('QuestionFeedback a11y', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
-          h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MCQ,
+            { id: 'q1', question: 'Q?' },
+            h(Option, { correct: true }, 'Right'),
+            h(Option, null, 'Wrong'),
+            h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -880,14 +909,20 @@ describe('QuestionFeedback a11y', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
-          h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MCQ,
+            { id: 'q1', question: 'Q?' },
+            h(Option, { correct: true }, 'Right'),
+            h(Option, null, 'Wrong'),
+            h(QuestionFeedback, { correct: 'Well done!', incorrect: 'Try again.' }),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -914,13 +949,14 @@ describe('Weighted scoring', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -947,17 +983,15 @@ describe('Weighted scoring', () => {
 
     // q1 weight=2 (correct), q2 weight=3 (incorrect)
     // weightedScore = 1*2 + 0*3 = 2, totalWeight = 5
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1', weight: 2 },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1', weight: 2 }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
+          h(MCQ, { id: 'q2', question: 'Q2', weight: 3 }, h(Option, null, 'Wrong'), h(Option, { correct: true }, 'Right')),
         ),
-        h(MCQ, { id: 'q2', question: 'Q2', weight: 3 },
-          h(Option, null, 'Wrong'),
-          h(Option, { correct: true }, 'Right'),
-        ),
-      ),
     )
 
     await flushEffects()
@@ -986,17 +1020,15 @@ describe('Weighted scoring', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
+          h(MCQ, { id: 'q2', question: 'Q2' }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
         ),
-        h(MCQ, { id: 'q2', question: 'Q2' },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
-        ),
-      ),
     )
 
     await flushEffects()
@@ -1026,14 +1058,14 @@ describe('MultiSelect partial credit', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, { correct: true }, 'B'),
-          h(Option, null, 'C'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MultiSelect, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, { correct: true }, 'B'), h(Option, null, 'C')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -1061,14 +1093,14 @@ describe('MultiSelect partial credit', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, { correct: true }, 'B'),
-          h(Option, null, 'C'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MultiSelect, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, { correct: true }, 'B'), h(Option, null, 'C')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -1094,15 +1126,21 @@ describe('MultiSelect partial credit', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, { correct: true }, 'B'),
-          h(Option, null, 'C'),
-          h(Option, null, 'D'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            MultiSelect,
+            { id: 'q1', question: 'Q?' },
+            h(Option, { correct: true }, 'A'),
+            h(Option, { correct: true }, 'B'),
+            h(Option, null, 'C'),
+            h(Option, null, 'D'),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -1132,13 +1170,14 @@ describe('MultiSelect partial credit', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MultiSelect, { id: 'q1', question: 'Q?' },
-          h(Option, { correct: true }, 'A'),
-          h(Option, null, 'B'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MultiSelect, { id: 'q1', question: 'Q?' }, h(Option, { correct: true }, 'A'), h(Option, null, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -1165,18 +1204,21 @@ describe('MultiSelect partial credit', () => {
     const ctx = createTestContext(runtime)
 
     // MCQ weight=1 (correct), MultiSelect weight=3 (partial: 1 of 2 correct)
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(MCQ, { id: 'q1', question: 'Q1', weight: 1 },
-          h(Option, { correct: true }, 'Right'),
-          h(Option, null, 'Wrong'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(MCQ, { id: 'q1', question: 'Q1', weight: 1 }, h(Option, { correct: true }, 'Right'), h(Option, null, 'Wrong')),
+          h(
+            MultiSelect,
+            { id: 'q2', question: 'Q2', weight: 3 },
+            h(Option, { correct: true }, 'A'),
+            h(Option, { correct: true }, 'B'),
+            h(Option, null, 'C'),
+          ),
         ),
-        h(MultiSelect, { id: 'q2', question: 'Q2', weight: 3 },
-          h(Option, { correct: true }, 'A'),
-          h(Option, { correct: true }, 'B'),
-          h(Option, null, 'C'),
-        ),
-      ),
     )
 
     await flushEffects()

@@ -1,5 +1,5 @@
-import type { VNode } from 'preact'
 import { Navigation as N } from '@kurikulum/core'
+import type { VNode } from 'preact'
 
 export function Navigation(): VNode {
   return (

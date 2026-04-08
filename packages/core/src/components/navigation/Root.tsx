@@ -1,7 +1,7 @@
 import type { VNode } from 'preact'
 import { useNavigation } from '../../hooks/index.ts'
-import { NavigationContext } from './context.ts'
 import type { HeadlessPartProps } from '../types.ts'
+import { NavigationContext } from './context.ts'
 
 export interface NavigationRootProps extends HeadlessPartProps {
   'aria-label'?: string

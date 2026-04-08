@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { createCourseRuntime } from './runtime.ts'
 import type { CourseConfig, CourseRuntime, DeliveryAdapter } from './types.ts'
 
@@ -12,13 +12,23 @@ function createMockAdapter(): DeliveryAdapter & {
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},

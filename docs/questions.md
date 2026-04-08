@@ -48,7 +48,11 @@ import { FillBlank } from './components/FillBlank.tsx'
 <FillBlank id="q3" question="Capital of France?" accept="Paris" />
 
 {/* Multiple accepted answers */}
-<FillBlank id="q4" question="HTTP security header?" accept={['Content-Security-Policy', 'CSP']} />
+<FillBlank
+  id="q4"
+  question="HTTP security header?"
+  accept={['Content-Security-Policy', 'CSP']}
+/>
 
 {/* Regex */}
 <FillBlank id="q5" question="Year of HTTP/2?" accept={/^2015$/} />

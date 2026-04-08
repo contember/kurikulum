@@ -10,21 +10,17 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
+import type { CourseContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-} from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
 import { Course } from '../../template/src/components/Course.tsx'
-import { Page } from '../../template/src/components/Page.tsx'
-import { Navigation } from '../../template/src/components/Navigation.tsx'
-import { Text } from '../../template/src/components/Text.tsx'
 import { Image } from '../../template/src/components/Image.tsx'
+import { Navigation } from '../../template/src/components/Navigation.tsx'
+import { Page } from '../../template/src/components/Page.tsx'
+import { Text } from '../../template/src/components/Text.tsx'
 import { Video } from '../../template/src/components/Video.tsx'
 
 function flushEffects(): Promise<void> {
@@ -37,13 +33,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -74,7 +80,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     },
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -86,8 +94,12 @@ describe('Course', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Course, null,
+      h(
+        CourseContext.Provider,
+        { value: ctx } as any,
+        h(
+          Course,
+          null,
           h(Page, { id: 'page-1' }, 'Page 1 content'),
           h(Page, { id: 'page-2' }, 'Page 2 content'),
           h(Page, { id: 'page-3' }, 'Page 3 content'),
@@ -108,8 +120,8 @@ describe('Course', () => {
 
     // Inactive pages have display:none on their wrapper parent
     expect(pageMains[0].parentElement!.style.display).not.toBe('none') // page-1 active
-    expect(pageMains[1].parentElement!.style.display).toBe('none')     // page-2 hidden
-    expect(pageMains[2].parentElement!.style.display).toBe('none')     // page-3 hidden
+    expect(pageMains[1].parentElement!.style.display).toBe('none') // page-2 hidden
+    expect(pageMains[2].parentElement!.style.display).toBe('none') // page-3 hidden
   })
 
   it('switches visible page after navigation', () => {
@@ -119,11 +131,10 @@ describe('Course', () => {
 
     const container = document.createElement('div')
     function App() {
-      return h(CourseContext.Provider, { value: ctx } as any,
-        h(Course, null,
-          h(Page, { id: 'page-1' }, 'Page 1 content'),
-          h(Page, { id: 'page-2' }, 'Page 2 content'),
-        ),
+      return h(
+        CourseContext.Provider,
+        { value: ctx } as any,
+        h(Course, null, h(Page, { id: 'page-1' }, 'Page 1 content'), h(Page, { id: 'page-2' }, 'Page 2 content')),
       )
     }
 
@@ -153,11 +164,7 @@ describe('Course', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Course, null,
-          h(Page, { id: 'page-1' }, 'Page 1 content'),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Course, null, h(Page, { id: 'page-1' }, 'Page 1 content'))),
       container,
     )
 
@@ -175,11 +182,7 @@ describe('Course', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Course, null,
-          h(Page, { id: 'nonexistent' }, 'Nope'),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Course, null, h(Page, { id: 'nonexistent' }, 'Nope'))),
       container,
     )
 
@@ -199,9 +202,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1' }, 'Hello from page'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1' }, 'Hello from page')),
       container,
     )
 
@@ -215,9 +216,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1' }, 'Content'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1' }, 'Content')),
       container,
     )
 
@@ -239,9 +238,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1', completion: 'mount' }, 'Content'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1', completion: 'mount' }, 'Content')),
       container,
     )
 
@@ -256,9 +253,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1', completion: 'manual' }, 'Content'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1', completion: 'manual' }, 'Content')),
       container,
     )
 
@@ -273,9 +268,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1', completion: 'timer', completionTimer: 0.05 }, 'Content'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1', completion: 'timer', completionTimer: 0.05 }, 'Content')),
       container,
     )
 
@@ -291,9 +284,7 @@ describe('Page', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1', completion: 'scroll' }, 'Content'),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Page, { id: 'page-1', completion: 'scroll' }, 'Content')),
       container,
     )
 
@@ -318,9 +309,7 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
@@ -334,9 +323,7 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
@@ -354,9 +341,7 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
@@ -373,9 +358,7 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
@@ -392,23 +375,19 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
     const buttons = container.getElementsByTagName('button')
-    expect(buttons[0].disabled).toBe(true)   // prev (first page)
-    expect(buttons[1].disabled).toBe(true)   // next (page not complete)
+    expect(buttons[0].disabled).toBe(true) // prev (first page)
+    expect(buttons[1].disabled).toBe(true) // next (page not complete)
 
     // After completing the page, next becomes enabled
     runtime.markComplete('page-1')
     ctx.notify()
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
     const buttons2 = container.getElementsByTagName('button')
@@ -423,15 +402,13 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      ),
+      h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null)),
       container,
     )
 
     const buttons = container.getElementsByTagName('button')
-    expect(buttons[0].disabled).toBe(false)  // prev
-    expect(buttons[1].disabled).toBe(true)   // next
+    expect(buttons[0].disabled).toBe(false) // prev
+    expect(buttons[1].disabled).toBe(true) // next
   })
 
   it('navigates when buttons are clicked', () => {
@@ -442,9 +419,7 @@ describe('Navigation', () => {
 
     const container = document.createElement('div')
     function App() {
-      return h(CourseContext.Provider, { value: ctx } as any,
-        h(Navigation, null),
-      )
+      return h(CourseContext.Provider, { value: ctx } as any, h(Navigation, null))
     }
 
     render(h(App, null), container)
@@ -560,8 +535,12 @@ describe('Video', () => {
 
     const container = document.createElement('div')
     render(
-      h(CourseContext.Provider, { value: ctx } as any,
-        h(Page, { id: 'page-1', completion: 'manual' },
+      h(
+        CourseContext.Provider,
+        { value: ctx } as any,
+        h(
+          Page,
+          { id: 'page-1', completion: 'manual' },
           h(Text, null, 'Some text'),
           h(Image, { src: '/img.png', alt: 'Image' }),
           h(Video, { src: '/vid.mp4' }),

@@ -1,5 +1,5 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { Assessment as A } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface AssessmentProps {
   id: string
@@ -28,7 +28,9 @@ export function Assessment({ id, passThreshold, maxAttempts, timeLimit, onTimeEx
       <A.Status class="mt-4 outline-none">
         {({ score, maxScore, passed }) => (
           <>
-            <p class="text-sm">Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}</p>
+            <p class="text-sm">
+              Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}
+            </p>
             {passed === true ? <p class="text-success font-medium">✓ Splněno!</p> : null}
             {passed === false ? <p class="text-danger font-medium">✗ Nesplněno.</p> : null}
           </>

@@ -3,17 +3,17 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseRuntime, CourseConfig, DeliveryAdapter } from '../types.ts'
-import { createCourseRuntime } from '../runtime.ts'
 import { CourseContext, createNotifier } from '../context.tsx'
 import type { CourseContextValue } from '../context.tsx'
+import { createCourseRuntime } from '../runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '../types.ts'
+import { useAssessment } from './useAssessment.ts'
+import { useCompletion } from './useCompletion.ts'
 import { useCourse } from './useCourse.ts'
 import { useNavigation } from './useNavigation.ts'
-import { useCompletion } from './useCompletion.ts'
-import { useAssessment } from './useAssessment.ts'
 import { usePage } from './usePage.ts'
 
 function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData: string; location: string } {
@@ -22,13 +22,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -60,7 +70,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     },
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -78,9 +90,7 @@ function renderHook<T>(hookFn: () => T, ctx: CourseContextValue): { get: () => T
   }
 
   render(
-    h(CourseContext.Provider, { value: ctx },
-      h(TestComponent, null),
-    ),
+    h(CourseContext.Provider, { value: ctx }, h(TestComponent, null)),
     container,
   )
 
@@ -94,7 +104,10 @@ describe('hooks — outside context', () => {
   it('useCourse throws outside CourseProvider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useCourse(); return null }
+      function Bad() {
+        useCourse()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useCourse must be used within a CourseProvider')
   })
@@ -102,7 +115,10 @@ describe('hooks — outside context', () => {
   it('useNavigation throws outside CourseProvider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useNavigation(); return null }
+      function Bad() {
+        useNavigation()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useNavigation must be used within a CourseProvider')
   })
@@ -110,7 +126,10 @@ describe('hooks — outside context', () => {
   it('useCompletion throws outside CourseProvider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useCompletion('x'); return null }
+      function Bad() {
+        useCompletion('x')
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useCompletion must be used within a CourseProvider')
   })
@@ -118,7 +137,10 @@ describe('hooks — outside context', () => {
   it('useAssessment throws outside CourseProvider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useAssessment(); return null }
+      function Bad() {
+        useAssessment()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useAssessment must be used within a CourseProvider')
   })
@@ -126,7 +148,10 @@ describe('hooks — outside context', () => {
   it('usePage throws outside CourseProvider', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { usePage(); return null }
+      function Bad() {
+        usePage()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('usePage must be used within a CourseProvider')
   })
@@ -291,8 +316,12 @@ describe('createNotifier', () => {
     const { subscribe, notify } = createNotifier()
     let count1 = 0
     let count2 = 0
-    subscribe(() => { count1++ })
-    subscribe(() => { count2++ })
+    subscribe(() => {
+      count1++
+    })
+    subscribe(() => {
+      count2++
+    })
     notify()
     expect(count1).toBe(1)
     expect(count2).toBe(1)
@@ -301,7 +330,9 @@ describe('createNotifier', () => {
   it('unsubscribe removes listener', () => {
     const { subscribe, notify } = createNotifier()
     let count = 0
-    const unsub = subscribe(() => { count++ })
+    const unsub = subscribe(() => {
+      count++
+    })
     notify()
     expect(count).toBe(1)
     unsub()

@@ -1,5 +1,5 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { FillBlank as FB } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface FillBlankProps {
   id: string

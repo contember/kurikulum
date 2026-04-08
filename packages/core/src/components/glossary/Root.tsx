@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useMemo, useState } from 'preact/hooks'
 import { GlossaryContext } from './context.ts'
 import type { GlossaryEntry } from './context.ts'
 
@@ -13,9 +13,9 @@ function searchEntries(entries: GlossaryEntry[], query: string): GlossaryEntry[]
   const q = query.toLowerCase()
   return entries.filter(
     (e) =>
-      e.term.toLowerCase().includes(q) ||
-      e.definition.toLowerCase().includes(q) ||
-      (e.aliases ?? []).some((a) => a.toLowerCase().includes(q)),
+      e.term.toLowerCase().includes(q)
+      || e.definition.toLowerCase().includes(q)
+      || (e.aliases ?? []).some((a) => a.toLowerCase().includes(q)),
   )
 }
 

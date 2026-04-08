@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import {
-  resolveCompletionStrategy,
-  createMountHandler,
-  createTimerHandler,
-  createManualHandler,
-  createScrollHandler,
-  createInteractiveHandler,
-  createCompletionHandler,
   CompletableRegistry,
+  createCompletionHandler,
+  createInteractiveHandler,
+  createManualHandler,
+  createMountHandler,
+  createScrollHandler,
+  createTimerHandler,
+  resolveCompletionStrategy,
 } from './completion.ts'
 
 describe('resolveCompletionStrategy', () => {

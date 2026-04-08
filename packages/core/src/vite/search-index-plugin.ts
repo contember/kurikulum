@@ -42,13 +42,13 @@ function extractContent(source: string): { title: string; content: string } {
  * Parse import statements and return a map of component name to resolved file path.
  */
 function parseImports(code: string, filePath: string): Map<string, string> {
-  const { dirname } = require('path') as typeof import('path')
+  const { dirname } = require('node:path') as typeof import('path')
   const dir = dirname(filePath)
   const map = new Map<string, string>()
 
   // Named imports: import { Foo, Bar } from './path'
   const namedRegex = /import\s+\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g
-  let match
+  let match: RegExpExecArray | null
   while ((match = namedRegex.exec(code)) !== null) {
     const names = match[1].split(',').map((n) => n.split(' as ').pop()!.trim())
     const specifier = match[2]
@@ -72,8 +72,8 @@ function parseImports(code: string, filePath: string): Map<string, string> {
 
 function resolveImportPath(dir: string, specifier: string): string | null {
   if (!specifier.startsWith('.')) return null
-  const { resolve } = require('path') as typeof import('path')
-  const { existsSync } = require('fs') as typeof import('fs')
+  const { resolve } = require('node:path') as typeof import('path')
+  const { existsSync } = require('node:fs') as typeof import('fs')
   const resolved = resolve(dir, specifier)
   if (existsSync(resolved)) return resolved
   for (const ext of ['.tsx', '.ts', '.jsx', '.js']) {
@@ -108,7 +108,7 @@ export function extractSearchEntries(source: string, filePath?: string): SearchE
 
     if (componentRef && importMap.has(componentRef[1])) {
       const componentFile = importMap.get(componentRef[1])!
-      const { readFileSync } = require('fs') as typeof import('fs')
+      const { readFileSync } = require('node:fs') as typeof import('fs')
       const componentSource = readFileSync(componentFile, 'utf-8')
       const extracted = extractContent(componentSource)
       title = extracted.title || pageId
@@ -141,7 +141,7 @@ export function searchIndexPlugin(options: SearchIndexPluginOptions = {}): ViteP
   const moduleId = options.moduleId ?? 'virtual:search-index'
   const resolvedId = '\0' + moduleId
 
-  let entries: SearchEntry[] = []
+  const entries: SearchEntry[] = []
 
   return {
     name: 'kurikulum-search-index',

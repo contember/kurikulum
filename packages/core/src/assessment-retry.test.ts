@@ -3,27 +3,27 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter } from './types.ts'
-import { CourseProvider } from './context.tsx'
-import { Assessment } from './components/assessment/index.ts'
+import { useContext } from 'preact/hooks'
 import { AssessmentContext } from './components/assessment/context.ts'
 import type { AssessmentContextValue } from './components/assessment/context.ts'
-import { MCQ } from './components/mcq/index.ts'
-import { MCQContext } from './components/mcq/context.ts'
-import type { MCQContextValue } from './components/mcq/context.ts'
-import { FillBlank } from './components/fill-blank/index.ts'
+import { Assessment } from './components/assessment/index.ts'
 import { FillBlankContext } from './components/fill-blank/context.ts'
 import type { FillBlankContextValue } from './components/fill-blank/context.ts'
-import { Matching } from './components/matching/index.ts'
+import { FillBlank } from './components/fill-blank/index.ts'
 import { MatchingContext } from './components/matching/context.ts'
 import type { MatchingContextValue } from './components/matching/context.ts'
-import { Ordering } from './components/ordering/index.ts'
+import { Matching } from './components/matching/index.ts'
+import { MCQContext } from './components/mcq/context.ts'
+import type { MCQContextValue } from './components/mcq/context.ts'
+import { MCQ } from './components/mcq/index.ts'
 import { OrderingContext } from './components/ordering/context.ts'
 import type { OrderingContextValue } from './components/ordering/context.ts'
-import { useContext } from 'preact/hooks'
+import { Ordering } from './components/ordering/index.ts'
+import { CourseProvider } from './context.tsx'
+import type { CourseConfig, DeliveryAdapter } from './types.ts'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -35,13 +35,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -75,15 +85,17 @@ describe('Assessment retry', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'test-quiz', passThreshold: 1.0, maxAttempts: 3 },
-          h(MCQ.Root, { id: 'q1', 'aria-label': 'Question 1' },
-            h(MCQ.Item, { correct: false },
-              h(MCQ.ItemLabel, null, 'Wrong'),
-            ),
-            h(MCQ.Item, { correct: true },
-              h(MCQ.ItemLabel, null, 'Right'),
-            ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'test-quiz', passThreshold: 1.0, maxAttempts: 3 },
+          h(
+            MCQ.Root,
+            { id: 'q1', 'aria-label': 'Question 1' },
+            h(MCQ.Item, { correct: false }, h(MCQ.ItemLabel, null, 'Wrong')),
+            h(MCQ.Item, { correct: true }, h(MCQ.ItemLabel, null, 'Right')),
             h(CaptureContexts, null),
           ),
         ),
@@ -133,17 +145,17 @@ describe('Assessment retry', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'test-quiz-2', passThreshold: 1.0, maxAttempts: 3 },
-          h(MCQ.Root, { id: 'q2', 'aria-label': 'Question 2' },
-            h(MCQ.Item, { correct: false },
-              h(MCQ.Control, null),
-              h(MCQ.ItemLabel, null, 'Wrong'),
-            ),
-            h(MCQ.Item, { correct: true },
-              h(MCQ.Control, null),
-              h(MCQ.ItemLabel, null, 'Right'),
-            ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'test-quiz-2', passThreshold: 1.0, maxAttempts: 3 },
+          h(
+            MCQ.Root,
+            { id: 'q2', 'aria-label': 'Question 2' },
+            h(MCQ.Item, { correct: false }, h(MCQ.Control, null), h(MCQ.ItemLabel, null, 'Wrong')),
+            h(MCQ.Item, { correct: true }, h(MCQ.Control, null), h(MCQ.ItemLabel, null, 'Right')),
             h(CaptureContexts, null),
           ),
         ),
@@ -187,12 +199,13 @@ describe('Assessment retry', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'fb-quiz', passThreshold: 1.0, maxAttempts: 3 },
-          h(FillBlank.Root, { id: 'fb1', accept: 'correct' },
-            h(FillBlank.Input, null),
-            h(Capture, null),
-          ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'fb-quiz', passThreshold: 1.0, maxAttempts: 3 },
+          h(FillBlank.Root, { id: 'fb1', accept: 'correct' }, h(FillBlank.Input, null), h(Capture, null)),
         ),
       ),
       container,
@@ -237,9 +250,15 @@ describe('Assessment retry', () => {
 
     // Note: happy-dom can't render <select>/<option>, so test context only
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'match-quiz', passThreshold: 1.0, maxAttempts: 3 },
-          h(Matching.Root, { id: 'm1' },
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'match-quiz', passThreshold: 1.0, maxAttempts: 3 },
+          h(
+            Matching.Root,
+            { id: 'm1' },
             h(Matching.Pair, { prompt: 'A', response: 'X' }),
             h(Matching.Pair, { prompt: 'B', response: 'Y' }),
             h(Capture, null),
@@ -284,9 +303,15 @@ describe('Assessment retry', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'order-quiz', passThreshold: 1.0, maxAttempts: 3 },
-          h(Ordering.Root, { id: 'o1' },
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'order-quiz', passThreshold: 1.0, maxAttempts: 3 },
+          h(
+            Ordering.Root,
+            { id: 'o1' },
             h(Ordering.Item, { order: 0 }, 'First'),
             h(Ordering.Item, { order: 1 }, 'Second'),
             h(Ordering.Item, { order: 2 }, 'Third'),

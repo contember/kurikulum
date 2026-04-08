@@ -1,6 +1,6 @@
+import { useFocusTrap, useRestore } from '@kurikulum/core'
 import type { VNode } from 'preact'
 import { useRef } from 'preact/hooks'
-import { useRestore, useFocusTrap } from '@kurikulum/core'
 
 export function ResumeDialog(): VNode | null {
   const { hasStoredState, storedPage, resume, restart } = useRestore()
@@ -21,8 +21,7 @@ export function ResumeDialog(): VNode | null {
       <div class="bg-bg-surface rounded-default shadow-lg max-w-md w-full mx-4 p-6 border border-border">
         <h2 class="text-lg font-semibold text-text mb-2">Pokračovat v kurzu?</h2>
         <p class="text-text-secondary mb-6">
-          Máte uložený postup{storedPage ? ` (stránka ${storedPage})` : ''}.
-          Chcete pokračovat kde jste skončili, nebo začít od začátku?
+          Máte uložený postup{storedPage ? ` (stránka ${storedPage})` : ''}. Chcete pokračovat kde jste skončili, nebo začít od začátku?
         </p>
         <div class="flex gap-3 justify-end">
           <button

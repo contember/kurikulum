@@ -4,7 +4,7 @@ const happyWindow = new HappyWindow()
 globalThis.document = happyWindow.document as unknown as Document
 globalThis.localStorage = happyWindow.localStorage as unknown as Storage
 
-import { describe, it, expect, beforeEach, spyOn, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock, spyOn } from 'bun:test'
 import { createScorm12Adapter } from './scorm12.ts'
 
 function createMockAPI() {

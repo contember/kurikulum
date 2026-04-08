@@ -18,27 +18,27 @@ export function Results({ class: className, children }: SearchResultsProps): VNo
       {children ?? (
         ctx.results.length > 0
           ? ctx.results.map((r, i) => (
-              <div
-                key={r.pageId}
-                id={`search-result-${i}`}
-                role="option"
-                tabIndex={-1}
-                aria-selected={i === ctx.activeIndex}
-                onClick={() => ctx.navigateTo(r.pageId)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    ctx.navigateTo(r.pageId)
-                  }
-                }}
-              >
-                <div>{r.title}</div>
-                <div>{r.snippet}</div>
-              </div>
-            ))
+            <div
+              key={r.pageId}
+              id={`search-result-${i}`}
+              role="option"
+              tabIndex={-1}
+              aria-selected={i === ctx.activeIndex}
+              onClick={() => ctx.navigateTo(r.pageId)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  ctx.navigateTo(r.pageId)
+                }
+              }}
+            >
+              <div>{r.title}</div>
+              <div>{r.snippet}</div>
+            </div>
+          ))
           : ctx.query.trim()
-            ? <div role="status">No results found</div>
-            : null
+          ? <div role="status">No results found</div>
+          : null
       )}
     </div>
   )

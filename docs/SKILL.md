@@ -12,6 +12,7 @@ globs:
 # Tabule E-Learning Framework
 
 Two-layer architecture (Radix + shadcn/ui style):
+
 - **`@kurikulum/core`** — headless compound components, hooks, adapters (npm dependency, don't edit)
 - **`src/`** — styled Preact wrappers with Tailwind (copied from template, freely editable)
 

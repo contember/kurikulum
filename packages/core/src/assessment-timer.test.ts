@@ -3,20 +3,20 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter } from './types.ts'
-import { CourseProvider } from './context.tsx'
-import { Assessment } from './components/assessment/index.ts'
+import { useContext } from 'preact/hooks'
 import { AssessmentContext } from './components/assessment/context.ts'
 import type { AssessmentContextValue } from './components/assessment/context.ts'
+import { Assessment } from './components/assessment/index.ts'
 import { TimerContext } from './components/assessment/timerContext.ts'
 import type { TimerContextValue } from './components/assessment/timerContext.ts'
-import { MCQ } from './components/mcq/index.ts'
 import { MCQContext } from './components/mcq/context.ts'
 import type { MCQContextValue } from './components/mcq/context.ts'
-import { useContext } from 'preact/hooks'
+import { MCQ } from './components/mcq/index.ts'
+import { CourseProvider } from './context.tsx'
+import type { CourseConfig, DeliveryAdapter } from './types.ts'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -29,14 +29,26 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     location: '',
     sessionTimeMs: 0,
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
-    setSessionTime(ms: number) { this.sessionTimeMs = ms },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
+    setSessionTime(ms: number) {
+      this.sessionTimeMs = ms
+    },
     recordInteraction() {},
     terminate() {},
   }
@@ -71,11 +83,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'timed-quiz', timeLimit: 300 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'timed-quiz', timeLimit: 300 }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -97,11 +105,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'no-timer-quiz' },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'no-timer-quiz' }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -118,11 +122,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'countdown-quiz', timeLimit: 10 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'countdown-quiz', timeLimit: 10 }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -151,19 +151,23 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, {
-          id: 'expire-quiz',
-          timeLimit: 2,
-          onTimeExpired: () => { timeExpiredCalled = true },
-        },
-          h(MCQ.Root, { id: 'q1', 'aria-label': 'Question' },
-            h(MCQ.Item, { correct: true },
-              h(MCQ.ItemLabel, null, 'Right'),
-            ),
-            h(MCQ.Item, { correct: false },
-              h(MCQ.ItemLabel, null, 'Wrong'),
-            ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          {
+            id: 'expire-quiz',
+            timeLimit: 2,
+            onTimeExpired: () => {
+              timeExpiredCalled = true
+            },
+          },
+          h(
+            MCQ.Root,
+            { id: 'q1', 'aria-label': 'Question' },
+            h(MCQ.Item, { correct: true }, h(MCQ.ItemLabel, null, 'Right')),
+            h(MCQ.Item, { correct: false }, h(MCQ.ItemLabel, null, 'Wrong')),
             h(Capture, null),
           ),
         ),
@@ -200,14 +204,13 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'manual-submit-quiz', timeLimit: 60 },
-          h(MCQ.Root, { id: 'q1', 'aria-label': 'Question' },
-            h(MCQ.Item, { correct: true },
-              h(MCQ.ItemLabel, null, 'Right'),
-            ),
-            h(Capture, null),
-          ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'manual-submit-quiz', timeLimit: 60 },
+          h(MCQ.Root, { id: 'q1', 'aria-label': 'Question' }, h(MCQ.Item, { correct: true }, h(MCQ.ItemLabel, null, 'Right')), h(Capture, null)),
         ),
       ),
       container,
@@ -238,11 +241,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'persist-quiz', timeLimit: 60 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'persist-quiz', timeLimit: 60 }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -264,11 +263,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'restore-quiz', timeLimit: 120 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'restore-quiz', timeLimit: 120 }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -298,11 +293,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'restore-quiz', timeLimit: 120 },
-          h(Capture2, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'restore-quiz', timeLimit: 120 }, h(Capture2, null))),
       container,
     )
     await flushEffects()
@@ -325,15 +316,17 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'retry-timer-quiz', timeLimit: 60, passThreshold: 1.0, maxAttempts: 3 },
-          h(MCQ.Root, { id: 'q1', 'aria-label': 'Question' },
-            h(MCQ.Item, { correct: false },
-              h(MCQ.ItemLabel, null, 'Wrong'),
-            ),
-            h(MCQ.Item, { correct: true },
-              h(MCQ.ItemLabel, null, 'Right'),
-            ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'retry-timer-quiz', timeLimit: 60, passThreshold: 1.0, maxAttempts: 3 },
+          h(
+            MCQ.Root,
+            { id: 'q1', 'aria-label': 'Question' },
+            h(MCQ.Item, { correct: false }, h(MCQ.ItemLabel, null, 'Wrong')),
+            h(MCQ.Item, { correct: true }, h(MCQ.ItemLabel, null, 'Right')),
             h(Capture, null),
           ),
         ),
@@ -370,11 +363,10 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'timer-render-quiz', timeLimit: 300 },
-          h(Assessment.Timer, null),
-          h(Capture, null),
-        ),
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(Assessment.Root, { id: 'timer-render-quiz', timeLimit: 300 }, h(Assessment.Timer, null), h(Capture, null)),
       ),
       container,
     )
@@ -392,11 +384,14 @@ describe('Assessment timer', () => {
 
   it('Assessment.Timer supports render function', async () => {
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'timer-render-fn-quiz', timeLimit: 90 },
+      h(
+        CourseProvider,
+        { config, adapter } as any,
+        h(
+          Assessment.Root,
+          { id: 'timer-render-fn-quiz', timeLimit: 90 },
           h(Assessment.Timer, {
-            children: (remaining: number, isWarning: boolean) =>
-              h('span', null, `${remaining}s${isWarning ? ' WARNING' : ''}`),
+            children: (remaining: number, isWarning: boolean) => h('span', null, `${remaining}s${isWarning ? ' WARNING' : ''}`),
           }),
         ),
       ),
@@ -419,11 +414,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'warning-quiz', timeLimit: 3 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'warning-quiz', timeLimit: 3 }, h(Capture, null))),
       container,
     )
     await flushEffects()
@@ -443,11 +434,7 @@ describe('Assessment timer', () => {
     }
 
     render(
-      h(CourseProvider, { config, adapter } as any,
-        h(Assessment.Root, { id: 'format-quiz', timeLimit: 3661 },
-          h(Capture, null),
-        ),
-      ),
+      h(CourseProvider, { config, adapter } as any, h(Assessment.Root, { id: 'format-quiz', timeLimit: 3661 }, h(Capture, null))),
       container,
     )
     await flushEffects()

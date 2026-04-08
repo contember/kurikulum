@@ -1,8 +1,8 @@
 import { createContext } from 'preact'
 import type { ComponentChildren, VNode } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
-import type { CourseRuntime, CourseConfig, CompletionStrategy, DeliveryAdapter, RestoreInfo } from './types.ts'
 import { createCourseRuntime } from './runtime.ts'
+import type { CompletionStrategy, CourseConfig, CourseRuntime, DeliveryAdapter, RestoreInfo } from './types.ts'
 
 export interface CourseContextValue {
   runtime: CourseRuntime
@@ -28,7 +28,9 @@ export function createNotifier() {
   return {
     subscribe(listener: () => void): () => void {
       listeners.add(listener)
-      return () => { listeners.delete(listener) }
+      return () => {
+        listeners.delete(listener)
+      }
     },
     notify(): void {
       for (const listener of listeners) {
@@ -41,12 +43,16 @@ export function createNotifier() {
 function createNoopAdapter(): DeliveryAdapter {
   return {
     async initialize() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setSuspendData() {},
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     commit() {},
@@ -82,13 +88,21 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
     const originalSubmitScore = runtime.submitScore.bind(runtime)
     const originalSubmitAssessmentScore = runtime.submitAssessmentScore.bind(runtime)
 
-    runtime.navigateTo = (pageId: string) => { originalNavigateTo(pageId); notify() }
-    runtime.markComplete = (id: string) => { originalMarkComplete(id); notify() }
+    runtime.navigateTo = (pageId: string) => {
+      originalNavigateTo(pageId)
+      notify()
+    }
+    runtime.markComplete = (id: string) => {
+      originalMarkComplete(id)
+      notify()
+    }
     runtime.submitScore = (score: number, max: number, threshold?: number) => {
-      originalSubmitScore(score, max, threshold); notify()
+      originalSubmitScore(score, max, threshold)
+      notify()
     }
     runtime.submitAssessmentScore = (assessmentId: string, score: number, max: number, threshold?: number, weight?: number) => {
-      originalSubmitAssessmentScore(assessmentId, score, max, threshold, weight); notify()
+      originalSubmitAssessmentScore(assessmentId, score, max, threshold, weight)
+      notify()
     }
 
     runtime.nextPage = () => {
@@ -133,7 +147,9 @@ export function CourseProvider({ config, adapter, children }: CourseProviderProp
   }
 
   useEffect(() => {
-    const handleBeforeUnload = () => { ctx.runtime.suspend() }
+    const handleBeforeUnload = () => {
+      ctx.runtime.suspend()
+    }
     globalThis.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {

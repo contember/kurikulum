@@ -3,16 +3,16 @@ import { Window } from 'happy-dom'
 const window = new Window()
 globalThis.document = window.document as unknown as Document
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseRuntime, CourseConfig, DeliveryAdapter } from '../../types.ts'
-import { createCourseRuntime } from '../../runtime.ts'
 import { CourseContext, createNotifier } from '../../context.tsx'
 import type { CourseContextValue } from '../../context.tsx'
-import { Notes } from './index.ts'
 import { useNotes } from '../../hooks/useNotes.ts'
+import { createCourseRuntime } from '../../runtime.ts'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '../../types.ts'
 import { MAX_NOTEPAD_LENGTH } from './context.ts'
+import { Notes } from './index.ts'
 
 function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData: string; location: string } {
   return {
@@ -20,13 +20,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; suspendData
     suspendData: '',
     location: '',
     async initialize() {},
-    commit() { this.committed++ },
-    setSuspendData(data: string) { this.suspendData = data },
-    getSuspendData() { return this.suspendData || null },
+    commit() {
+      this.committed++
+    },
+    setSuspendData(data: string) {
+      this.suspendData = data
+    },
+    getSuspendData() {
+      return this.suspendData || null
+    },
     setScore() {},
     setStatus() {},
-    setLocation(pageId: string) { this.location = pageId },
-    getLocation() { return this.location || null },
+    setLocation(pageId: string) {
+      this.location = pageId
+    },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -57,7 +67,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     },
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -88,11 +100,7 @@ describe('Notes.Root', () => {
 
   it('renders children', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h('span', null, 'Hello'),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h('span', null, 'Hello'))),
       container,
     )
     expect(container.getElementsByTagName('span').length).toBe(1)
@@ -107,11 +115,7 @@ describe('Notes.Root', () => {
     }
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Capture, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Capture, null))),
       container,
     )
 
@@ -127,11 +131,7 @@ describe('Notes.Root', () => {
       return null
     }
 
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
+    const tree = h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Capture, null)))
 
     render(tree, container)
     captured!.setText('My notes')
@@ -148,11 +148,7 @@ describe('Notes.Root', () => {
       return null
     }
 
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
+    const tree = h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Capture, null)))
 
     render(tree, container)
     const longText = 'a'.repeat(MAX_NOTEPAD_LENGTH + 500)
@@ -170,11 +166,7 @@ describe('Notes.Root', () => {
       return null
     }
 
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
+    const tree = h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Capture, null)))
 
     render(tree, container)
     captured!.setText('Persisted text')
@@ -191,11 +183,7 @@ describe('Notes.Root', () => {
       return null
     }
 
-    const tree = h(CourseContext.Provider, { value: ctx },
-      h(Notes.Root, null,
-        h(Capture, null),
-      ),
-    )
+    const tree = h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Capture, null)))
 
     render(tree, container)
     captured!.setText('Survives restart')
@@ -234,11 +222,7 @@ describe('Notes.Panel', () => {
 
   it('is hidden when closed', () => {
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Notes.Panel, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Notes.Panel, null))),
       container,
     )
     const dialog = findByRole(container, 'dialog')
@@ -254,12 +238,7 @@ describe('Notes.Panel', () => {
     }
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Opener, null),
-          h(Notes.Panel, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Opener, null), h(Notes.Panel, null))),
       container,
     )
 
@@ -267,12 +246,7 @@ describe('Notes.Panel', () => {
     await flushEffects()
 
     render(
-      h(CourseContext.Provider, { value: ctx },
-        h(Notes.Root, null,
-          h(Opener, null),
-          h(Notes.Panel, null),
-        ),
-      ),
+      h(CourseContext.Provider, { value: ctx }, h(Notes.Root, null, h(Opener, null), h(Notes.Panel, null))),
       container,
     )
 
@@ -286,7 +260,10 @@ describe('useNotes hook', () => {
   it('throws outside Notes.Root', () => {
     expect(() => {
       const container = document.createElement('div')
-      function Bad() { useNotes(); return null }
+      function Bad() {
+        useNotes()
+        return null
+      }
       render(h(Bad, null), container)
     }).toThrow('useNotes must be used within a Notes.Root')
   })

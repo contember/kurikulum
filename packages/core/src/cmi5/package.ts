@@ -1,7 +1,7 @@
+import archiver from 'archiver'
+import { createWriteStream } from 'node:fs'
 import { readdir } from 'node:fs/promises'
 import { join, relative } from 'node:path'
-import { createWriteStream } from 'node:fs'
-import archiver from 'archiver'
 import { generateCmi5Manifest } from './manifest.ts'
 
 export interface Cmi5PackageOptions {

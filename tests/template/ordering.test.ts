@@ -14,20 +14,15 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier, Ordering as O } from '@kurikulum/core'
+import type { CourseContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-  Ordering as O,
-} from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
+import { Assessment } from '../../template/src/components/Assessment.tsx'
 import { Ordering, OrderingItem } from '../../template/src/components/Ordering.tsx'
 import { QuestionFeedback } from '../../template/src/components/QuestionFeedback.tsx'
-import { Assessment } from '../../template/src/components/Assessment.tsx'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -37,13 +32,19 @@ function createMockAdapter(): DeliveryAdapter & { committed: number } {
   return {
     committed: 0,
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -63,10 +64,12 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -79,7 +82,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -97,7 +102,7 @@ function renderWithContext(
 }
 
 /** Get items sorted by their CSS order (visual order) */
-function getOrderedItems(container: HTMLElement): { el: HTMLElement, text: string, order: number }[] {
+function getOrderedItems(container: HTMLElement): { el: HTMLElement; text: string; order: number }[] {
   const listItems = Array.from(container.querySelectorAll('[role="list"] > div')) as HTMLElement[]
   return listItems
     .map(el => {
@@ -117,7 +122,7 @@ function getItemTexts(container: HTMLElement): string[] {
 }
 
 /** Get move buttons for a specific item element */
-function getItemButtons(item: HTMLElement): { up: HTMLButtonElement, down: HTMLButtonElement } {
+function getItemButtons(item: HTMLElement): { up: HTMLButtonElement; down: HTMLButtonElement } {
   const buttons = Array.from(item.getElementsByTagName('button'))
   const up = buttons.find(b => b.getAttribute('aria-label') === 'Move up')!
   const down = buttons.find(b => b.getAttribute('aria-label') === 'Move down')!
@@ -125,7 +130,7 @@ function getItemButtons(item: HTMLElement): { up: HTMLButtonElement, down: HTMLB
 }
 
 /** Get all move buttons sorted by visual order */
-function getMoveButtonsOrdered(container: HTMLElement): { upButtons: HTMLButtonElement[], downButtons: HTMLButtonElement[] } {
+function getMoveButtonsOrdered(container: HTMLElement): { upButtons: HTMLButtonElement[]; downButtons: HTMLButtonElement[] } {
   const items = getOrderedItems(container)
   const upButtons = items.map(i => getItemButtons(i.el).up)
   const downButtons = items.map(i => getItemButtons(i.el).down)
@@ -138,7 +143,10 @@ async function arrangeCorrectly(container: HTMLElement, rerender: () => void, co
     const texts = getItemTexts(container)
     let allCorrect = true
     for (let i = 0; i < correctOrder.length; i++) {
-      if (texts[i] !== correctOrder[i]) { allCorrect = false; break }
+      if (texts[i] !== correctOrder[i]) {
+        allCorrect = false
+        break
+      }
     }
     if (allCorrect) return
 
@@ -165,12 +173,16 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort the steps:' },
-        h(OrderingItem, { order: 0 }, 'First'),
-        h(OrderingItem, { order: 1 }, 'Second'),
-        h(OrderingItem, { order: 2 }, 'Third'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort the steps:' },
+          h(OrderingItem, { order: 0 }, 'First'),
+          h(OrderingItem, { order: 1 }, 'Second'),
+          h(OrderingItem, { order: 2 }, 'Third'),
+        ),
     )
 
     await flushEffects()
@@ -193,8 +205,12 @@ describe('Ordering', () => {
       const container = document.createElement('div')
       document.body.appendChild(container)
       function App() {
-        return h(CourseContext.Provider, { value: ctx } as any,
-          h(Ordering, { id: `q-shuffle-${i}`, question: 'Sort:' },
+        return h(
+          CourseContext.Provider,
+          { value: ctx } as any,
+          h(
+            Ordering,
+            { id: `q-shuffle-${i}`, question: 'Sort:' },
             h(OrderingItem, { order: 0 }, 'A'),
             h(OrderingItem, { order: 1 }, 'B'),
             h(OrderingItem, { order: 2 }, 'C'),
@@ -219,12 +235,16 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-        h(OrderingItem, { order: 2 }, 'C'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort:' },
+          h(OrderingItem, { order: 0 }, 'A'),
+          h(OrderingItem, { order: 1 }, 'B'),
+          h(OrderingItem, { order: 2 }, 'C'),
+        ),
     )
 
     await flushEffects()
@@ -251,11 +271,9 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
@@ -263,7 +281,7 @@ describe('Ordering', () => {
     await arrangeCorrectly(container, rerender, ['A', 'B'])
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -278,12 +296,16 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-        h(OrderingItem, { order: 2 }, 'C'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort:' },
+          h(OrderingItem, { order: 0 }, 'A'),
+          h(OrderingItem, { order: 1 }, 'B'),
+          h(OrderingItem, { order: 2 }, 'C'),
+        ),
     )
 
     await flushEffects()
@@ -292,7 +314,7 @@ describe('Ordering', () => {
     await arrangeCorrectly(container, rerender, ['B', 'A', 'C'])
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -308,17 +330,15 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -336,17 +356,15 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -359,7 +377,7 @@ describe('Ordering', () => {
 
     // Submit button should be hidden
     const submitBtns = Array.from(container.getElementsByTagName('button')).filter(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )
     expect(submitBtns.length).toBe(0)
   })
@@ -369,12 +387,16 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-        h(OrderingItem, { order: 2 }, 'C'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort:' },
+          h(OrderingItem, { order: 0 }, 'A'),
+          h(OrderingItem, { order: 1 }, 'B'),
+          h(OrderingItem, { order: 2 }, 'C'),
+        ),
     )
 
     await flushEffects()
@@ -397,13 +419,14 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(Ordering, { id: 'q1', question: 'Sort:' },
-          h(OrderingItem, { order: 0 }, 'A'),
-          h(OrderingItem, { order: 1 }, 'B'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
         ),
-      ),
     )
 
     await flushEffects()
@@ -433,14 +456,20 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 1, maxAttempts: 3 },
-        h(Ordering, { id: 'q1', question: 'Sort:' },
-          h(OrderingItem, { order: 0 }, 'A'),
-          h(OrderingItem, { order: 1 }, 'B'),
-          h(OrderingItem, { order: 2 }, 'C'),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Assessment,
+          { id: 'quiz', passThreshold: 1, maxAttempts: 3 },
+          h(
+            Ordering,
+            { id: 'q1', question: 'Sort:' },
+            h(OrderingItem, { order: 0 }, 'A'),
+            h(OrderingItem, { order: 1 }, 'B'),
+            h(OrderingItem, { order: 2 }, 'C'),
+          ),
         ),
-      ),
     )
 
     await flushEffects()
@@ -486,11 +515,9 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(OrderingItem, { order: 1 }, 'B'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Ordering, { id: 'q1', question: 'Sort:' }, h(OrderingItem, { order: 0 }, 'A'), h(OrderingItem, { order: 1 }, 'B')),
     )
 
     await flushEffects()
@@ -498,7 +525,7 @@ describe('Ordering', () => {
     expect(runtime.isComplete('q1')).toBe(false)
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -512,11 +539,15 @@ describe('Ordering', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Ordering, { id: 'q1', question: 'Sort:' },
-        h(OrderingItem, { order: 0 }, 'A'),
-        h(QuestionFeedback, { correct: 'All correct!', incorrect: 'Try again!' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          Ordering,
+          { id: 'q1', question: 'Sort:' },
+          h(OrderingItem, { order: 0 }, 'A'),
+          h(QuestionFeedback, { correct: 'All correct!', incorrect: 'Try again!' }),
+        ),
     )
 
     await flushEffects()
@@ -525,7 +556,7 @@ describe('Ordering', () => {
     expect(container.textContent).not.toContain('Try again!')
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()

@@ -1,6 +1,17 @@
+import {
+  FillBlank,
+  FillBlankContext,
+  Matching,
+  MatchingContext,
+  MCQ,
+  MCQContext,
+  MultiSelect,
+  MultiSelectContext,
+  Ordering,
+  OrderingContext,
+} from '@kurikulum/core'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { MCQ, MultiSelect, FillBlank, Matching, Ordering, MCQContext, MultiSelectContext, FillBlankContext, MatchingContext, OrderingContext } from '@kurikulum/core'
 
 export interface QuestionFeedbackProps {
   correct?: ComponentChildren

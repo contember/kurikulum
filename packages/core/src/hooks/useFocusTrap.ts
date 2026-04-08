@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'preact/hooks'
 import type { RefObject } from 'preact'
+import { useEffect, useRef } from 'preact/hooks'
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',

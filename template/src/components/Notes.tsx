@@ -1,5 +1,5 @@
-import type { VNode } from 'preact'
 import { Notes as N, useNotes } from '@kurikulum/core'
+import type { VNode } from 'preact'
 
 export interface NotesProps {
   children?: preact.ComponentChildren

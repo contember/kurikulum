@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
-import { useCompletion } from '../../hooks/index.ts'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import { useCompletion } from '../../hooks/index.ts'
 import { AssessmentContext } from '../assessment/context.ts'
 import { CategorySortContext } from './context.ts'
 import type { CategoryDef, CategoryItemDef, CategorySortContextValue } from './context.ts'
@@ -208,7 +208,28 @@ export function Root({
     selectedItemId,
     toggleSelectItem,
     assignSelectedToCategory,
-  }), [categories, items, assignments, assign, unassign, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, draggedItemId, dropTargetCategoryId, onDragStart, onDragOverCategory, onDragEnd, onDropOnCategory, selectedItemId, toggleSelectItem, assignSelectedToCategory])
+  }), [
+    categories,
+    items,
+    assignments,
+    assign,
+    unassign,
+    submitted,
+    assessmentCtx,
+    submit,
+    id,
+    isCorrect,
+    scoreValue,
+    draggedItemId,
+    dropTargetCategoryId,
+    onDragStart,
+    onDragOverCategory,
+    onDragEnd,
+    onDropOnCategory,
+    selectedItemId,
+    toggleSelectItem,
+    assignSelectedToCategory,
+  ])
 
   return (
     <CategorySortContext.Provider value={ctxValue}>

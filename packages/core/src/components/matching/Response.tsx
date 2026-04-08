@@ -22,9 +22,7 @@ export function Response({ class: className }: MatchingResponseProps): VNode {
       aria-label={`Response for ${pairCtx.prompt}`}
     >
       <option value="" disabled>—</option>
-      {ctx.responses.map((r) => (
-        <option key={r} value={r}>{r}</option>
-      ))}
+      {ctx.responses.map((r) => <option key={r} value={r}>{r}</option>)}
     </select>
   )
 }

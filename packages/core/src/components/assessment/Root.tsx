@@ -1,18 +1,18 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useCourse } from '../../hooks/index.ts'
+import type { AttemptAnswer } from '../../types.ts'
 import { AssessmentContext } from './context.ts'
 import { TimerContext } from './timerContext.ts'
 import type { TimerContextValue } from './timerContext.ts'
-import type { AttemptAnswer } from '../../types.ts'
 
 export interface AssessmentRootProps {
   id: string
   passThreshold?: number
   maxAttempts?: number
   weight?: number
-  timeLimit?: number          // seconds, undefined = no limit
-  onTimeExpired?: () => void  // callback when time runs out (before auto-submit)
+  timeLimit?: number // seconds, undefined = no limit
+  onTimeExpired?: () => void // callback when time runs out (before auto-submit)
   children?: ComponentChildren
   class?: string
 }
@@ -23,7 +23,9 @@ function formatTime(seconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export function Root({ id, passThreshold, maxAttempts, weight = 1, timeLimit, onTimeExpired, children, class: className }: AssessmentRootProps): VNode {
+export function Root(
+  { id, passThreshold, maxAttempts, weight = 1, timeLimit, onTimeExpired, children, class: className }: AssessmentRootProps,
+): VNode {
   const runtime = useCourse()
   const [submitted, setSubmitted] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -41,7 +43,9 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, timeLimit, on
 
   const register = useCallback((qId: string, evaluate: () => number, qWeight: number = 1, getResponse?: () => string) => {
     evaluatorsRef.current.set(qId, { evaluate, weight: qWeight, getResponse })
-    return () => { evaluatorsRef.current.delete(qId) }
+    return () => {
+      evaluatorsRef.current.delete(qId)
+    }
   }, [])
 
   const submit = useCallback(() => {
@@ -121,30 +125,34 @@ export function Root({ id, passThreshold, maxAttempts, weight = 1, timeLimit, on
   const attemptsExhausted = submitted && passed === false && maxAttempts !== undefined && attempts >= maxAttempts
 
   // Timer context value
-  const timerCtx: TimerContextValue | null = timeLimit != null ? {
-    remaining,
-    total: timeLimit,
-    isRunning: !submitted && remaining > 0,
-    isExpired: remaining <= 0,
-    isWarning: remaining <= 60 && remaining > 0,
-    formatted: formatTime(remaining),
-  } : null
+  const timerCtx: TimerContextValue | null = timeLimit != null
+    ? {
+      remaining,
+      total: timeLimit,
+      isRunning: !submitted && remaining > 0,
+      isExpired: remaining <= 0,
+      isWarning: remaining <= 60 && remaining > 0,
+      formatted: formatTime(remaining),
+    }
+    : null
 
   const content = (
-    <AssessmentContext.Provider value={{
-      register,
-      submitted,
-      attempt,
-      submit,
-      retry,
-      score,
-      maxScore,
-      passed,
-      attempts,
-      canRetry,
-      attemptsExhausted,
-      history,
-    }}>
+    <AssessmentContext.Provider
+      value={{
+        register,
+        submitted,
+        attempt,
+        submit,
+        retry,
+        score,
+        maxScore,
+        passed,
+        attempts,
+        canRetry,
+        attemptsExhausted,
+        history,
+      }}
+    >
       <div
         role="region"
         aria-label="Assessment"

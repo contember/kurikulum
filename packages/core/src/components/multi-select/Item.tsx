@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useContext } from 'preact/hooks'
+import { useContext, useState } from 'preact/hooks'
 import { MultiSelectContext, MultiSelectItemContext } from './context.ts'
 
 export interface MultiSelectItemProps {

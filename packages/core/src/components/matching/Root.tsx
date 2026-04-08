@@ -1,10 +1,10 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
-import { useCompletion } from '../../hooks/index.ts'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import { useCompletion } from '../../hooks/index.ts'
 import { AssessmentContext } from '../assessment/context.ts'
 import { MatchingContext } from './context.ts'
-import type { MatchingPairDef, MatchingContextValue } from './context.ts'
+import type { MatchingContextValue, MatchingPairDef } from './context.ts'
 
 export interface MatchingRootProps {
   id: string
@@ -271,7 +271,31 @@ export function Root({
     assignSelectedToPair,
     assignResponse,
     unassign,
-  }), [pairs, responses, selections, select, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerPair, unplacedResponses, draggedResponse, dropTargetPairIndex, onDragStartResponse, onDragOverPair, onDragEnd, onDropOnPair, selectedResponse, toggleSelectResponse, assignSelectedToPair, assignResponse, unassign])
+  }), [
+    pairs,
+    responses,
+    selections,
+    select,
+    submitted,
+    assessmentCtx,
+    submit,
+    id,
+    isCorrect,
+    scoreValue,
+    registerPair,
+    unplacedResponses,
+    draggedResponse,
+    dropTargetPairIndex,
+    onDragStartResponse,
+    onDragOverPair,
+    onDragEnd,
+    onDropOnPair,
+    selectedResponse,
+    toggleSelectResponse,
+    assignSelectedToPair,
+    assignResponse,
+    unassign,
+  ])
 
   return (
     <MatchingContext.Provider value={ctxValue}>

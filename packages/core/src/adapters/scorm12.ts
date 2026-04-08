@@ -31,11 +31,16 @@ function pad(n: number): string {
 
 function mapStatus(status: string): string {
   switch (status) {
-    case 'incomplete': return 'incomplete'
-    case 'completed': return 'completed'
-    case 'passed': return 'passed'
-    case 'failed': return 'failed'
-    default: return 'incomplete'
+    case 'incomplete':
+      return 'incomplete'
+    case 'completed':
+      return 'completed'
+    case 'passed':
+      return 'passed'
+    case 'failed':
+      return 'failed'
+    default:
+      return 'incomplete'
   }
 }
 
@@ -54,9 +59,12 @@ function formatTimeOfDay(): string {
 
 function mapResult(result: InteractionRecord['result']): string {
   switch (result) {
-    case 'correct': return 'correct'
-    case 'wrong': return 'wrong'
-    case 'neutral': return 'neutral'
+    case 'correct':
+      return 'correct'
+    case 'wrong':
+      return 'wrong'
+    case 'neutral':
+      return 'neutral'
   }
 }
 

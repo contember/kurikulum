@@ -1,15 +1,9 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext, useEffect, useMemo, useRef } from 'preact/hooks'
+import { CompletableRegistry, createCompletionHandler } from '../../completion.ts'
+import type { CompletionHandler, CompletionStrategy } from '../../completion.ts'
 import { CourseContext } from '../../context.tsx'
-import {
-  useCompletion,
-  useCourse,
-} from '../../hooks/index.ts'
-import {
-  createCompletionHandler,
-  CompletableRegistry,
-} from '../../completion.ts'
-import type { CompletionStrategy, CompletionHandler } from '../../completion.ts'
+import { useCompletion, useCourse } from '../../hooks/index.ts'
 import type { CourseRuntime } from '../../types.ts'
 import { PageContext } from './context.ts'
 

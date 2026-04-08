@@ -1,9 +1,9 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useCallback, useMemo, useEffect, useContext } from 'preact/hooks'
+import { useCallback, useContext, useEffect, useMemo, useState } from 'preact/hooks'
+import { CourseContext } from '../../context.tsx'
 import { SearchContext } from './context.ts'
 import type { SearchEntry } from './context.ts'
 import { searchEntries } from './search-engine.ts'
-import { CourseContext } from '../../context.tsx'
 
 export interface SearchRootProps {
   index: SearchEntry[]

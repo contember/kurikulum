@@ -14,20 +14,13 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { Assessment as A, CategorySort as CS, CategorySortContext, CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
+import type { CategorySortContextValue, CourseContextValue } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
 import { useContext } from 'preact/hooks'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-  CategorySort as CS,
-  CategorySortContext,
-  Assessment as A,
-} from '@kurikulum/core'
-import type { CourseContextValue, CategorySortContextValue } from '@kurikulum/core'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -38,15 +31,23 @@ function createMockAdapter(): DeliveryAdapter & { committed: number; interaction
     committed: 0,
     interactions: [],
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
-    recordInteraction(i: any) { this.interactions.push(i) },
+    recordInteraction(i: any) {
+      this.interactions.push(i)
+    },
     terminate() {},
   }
 }
@@ -65,10 +66,12 @@ function createTestContext(runtime: CourseRuntime, adapter?: DeliveryAdapter): C
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -81,7 +84,9 @@ function createTestContext(runtime: CourseRuntime, adapter?: DeliveryAdapter): C
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -131,16 +136,20 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -158,11 +167,9 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Category, { id: 'plastic' }),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(CS.Root, { id: 'cs1', categories, items } as any, h(CS.Item, { id: 'bottle' }), h(CS.Category, { id: 'plastic' })),
     )
 
     await flushEffects()
@@ -176,18 +183,22 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-        h(CS.Feedback, { correct: 'All correct!', incorrect: 'Try again!' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Feedback, { correct: 'All correct!', incorrect: 'Try again!' }),
+        ),
     )
 
     await flushEffects()
@@ -197,7 +208,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -214,18 +225,22 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-        h(CS.Feedback, { correct: 'Correct!', incorrect: 'Wrong!' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Feedback, { correct: 'Correct!', incorrect: 'Wrong!' }),
+        ),
     )
 
     await flushEffects()
@@ -235,7 +250,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -251,20 +266,24 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )
     expect(submitBtn).not.toBeNull()
     expect(submitBtn!.disabled).toBe(true)
@@ -275,19 +294,25 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(A.Root, { id: 'quiz', passThreshold: 0.5 },
-        h(CS.Root, { id: 'cs1', categories, items } as any,
-          h(ContextCapture, null),
-          h(CS.Item, { id: 'bottle' }),
-          h(CS.Item, { id: 'newspaper' }),
-          h(CS.Item, { id: 'jar' }),
-          h(CS.Category, { id: 'plastic' }),
-          h(CS.Category, { id: 'paper' }),
-          h(CS.Category, { id: 'glass' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          A.Root,
+          { id: 'quiz', passThreshold: 0.5 },
+          h(
+            CS.Root,
+            { id: 'cs1', categories, items } as any,
+            h(ContextCapture, null),
+            h(CS.Item, { id: 'bottle' }),
+            h(CS.Item, { id: 'newspaper' }),
+            h(CS.Item, { id: 'jar' }),
+            h(CS.Category, { id: 'plastic' }),
+            h(CS.Category, { id: 'paper' }),
+            h(CS.Category, { id: 'glass' }),
+          ),
+          h(A.Submit, null, 'Odeslat'),
         ),
-        h(A.Submit, null, 'Odeslat'),
-      ),
     )
 
     await flushEffects()
@@ -296,7 +321,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -311,17 +336,21 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -330,7 +359,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -348,17 +377,21 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -368,7 +401,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -382,11 +415,15 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items, 'aria-label': 'Waste sorting' } as any,
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Category, { id: 'plastic' }),
-      ),
+    const { container } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items, 'aria-label': 'Waste sorting' } as any,
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Category, { id: 'plastic' }),
+        ),
     )
 
     await flushEffects()
@@ -406,17 +443,21 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -425,14 +466,14 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
     await flushEffects()
 
     const submitBtns = Array.from(container.getElementsByTagName('button')).filter(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )
     expect(submitBtns.length).toBe(0)
   })
@@ -442,17 +483,21 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -461,7 +506,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -478,20 +523,26 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(A.Root, { id: 'quiz', passThreshold: 1, maxAttempts: 3 },
-        h(CS.Root, { id: 'cs1', categories, items } as any,
-          h(ContextCapture, null),
-          h(CS.Item, { id: 'bottle' }),
-          h(CS.Item, { id: 'newspaper' }),
-          h(CS.Item, { id: 'jar' }),
-          h(CS.Category, { id: 'plastic' }),
-          h(CS.Category, { id: 'paper' }),
-          h(CS.Category, { id: 'glass' }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          A.Root,
+          { id: 'quiz', passThreshold: 1, maxAttempts: 3 },
+          h(
+            CS.Root,
+            { id: 'cs1', categories, items } as any,
+            h(ContextCapture, null),
+            h(CS.Item, { id: 'bottle' }),
+            h(CS.Item, { id: 'newspaper' }),
+            h(CS.Item, { id: 'jar' }),
+            h(CS.Category, { id: 'plastic' }),
+            h(CS.Category, { id: 'paper' }),
+            h(CS.Category, { id: 'glass' }),
+          ),
+          h(A.Submit, null, 'Odeslat'),
+          h(A.Retry, null, 'Zkusit znovu'),
         ),
-        h(A.Submit, null, 'Odeslat'),
-        h(A.Retry, null, 'Zkusit znovu'),
-      ),
     )
 
     await flushEffects()
@@ -501,7 +552,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()
@@ -510,7 +561,7 @@ describe('CategorySort', () => {
     expect(runtime.state.passed).toBe(false)
 
     const retryBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Zkusit')
+      b => b.textContent?.includes('Zkusit'),
     )
     expect(retryBtn).not.toBeNull()
     retryBtn!.click()
@@ -527,17 +578,21 @@ describe('CategorySort', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime, adapter)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(CS.Root, { id: 'cs1', categories, items } as any,
-        h(ContextCapture, null),
-        h(CS.Item, { id: 'bottle' }),
-        h(CS.Item, { id: 'newspaper' }),
-        h(CS.Item, { id: 'jar' }),
-        h(CS.Category, { id: 'plastic' }),
-        h(CS.Category, { id: 'paper' }),
-        h(CS.Category, { id: 'glass' }),
-        h(CS.Submit, null, 'Odeslat'),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () =>
+        h(
+          CS.Root,
+          { id: 'cs1', categories, items } as any,
+          h(ContextCapture, null),
+          h(CS.Item, { id: 'bottle' }),
+          h(CS.Item, { id: 'newspaper' }),
+          h(CS.Item, { id: 'jar' }),
+          h(CS.Category, { id: 'plastic' }),
+          h(CS.Category, { id: 'paper' }),
+          h(CS.Category, { id: 'glass' }),
+          h(CS.Submit, null, 'Odeslat'),
+        ),
     )
 
     await flushEffects()
@@ -547,7 +602,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat')
+      b => b.textContent?.includes('Odeslat'),
     )!
     submitBtn.click()
     rerender()

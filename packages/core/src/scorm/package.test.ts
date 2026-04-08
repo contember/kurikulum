@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
-import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
-import { createScormPackage } from './package.ts'
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import JSZip from 'jszip'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { readFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { createScormPackage } from './package.ts'
 
 describe('createScormPackage', () => {
   let tempDir: string

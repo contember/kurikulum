@@ -4,7 +4,7 @@ const happyWindow = new HappyWindow()
 globalThis.document = happyWindow.document as unknown as Document
 globalThis.localStorage = happyWindow.localStorage as unknown as Storage
 
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import { createXApiAdapter } from './xapi.ts'
 import type { XApiConfig, XApiStatement } from './xapi.ts'
 
@@ -363,7 +363,7 @@ describe('createXApiAdapter', () => {
       expect(statementCalls.length).toBeGreaterThanOrEqual(1)
 
       const headers = statementCalls[0].init.headers as Record<string, string>
-      expect(headers['Authorization']).toBe('Basic dXNlcjpwYXNz')
+      expect(headers.Authorization).toBe('Basic dXNlcjpwYXNz')
       expect(headers['X-Experience-API-Version']).toBe('1.0.3')
       expect(headers['Content-Type']).toBe('application/json')
     })
@@ -387,9 +387,17 @@ describe('createXApiAdapter', () => {
 
     it('retries offline queue on next flush', async () => {
       // First: save some statements to offline queue
-      localStorage.setItem('tabule:xapi:queue', JSON.stringify([
-        { actor: { objectType: 'Agent' }, verb: { id: 'test', display: { 'en-US': 'test' } }, object: { id: 'test', definition: { type: 'test' } }, timestamp: new Date().toISOString() },
-      ]))
+      localStorage.setItem(
+        'tabule:xapi:queue',
+        JSON.stringify([
+          {
+            actor: { objectType: 'Agent' },
+            verb: { id: 'test', display: { 'en-US': 'test' } },
+            object: { id: 'test', definition: { type: 'test' } },
+            timestamp: new Date().toISOString(),
+          },
+        ]),
+      )
 
       const { fetchFn, calls } = createMockFetch({ ok: true })
       const adapter = createXApiAdapter(createConfig(), fetchFn)

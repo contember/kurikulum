@@ -18,7 +18,11 @@ import { Text } from './components/Text.tsx'
 ```tsx
 import { Image } from './components/Image.tsx'
 
-<Image src="/images/diagram.png" alt="Architecture diagram" caption="System overview" />
+<Image
+  src="/images/diagram.png"
+  alt="Architecture diagram"
+  caption="System overview"
+/>
 ```
 
 Props: `src`, `alt` (required), `caption` (optional). Renders `<figure>` with `<figcaption>`.
@@ -28,7 +32,11 @@ Props: `src`, `alt` (required), `caption` (optional). Renders `<figure>` with `<
 ```tsx
 import { Video } from './components/Video.tsx'
 
-<Video src="/videos/demo.mp4" poster="/images/poster.jpg" caption="Demo walkthrough" />
+<Video
+  src="/videos/demo.mp4"
+  poster="/images/poster.jpg"
+  caption="Demo walkthrough"
+/>
 ```
 
 Props: `src` (required), `poster`, `caption`. Renders native `<video controls>`.

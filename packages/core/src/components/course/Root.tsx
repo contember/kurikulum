@@ -1,9 +1,9 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { toChildArray, cloneElement } from 'preact'
+import { cloneElement, toChildArray } from 'preact'
 import { useContext, useEffect } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
-import type { CourseRuntime } from '../../types.ts'
 import { useNavigation } from '../../hooks/index.ts'
+import type { CourseRuntime } from '../../types.ts'
 
 export interface CourseRootProps {
   class?: string

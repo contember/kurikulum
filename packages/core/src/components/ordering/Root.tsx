@@ -1,10 +1,10 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
-import { useCompletion } from '../../hooks/index.ts'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import { useCompletion } from '../../hooks/index.ts'
 import { AssessmentContext } from '../assessment/context.ts'
 import { OrderingContext } from './context.ts'
-import type { OrderingItemDef, OrderingContextValue } from './context.ts'
+import type { OrderingContextValue, OrderingItemDef } from './context.ts'
 
 export interface OrderingRootProps {
   id: string
@@ -222,7 +222,27 @@ export function Root({
     onDragOver,
     onDragEnd,
     onDrop,
-  }), [items, currentOrder, moveUp, moveDown, moveToPosition, submitted, assessmentCtx, submit, id, isCorrect, scoreValue, registerItem, dragEnabled, draggedPosition, dropTargetPosition, onDragStart, onDragOver, onDragEnd, onDrop])
+  }), [
+    items,
+    currentOrder,
+    moveUp,
+    moveDown,
+    moveToPosition,
+    submitted,
+    assessmentCtx,
+    submit,
+    id,
+    isCorrect,
+    scoreValue,
+    registerItem,
+    dragEnabled,
+    draggedPosition,
+    dropTargetPosition,
+    onDragStart,
+    onDragOver,
+    onDragEnd,
+    onDrop,
+  ])
 
   return (
     <OrderingContext.Provider value={ctxValue}>

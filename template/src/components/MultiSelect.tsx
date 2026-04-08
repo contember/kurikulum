@@ -1,5 +1,5 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { MultiSelect as MS } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface MultiSelectProps {
   id: string

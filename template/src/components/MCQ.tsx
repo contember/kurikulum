@@ -1,5 +1,5 @@
-import type { ComponentChildren, VNode } from 'preact'
 import { MCQ as M } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
 
 export interface MCQProps {
   id: string

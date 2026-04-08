@@ -76,7 +76,13 @@ export function createXApiAdapter(config: XApiConfig, fetchFn?: typeof fetch): D
   let lastStatus: string | null = null
   let sessionTimeMs = 0
 
-  function buildStatement(verb: typeof VERBS[keyof typeof VERBS], objectId: string, activityType: string, result?: XApiResult, objectName?: string): XApiStatement {
+  function buildStatement(
+    verb: typeof VERBS[keyof typeof VERBS],
+    objectId: string,
+    activityType: string,
+    result?: XApiResult,
+    objectName?: string,
+  ): XApiStatement {
     const stmt: XApiStatement = {
       actor,
       verb,
@@ -158,7 +164,9 @@ export function createXApiAdapter(config: XApiConfig, fetchFn?: typeof fetch): D
 
   function startBatchTimer() {
     if (batchTimer) return
-    batchTimer = setInterval(() => { flushBatch() }, BATCH_INTERVAL_MS)
+    batchTimer = setInterval(() => {
+      flushBatch()
+    }, BATCH_INTERVAL_MS)
   }
 
   function stopBatchTimer() {

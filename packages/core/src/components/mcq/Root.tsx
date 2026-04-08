@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useContext, useRef, useCallback, useMemo } from 'preact/hooks'
-import { useCompletion } from '../../hooks/index.ts'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { CourseContext } from '../../context.tsx'
+import { useCompletion } from '../../hooks/index.ts'
 import { AssessmentContext } from '../assessment/context.ts'
 import { MCQContext } from './context.ts'
 

@@ -6,8 +6,8 @@ export function BonusPage(): VNode {
     <Text>
       <h1>Bonusový materiál</h1>
       <p>
-        Gratulujeme ke splnění rychlého kvízu! Tato stránka je viditelná pouze pro ty,
-        kteří úspěšně prošli kvízem — to je ukázka <strong>podmíněné navigace</strong>.
+        Gratulujeme ke splnění rychlého kvízu! Tato stránka je viditelná pouze pro ty, kteří úspěšně prošli kvízem — to je ukázka{' '}
+        <strong>podmíněné navigace</strong>.
       </p>
       <h2>OWASP Top 10 — 2021</h2>
       <ol>

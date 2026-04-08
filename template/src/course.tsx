@@ -1,23 +1,23 @@
-import { render } from 'preact'
 import { CourseProvider, createAdapter, createXApiAdapter } from '@kurikulum/core'
 import type { CourseConfig } from '@kurikulum/core'
+import { render } from 'preact'
+import searchIndex from 'virtual:search-index'
 import { Course } from './components/Course.tsx'
-import { Page } from './components/Page.tsx'
+import { Glossary, GlossaryPanel, GlossaryToggle } from './components/Glossary.tsx'
 import { Navigation } from './components/Navigation.tsx'
+import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
+import { Page } from './components/Page.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
-import { Glossary, GlossaryPanel, GlossaryToggle } from './components/Glossary.tsx'
-import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
-import { IntroPage } from './pages/IntroPage.tsx'
-import { TheoryPage } from './pages/TheoryPage.tsx'
-import { MediaPage } from './pages/MediaPage.tsx'
-import { QuickQuizPage } from './pages/QuickQuizPage.tsx'
 import { AdvancedQuizPage } from './pages/AdvancedQuizPage.tsx'
 import { AssessmentPage } from './pages/AssessmentPage.tsx'
 import { BonusPage } from './pages/BonusPage.tsx'
+import { IntroPage } from './pages/IntroPage.tsx'
+import { MediaPage } from './pages/MediaPage.tsx'
+import { QuickQuizPage } from './pages/QuickQuizPage.tsx'
 import { ScrollPage } from './pages/ScrollPage.tsx'
 import { SummaryPage } from './pages/SummaryPage.tsx'
-import searchIndex from 'virtual:search-index'
+import { TheoryPage } from './pages/TheoryPage.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
@@ -63,54 +63,54 @@ function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
       <Search index={searchIndex}>
-      <Glossary entries={glossaryEntries}>
-      <Notes>
-      <div class="h-screen flex flex-col bg-bg text-text font-sans">
-        <Course>
-          <ResumeDialog />
-          <SearchModal />
-          <GlossaryPanel />
-          <NotesPanel />
+        <Glossary entries={glossaryEntries}>
+          <Notes>
+            <div class="h-screen flex flex-col bg-bg text-text font-sans">
+              <Course>
+                <ResumeDialog />
+                <SearchModal />
+                <GlossaryPanel />
+                <NotesPanel />
 
-          <Page id="intro" completion="mount">
-            <IntroPage />
-          </Page>
-          <Page id="theory" completion="timer" completionTimer={5}>
-            <TheoryPage />
-          </Page>
-          <Page id="media" completion="scroll">
-            <MediaPage />
-          </Page>
-          <Page id="standalone-quiz" completion="interactive">
-            <QuickQuizPage />
-          </Page>
-          <Page id="advanced-quiz" completion="interactive">
-            <AdvancedQuizPage />
-          </Page>
-          <Page id="assessment" completion="interactive">
-            <AssessmentPage />
-          </Page>
-          <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
-            <BonusPage />
-          </Page>
-          <Page id="scroll-page" completion="scroll">
-            <ScrollPage />
-          </Page>
-          <Page id="summary" completion="manual">
-            <SummaryPage />
-          </Page>
-        </Course>
-        <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
-          <SearchButton />
-          <GlossaryToggle />
-          <NotesToggle />
-          <div class="ml-auto">
-            <Navigation />
-          </div>
-        </footer>
-      </div>
-      </Notes>
-      </Glossary>
+                <Page id="intro" completion="mount">
+                  <IntroPage />
+                </Page>
+                <Page id="theory" completion="timer" completionTimer={5}>
+                  <TheoryPage />
+                </Page>
+                <Page id="media" completion="scroll">
+                  <MediaPage />
+                </Page>
+                <Page id="standalone-quiz" completion="interactive">
+                  <QuickQuizPage />
+                </Page>
+                <Page id="advanced-quiz" completion="interactive">
+                  <AdvancedQuizPage />
+                </Page>
+                <Page id="assessment" completion="interactive">
+                  <AssessmentPage />
+                </Page>
+                <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
+                  <BonusPage />
+                </Page>
+                <Page id="scroll-page" completion="scroll">
+                  <ScrollPage />
+                </Page>
+                <Page id="summary" completion="manual">
+                  <SummaryPage />
+                </Page>
+              </Course>
+              <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
+                <SearchButton />
+                <GlossaryToggle />
+                <NotesToggle />
+                <div class="ml-auto">
+                  <Navigation />
+                </div>
+              </footer>
+            </div>
+          </Notes>
+        </Glossary>
       </Search>
     </CourseProvider>
   )

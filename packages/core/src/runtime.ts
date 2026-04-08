@@ -1,4 +1,13 @@
-import type { AssessmentResult, AttemptAnswer, CourseConfig, CourseRuntime, CourseState, DeliveryAdapter, RestoreInfo, SuspendEnvelope } from './types.ts'
+import type {
+  AssessmentResult,
+  AttemptAnswer,
+  CourseConfig,
+  CourseRuntime,
+  CourseState,
+  DeliveryAdapter,
+  RestoreInfo,
+  SuspendEnvelope,
+} from './types.ts'
 
 export const CURRENT_SCHEMA_VERSION = 1
 
@@ -98,7 +107,14 @@ export function createCourseRuntime(
       runtime.submitAssessmentScore('__default__', score, max, threshold)
     },
 
-    submitAssessmentScore(assessmentId: string, score: number, max: number, threshold?: number, weight?: number, answers?: Record<string, AttemptAnswer>) {
+    submitAssessmentScore(
+      assessmentId: string,
+      score: number,
+      max: number,
+      threshold?: number,
+      weight?: number,
+      answers?: Record<string, AttemptAnswer>,
+    ) {
       const existing = state.assessments[assessmentId]
       const passed = score / max >= (threshold ?? passThreshold)
       const record = {

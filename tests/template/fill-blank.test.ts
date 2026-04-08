@@ -9,20 +9,16 @@ globalThis.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 } as any
 
-import { describe, it, expect } from 'bun:test'
+import type { CourseConfig, CourseRuntime, DeliveryAdapter } from '@kurikulum/core'
+import { CourseContext, createCourseRuntime, createNotifier } from '@kurikulum/core'
+import type { CourseContextValue } from '@kurikulum/core'
+import { FillBlank as FB } from '@kurikulum/core'
+import { describe, expect, it } from 'bun:test'
 import { h } from 'preact'
 import { render } from 'preact'
-import type { CourseConfig, DeliveryAdapter, CourseRuntime } from '@kurikulum/core'
-import {
-  CourseContext,
-  createNotifier,
-  createCourseRuntime,
-} from '@kurikulum/core'
-import type { CourseContextValue } from '@kurikulum/core'
+import { Assessment } from '../../template/src/components/Assessment.tsx'
 import { FillBlank } from '../../template/src/components/FillBlank.tsx'
 import { QuestionFeedback } from '../../template/src/components/QuestionFeedback.tsx'
-import { Assessment } from '../../template/src/components/Assessment.tsx'
-import { FillBlank as FB } from '@kurikulum/core'
 
 function flushEffects(): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, 50))
@@ -44,13 +40,19 @@ function createMockAdapter(): DeliveryAdapter & { committed: number } {
   return {
     committed: 0,
     async initialize() {},
-    commit() { this.committed++ },
+    commit() {
+      this.committed++
+    },
     setSuspendData() {},
-    getSuspendData() { return null },
+    getSuspendData() {
+      return null
+    },
     setScore() {},
     setStatus() {},
     setLocation() {},
-    getLocation() { return null },
+    getLocation() {
+      return null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -70,10 +72,12 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
   const originalSubmitScore = runtime.submitScore.bind(runtime)
   const originalMarkComplete = runtime.markComplete.bind(runtime)
   runtime.submitScore = (score: number, max: number, threshold?: number) => {
-    originalSubmitScore(score, max, threshold); notify()
+    originalSubmitScore(score, max, threshold)
+    notify()
   }
   runtime.markComplete = (id: string) => {
-    originalMarkComplete(id); notify()
+    originalMarkComplete(id)
+    notify()
   }
 
   return {
@@ -86,7 +90,9 @@ function createTestContext(runtime: CourseRuntime): CourseContextValue & { notif
     getVisiblePages: () => [],
     restoreInfo: { restored: false, storedPage: null },
     restoreDismissed: false,
-    dismissRestore() { notify() },
+    dismissRestore() {
+      notify()
+    },
   }
 }
 
@@ -108,8 +114,9 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Capital of France?', accept: 'Paris', placeholder: 'Enter city...' }),
+    const { container } = renderWithContext(
+      ctx,
+      () => h(FillBlank, { id: 'q1', question: 'Capital of France?', accept: 'Paris', placeholder: 'Enter city...' }),
     )
 
     await flushEffects()
@@ -129,9 +136,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris' }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris' }))
 
     await flushEffects()
 
@@ -153,9 +158,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris' }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris' }))
 
     await flushEffects()
 
@@ -177,9 +180,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Capital?', accept: ['Paris', 'Paříž'] }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Capital?', accept: ['Paris', 'Paříž'] }))
 
     await flushEffects()
 
@@ -201,9 +202,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Year?', accept: /^1991$/ }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Year?', accept: /^1991$/ }))
 
     await flushEffects()
 
@@ -225,8 +224,9 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris', caseSensitive: true }),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(FillBlank, { id: 'q1', question: 'Capital?', accept: 'Paris', caseSensitive: true }),
     )
 
     await flushEffects()
@@ -249,9 +249,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Q?', accept: 'A' }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Q?', accept: 'A' }))
 
     await flushEffects()
 
@@ -274,9 +272,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }))
 
     await flushEffects()
 
@@ -298,10 +294,9 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5 },
-        h(FillBlank, { id: 'q1', question: 'Capital of France?', accept: 'Paris' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Assessment, { id: 'quiz', passThreshold: 0.5 }, h(FillBlank, { id: 'q1', question: 'Capital of France?', accept: 'Paris' })),
     )
 
     await flushEffects()
@@ -336,10 +331,9 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(Assessment, { id: 'quiz', passThreshold: 0.5, maxAttempts: 3 },
-        h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(Assessment, { id: 'quiz', passThreshold: 0.5, maxAttempts: 3 }, h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' })),
     )
 
     await flushEffects()
@@ -385,10 +379,9 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' },
-        h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong!' }),
-      ),
+    const { container, rerender } = renderWithContext(
+      ctx,
+      () => h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }, h(QuestionFeedback, { correct: 'Correct!', incorrect: 'Wrong!' })),
     )
 
     await flushEffects()
@@ -414,9 +407,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container, rerender } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }),
-    )
+    const { container, rerender } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }))
 
     await flushEffects()
 
@@ -439,9 +430,7 @@ describe('FillBlank', () => {
     const runtime = createCourseRuntime(config, adapter)
     const ctx = createTestContext(runtime)
 
-    const { container } = renderWithContext(ctx, () =>
-      h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }),
-    )
+    const { container } = renderWithContext(ctx, () => h(FillBlank, { id: 'q1', question: 'Q?', accept: 'Paris' }))
 
     await flushEffects()
 

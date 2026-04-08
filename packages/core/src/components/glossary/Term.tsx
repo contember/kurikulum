@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useContext, useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useContext, useMemo, useState } from 'preact/hooks'
 import { GlossaryContext } from './context.ts'
 
 export interface GlossaryTermProps {
@@ -19,8 +19,8 @@ export function Term({ term, class: className, tooltipClass, children }: Glossar
     () =>
       ctx.entries.find(
         (e) =>
-          e.term.toLowerCase() === term.toLowerCase() ||
-          (e.aliases ?? []).some((a) => a.toLowerCase() === term.toLowerCase()),
+          e.term.toLowerCase() === term.toLowerCase()
+          || (e.aliases ?? []).some((a) => a.toLowerCase() === term.toLowerCase()),
       ),
     [ctx.entries, term],
   )

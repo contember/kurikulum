@@ -54,8 +54,8 @@ export function searchEntries(entries: SearchEntry[], query: string): SearchResu
       const snippet = contentMatch
         ? extractSnippet(entry.content, trimmed)
         : titleMatch
-          ? entry.content.slice(0, 120) + (entry.content.length > 120 ? '...' : '')
-          : extractSnippet(entry.content, trimmed)
+        ? entry.content.slice(0, 120) + (entry.content.length > 120 ? '...' : '')
+        : extractSnippet(entry.content, trimmed)
 
       results.push({
         pageId: entry.pageId,

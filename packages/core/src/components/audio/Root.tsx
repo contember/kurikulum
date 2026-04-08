@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useEffect, useRef, useCallback } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
 import { AudioContext } from './context.ts'
 

@@ -1,7 +1,7 @@
-import type { ComponentChildren, VNode } from 'preact'
-import { useContext } from 'preact/hooks'
 import { CategorySort as CS, CategorySortContext } from '@kurikulum/core'
 import type { CategoryDef, CategoryItemDef } from '@kurikulum/core'
+import type { ComponentChildren, VNode } from 'preact'
+import { useContext } from 'preact/hooks'
 
 export interface CategorySortProps {
   id: string

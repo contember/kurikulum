@@ -1,6 +1,6 @@
-import type { VNode } from 'preact'
 import { Glossary as G, useGlossary } from '@kurikulum/core'
 import type { GlossaryEntry } from '@kurikulum/core'
+import type { VNode } from 'preact'
 
 export interface GlossaryProps {
   entries: GlossaryEntry[]

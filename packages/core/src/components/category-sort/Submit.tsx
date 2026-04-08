@@ -1,7 +1,7 @@
 import type { VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { CategorySortContext } from './context.ts'
 import type { HeadlessPartProps } from '../types.ts'
+import { CategorySortContext } from './context.ts'
 
 export function Submit({ children, class: className }: HeadlessPartProps): VNode | null {
   const ctx = useContext(CategorySortContext)

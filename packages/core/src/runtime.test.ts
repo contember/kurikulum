@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, mock } from 'bun:test'
+import { beforeEach, describe, expect, it, mock } from 'bun:test'
 import { createCourseRuntime, CURRENT_SCHEMA_VERSION } from './runtime.ts'
-import type { CourseConfig, CourseRuntime, DeliveryAdapter, AssessmentResult, SuspendEnvelope } from './types.ts'
+import type { AssessmentResult, CourseConfig, CourseRuntime, DeliveryAdapter, SuspendEnvelope } from './types.ts'
 
 function createMockAdapter(): DeliveryAdapter & {
   committed: number
@@ -26,7 +26,9 @@ function createMockAdapter(): DeliveryAdapter & {
     setLocation(pageId: string) {
       this.location = pageId
     },
-    getLocation() { return this.location || null },
+    getLocation() {
+      return this.location || null
+    },
     setSessionTime() {},
     recordInteraction() {},
     terminate() {},
@@ -318,8 +320,12 @@ describe('createCourseRuntime', () => {
     it('calls adapter.setScore and adapter.setStatus on assessment submit', () => {
       const scoreArgs: [number, number][] = []
       const statusArgs: string[] = []
-      adapter.setScore = (score: number, max: number) => { scoreArgs.push([score, max]) }
-      adapter.setStatus = (status: any) => { statusArgs.push(status) }
+      adapter.setScore = (score: number, max: number) => {
+        scoreArgs.push([score, max])
+      }
+      adapter.setStatus = (status: any) => {
+        statusArgs.push(status)
+      }
 
       runtime.submitAssessmentScore('quiz-1', 8, 10)
 
@@ -329,7 +335,9 @@ describe('createCourseRuntime', () => {
 
     it('reports aggregate score to adapter with multiple assessments', () => {
       const scoreArgs: [number, number][] = []
-      adapter.setScore = (score: number, max: number) => { scoreArgs.push([score, max]) }
+      adapter.setScore = (score: number, max: number) => {
+        scoreArgs.push([score, max])
+      }
 
       runtime.submitAssessmentScore('quiz-1', 8, 10, undefined, 0.4)
       runtime.submitAssessmentScore('quiz-2', 6, 10, undefined, 0.6)

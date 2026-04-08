@@ -1,7 +1,7 @@
 import type { VNode } from 'preact'
 import { useContext } from 'preact/hooks'
-import { NavigationContext } from './context.ts'
 import type { HeadlessPartProps } from '../types.ts'
+import { NavigationContext } from './context.ts'
 
 export function Prev({ children, class: className }: HeadlessPartProps): VNode {
   const ctx = useContext(NavigationContext)

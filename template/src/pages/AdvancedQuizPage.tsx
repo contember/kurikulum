@@ -1,11 +1,11 @@
 import type { VNode } from 'preact'
-import { Text } from '../components/Text.tsx'
 import { Assessment } from '../components/Assessment.tsx'
+import { CategorySort } from '../components/CategorySort.tsx'
 import { FillBlank } from '../components/FillBlank.tsx'
-import { QuestionFeedback } from '../components/QuestionFeedback.tsx'
 import { Matching, MatchingPair } from '../components/Matching.tsx'
 import { Ordering, OrderingItem } from '../components/Ordering.tsx'
-import { CategorySort } from '../components/CategorySort.tsx'
+import { QuestionFeedback } from '../components/QuestionFeedback.tsx'
+import { Text } from '../components/Text.tsx'
 
 export function AdvancedQuizPage(): VNode {
   return (
@@ -13,8 +13,7 @@ export function AdvancedQuizPage(): VNode {
       <Text>
         <h1>Pokročilé otázky</h1>
         <p>
-          Tato sekce ukazuje pokročilé typy otázek s <strong>váženým skórováním</strong> —
-          důležitější otázky mají vyšší váhu.
+          Tato sekce ukazuje pokročilé typy otázek s <strong>váženým skórováním</strong> — důležitější otázky mají vyšší váhu.
         </p>
       </Text>
       <Assessment id="advanced-test" passThreshold={0.6}>

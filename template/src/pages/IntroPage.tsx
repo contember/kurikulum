@@ -1,6 +1,6 @@
 import type { VNode } from 'preact'
-import { Text } from '../components/Text.tsx'
 import { Image } from '../components/Image.tsx'
+import { Text } from '../components/Text.tsx'
 
 export function IntroPage(): VNode {
   return (
@@ -8,13 +8,11 @@ export function IntroPage(): VNode {
       <Text>
         <h1>Základy webové bezpečnosti</h1>
         <p>
-          Vítejte v kurzu zaměřeném na nejčastější bezpečnostní hrozby webových aplikací.
-          Projdeme si základní koncepty podle <strong>OWASP Top 10</strong> a naučíte se,
-          jak se proti nim bránit.
+          Vítejte v kurzu zaměřeném na nejčastější bezpečnostní hrozby webových aplikací. Projdeme si základní koncepty podle{' '}
+          <strong>OWASP Top 10</strong> a naučíte se, jak se proti nim bránit.
         </p>
         <p>
-          Kurz obsahuje teoretické materiály, multimediální obsah, samostatné kvízy
-          i hodnocený test. Pokračujte kliknutím na <em>Další</em>.
+          Kurz obsahuje teoretické materiály, multimediální obsah, samostatné kvízy i hodnocený test. Pokračujte kliknutím na <em>Další</em>.
         </p>
       </Text>
       <Image

@@ -1,7 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useCallback, useMemo } from 'preact/hooks'
-import { NotesContext, MAX_NOTEPAD_LENGTH } from './context.ts'
+import { useCallback, useMemo, useState } from 'preact/hooks'
 import { useCourse } from '../../hooks/useCourse.ts'
+import { MAX_NOTEPAD_LENGTH, NotesContext } from './context.ts'
 
 export interface NotesRootProps {
   children?: ComponentChildren

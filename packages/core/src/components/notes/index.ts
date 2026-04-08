@@ -1,5 +1,5 @@
-import { Root } from './Root.tsx'
 import { Panel } from './Panel.tsx'
+import { Root } from './Root.tsx'
 
 export const Notes = { Root, Panel }
 export { NotesContext } from './context.ts'

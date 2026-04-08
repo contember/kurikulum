@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { useState, useContext } from 'preact/hooks'
+import { useContext, useState } from 'preact/hooks'
 import { MCQContext, MCQItemContext } from './context.ts'
 
 export interface MCQItemProps {

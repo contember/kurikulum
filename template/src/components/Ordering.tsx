@@ -1,7 +1,7 @@
+import { Ordering as O, OrderingContext, OrderingItemContext } from '@kurikulum/core'
 import type { ComponentChildren, VNode } from 'preact'
 import { toChildArray } from 'preact'
 import { useContext } from 'preact/hooks'
-import { Ordering as O, OrderingItemContext, OrderingContext } from '@kurikulum/core'
 import { CheckIcon, CrossIcon } from './Icons.tsx'
 
 export interface OrderingProps {
@@ -53,7 +53,7 @@ export function OrderingItem({ order, children }: OrderingItemProps): VNode {
 function DropIndicator(): VNode | null {
   const ctx = useContext(OrderingContext)
   const itemCtx = useContext(OrderingItemContext)
-  if (!ctx || !itemCtx || !itemCtx.isDragOver || ctx.draggedPosition === null) return null
+  if (!ctx || !itemCtx?.isDragOver || ctx.draggedPosition === null) return null
 
   // Line goes below the item when dragging downward, above when dragging upward
   const isBelow = ctx.draggedPosition < itemCtx.position

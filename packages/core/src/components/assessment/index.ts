@@ -1,9 +1,9 @@
-import { Root } from './Root.tsx'
-import { Submit } from './Submit.tsx'
-import { Status } from './Status.tsx'
-import { Retry } from './Retry.tsx'
 import { AttemptsExhausted } from './AttemptsExhausted.tsx'
 import { History } from './History.tsx'
+import { Retry } from './Retry.tsx'
+import { Root } from './Root.tsx'
+import { Status } from './Status.tsx'
+import { Submit } from './Submit.tsx'
 import { Timer } from './Timer.tsx'
 
 export const Assessment = { Root, Submit, Status, Retry, AttemptsExhausted, History, Timer }

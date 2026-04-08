@@ -31,9 +31,12 @@ function formatTimestamp(): string {
 
 function mapResult(result: InteractionRecord['result']): string {
   switch (result) {
-    case 'correct': return 'correct'
-    case 'wrong': return 'incorrect'
-    case 'neutral': return 'neutral'
+    case 'correct':
+      return 'correct'
+    case 'wrong':
+      return 'incorrect'
+    case 'neutral':
+      return 'neutral'
   }
 }
 
