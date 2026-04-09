@@ -1,8 +1,13 @@
 {
   "name": "kurikulum",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "type": "module",
   "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./vite": "./src/vite/search-index-plugin.ts",
+    "./scorm/package": "./src/scorm/package.ts"
+  },
   "files": ["src"],
   "repository": {
     "type": "git",

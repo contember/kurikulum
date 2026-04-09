@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+
 interface VitePlugin {
   name: string
   enforce?: 'pre' | 'post'
@@ -42,7 +45,6 @@ function extractContent(source: string): { title: string; content: string } {
  * Parse import statements and return a map of component name to resolved file path.
  */
 function parseImports(code: string, filePath: string): Map<string, string> {
-  const { dirname } = require('node:path') as typeof import('path')
   const dir = dirname(filePath)
   const map = new Map<string, string>()
 
@@ -72,8 +74,6 @@ function parseImports(code: string, filePath: string): Map<string, string> {
 
 function resolveImportPath(dir: string, specifier: string): string | null {
   if (!specifier.startsWith('.')) return null
-  const { resolve } = require('node:path') as typeof import('path')
-  const { existsSync } = require('node:fs') as typeof import('fs')
   const resolved = resolve(dir, specifier)
   if (existsSync(resolved)) return resolved
   for (const ext of ['.tsx', '.ts', '.jsx', '.js']) {
@@ -108,7 +108,6 @@ export function extractSearchEntries(source: string, filePath?: string): SearchE
 
     if (componentRef && importMap.has(componentRef[1])) {
       const componentFile = importMap.get(componentRef[1])!
-      const { readFileSync } = require('node:fs') as typeof import('fs')
       const componentSource = readFileSync(componentFile, 'utf-8')
       const extracted = extractContent(componentSource)
       title = extracted.title || pageId

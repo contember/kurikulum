@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "kurikulum": "workspace:*",
+    "kurikulum": "^0.1.2",
     "preact": "^10.0.0"
   },
   "devDependencies": {
@@ -20,6 +20,6 @@
     "dev": "vite",
     "build": "vite build",
     "build:scorm": "KURIKULUM_TARGET=scorm-1.2 vite build && bun run package",
-    "package": "bun ../packages/core/src/scorm/package.ts dist/scorm-1.2 Course dist/Course.zip"
+    "package": "bun node_modules/kurikulum/src/scorm/package.ts dist/scorm-1.2 Course dist/Course.zip"
   }
 }
