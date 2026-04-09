@@ -1,8 +1,8 @@
 import preact from '@preact/preset-vite'
 import tailwindcss from '@tailwindcss/vite'
+import { searchIndexPlugin } from 'kurikulum/vite'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
-import { searchIndexPlugin } from 'kurikulum/vite'
 
 export default defineConfig(({ mode }) => {
   const target = process.env.KURIKULUM_TARGET || 'standalone'
