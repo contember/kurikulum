@@ -17,9 +17,9 @@
     "vite-plugin-singlefile": "^2.0.0"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:scorm": "KURIKULUM_TARGET=scorm-1.2 vite build && bun run package",
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "build:scorm": "KURIKULUM_TARGET=scorm-1.2 bunx --bun vite build && bun run package",
     "package": "bun node_modules/kurikulum/src/scorm/package.ts dist/scorm-1.2 Course dist/Course.zip"
   }
 }
