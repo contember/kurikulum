@@ -44,6 +44,7 @@ export function Root({ id, completion = 'mount', completionTimer, active = true,
     let unsub: (() => void) | undefined
     if (completion === 'interactive') {
       unsub = ctx.subscribe(() => {
+        if (runtime.isComplete(id)) return
         if (registry.isPageInteractiveComplete(id, runtime.state.completions)) {
           markComplete()
         }
