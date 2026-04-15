@@ -1,6 +1,8 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { cloneElement, toChildArray } from 'preact'
 import { useContext, useEffect } from 'preact/hooks'
+import { resolveCompletionStrategy } from '../../completion.ts'
+import type { CompletionStrategy } from '../../completion.ts'
 import { CourseContext } from '../../context.tsx'
 import { useNavigation } from '../../hooks/index.ts'
 import type { CourseRuntime } from '../../types.ts'
@@ -41,6 +43,20 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
 
   const visiblePages = ctx.getVisiblePages()
 
+  // Pre-populate completions for visible mount-strategy pages so that Navigation
+  // renders with canGoNext=true on the first paint. Safe to call during render:
+  // subscribers are registered in useEffect, so on the initial render notify()
+  // has no listeners. The isComplete guard prevents notify feedback on re-renders.
+  const visibleSet = new Set(visiblePages)
+  for (const page of pages) {
+    const props = page.props as unknown as { id: string; completion?: CompletionStrategy }
+    if (!visibleSet.has(props.id)) continue
+    const strategy = resolveCompletionStrategy(props.completion, ctx.defaultCompletion)
+    if (strategy === 'mount' && !ctx.runtime.isComplete(props.id)) {
+      ctx.runtime.markComplete(props.id)
+    }
+  }
+
   // If current page is not visible, navigate to nearest visible page
   useEffect(() => {
     if (visiblePages.length > 0 && !visiblePages.includes(currentPage)) {
@@ -58,7 +74,7 @@ export function Root({ children, class: className }: CourseRootProps): VNode {
       }
       ctx.runtime.navigateTo(nearest)
     }
-  })
+  }, [currentPage, visiblePages.join('|')])
 
   return (
     <div class={className}>
