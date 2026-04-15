@@ -28,6 +28,14 @@ function createInitialState(config: CourseConfig): CourseState {
   }
 }
 
+function hasMeaningfulProgress(state: CourseState, config: CourseConfig): boolean {
+  if (state.currentPage && state.currentPage !== config.pages[0]) return true
+  if (Object.keys(state.completions).length > 0) return true
+  if (Object.keys(state.assessments).length > 0) return true
+  if (state.notepad !== '') return true
+  return false
+}
+
 function recomputeAggregateScore(state: CourseState): void {
   const assessments = Object.values(state.assessments)
   if (assessments.length === 0) {
@@ -192,6 +200,7 @@ export function createCourseRuntime(
             if (!config.pages.includes(state.currentPage)) {
               state.currentPage = config.pages[0] ?? ''
             }
+            if (!hasMeaningfulProgress(state, config)) return noRestore
             return { restored: true, storedPage: state.currentPage }
           }
         }
@@ -207,6 +216,7 @@ export function createCourseRuntime(
       if (!pages.includes(state.currentPage)) {
         state.currentPage = pages[0] ?? ''
       }
+      if (!hasMeaningfulProgress(state, config)) return noRestore
       return { restored: true, storedPage: state.currentPage }
     },
 

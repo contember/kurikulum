@@ -218,6 +218,29 @@ describe('runtime.restore() returns RestoreInfo', () => {
     expect(info.storedPage).toBe('page-2')
   })
 
+  it('returns restored=false when suspended state has no meaningful progress', () => {
+    const adapter = createMockAdapter()
+    const runtime1 = createCourseRuntime(config, adapter)
+    runtime1.suspend()
+
+    const runtime2 = createCourseRuntime(config, adapter)
+    const info = runtime2.restore()
+    expect(info.restored).toBe(false)
+    expect(info.storedPage).toBeNull()
+  })
+
+  it('returns restored=true when suspended state has a completion on first page', () => {
+    const adapter = createMockAdapter()
+    const runtime1 = createCourseRuntime(config, adapter)
+    runtime1.markComplete('page-1')
+    runtime1.suspend()
+
+    const runtime2 = createCourseRuntime(config, adapter)
+    const info = runtime2.restore()
+    expect(info.restored).toBe(true)
+    expect(info.storedPage).toBe('page-1')
+  })
+
   it('returns restored=false for invalid JSON', () => {
     const adapter = createMockAdapter()
     adapter.suspendData = 'not-json'
