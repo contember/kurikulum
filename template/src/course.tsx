@@ -67,7 +67,6 @@ function App() {
           <Notes>
             <div class="h-screen flex flex-col bg-bg text-text font-sans">
               <Course>
-                <ResumeDialog />
                 <SearchModal />
                 <GlossaryPanel />
                 <NotesPanel />
@@ -108,6 +107,7 @@ function App() {
                   <Navigation />
                 </div>
               </footer>
+              <ResumeDialog />
             </div>
           </Notes>
         </Glossary>

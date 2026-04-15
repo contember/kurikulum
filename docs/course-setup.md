@@ -56,7 +56,6 @@ render(<App />, document.getElementById('app')!)
       <Notes>
         <div class="h-screen flex flex-col bg-bg text-text font-sans">
           <Course>
-            <ResumeDialog />
             <SearchModal />
             <GlossaryPanel />
             <NotesPanel />
@@ -73,6 +72,7 @@ render(<App />, document.getElementById('app')!)
               <Navigation />
             </div>
           </footer>
+          <ResumeDialog />
         </div>
       </Notes>
     </Glossary>
@@ -81,6 +81,8 @@ render(<App />, document.getElementById('app')!)
 ```
 
 Provider nesting order: `CourseProvider > Search > Glossary > Notes > layout`
+
+**Note:** `ResumeDialog` must be rendered as a sibling of `<Course>`, not a child. `<Course>` uses `overflow-y:auto`, and some LMS iframes clip `position: fixed` children inside scroll containers.
 
 ## Suspend Data Versioning
 
