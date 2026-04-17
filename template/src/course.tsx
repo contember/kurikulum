@@ -95,7 +95,7 @@ function App() {
                 <Page id="scroll-page" completion="scroll">
                   <ScrollPage />
                 </Page>
-                <Page id="summary" completion="manual">
+                <Page id="summary" completion="mount" when={(rt) => rt.state.assessments['final-test']?.passed === true}>
                   <SummaryPage />
                 </Page>
               </Course>

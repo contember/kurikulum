@@ -43,6 +43,10 @@ Two-layer architecture (Radix + shadcn/ui style):
 3. Add page ID to `config.pages` array
 4. Add `<Page id="my-page" completion="..."><MyPage /></Page>` inside `<Course>`
 
+## Always Remember
+
+- **Gate summary/certificate pages after an `<Assessment>`** with `when={(rt) => rt.state.assessments['<id>']?.passed === true}` — otherwise Next advances past the quiz regardless of score. See `docs/assessment.md` → *Gating Summary / Certificate Pages*.
+
 ## Build Commands
 
 ```bash
