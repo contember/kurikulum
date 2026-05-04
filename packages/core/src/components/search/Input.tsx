@@ -1,15 +1,18 @@
 import type { VNode } from 'preact'
 import { useCallback, useContext, useEffect, useRef } from 'preact/hooks'
+import { useLocale } from '../../i18n/index.ts'
 import { SearchContext } from './context.ts'
 
 export interface SearchInputProps {
   class?: string
   placeholder?: string
+  'aria-label'?: string
 }
 
-export function Input({ class: className, placeholder = 'Search...' }: SearchInputProps): VNode {
+export function Input({ class: className, placeholder, 'aria-label': ariaLabel }: SearchInputProps): VNode {
   const ctx = useContext(SearchContext)
   if (!ctx) throw new Error('Search.Input must be used within Search.Root')
+  const { t } = useLocale()
 
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -40,11 +43,11 @@ export function Input({ class: className, placeholder = 'Search...' }: SearchInp
       ref={inputRef}
       type="search"
       class={className}
-      placeholder={placeholder}
+      placeholder={placeholder ?? t('search.input')}
       value={ctx.query}
       onInput={(e) => ctx.setQuery((e.target as HTMLInputElement).value)}
       onKeyDown={onKeyDown}
-      aria-label="Search course content"
+      aria-label={ariaLabel ?? t('search.input')}
       role="combobox"
       aria-expanded={ctx.results.length > 0}
       aria-controls="search-results-listbox"

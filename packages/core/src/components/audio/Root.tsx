@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useCompletion } from '../../hooks/index.ts'
+import { useLocale } from '../../i18n/index.ts'
 import { AudioContext } from './context.ts'
 
 export interface AudioRootProps {
@@ -10,9 +11,13 @@ export interface AudioRootProps {
   class?: string
   children?: ComponentChildren
   id?: string
+  'aria-label'?: string
 }
 
-export function Root({ src, autoplay = false, completeOnEnd = false, class: className, children, id }: AudioRootProps): VNode {
+export function Root(
+  { src, autoplay = false, completeOnEnd = false, class: className, children, id, 'aria-label': ariaLabel }: AudioRootProps,
+): VNode {
+  const { t } = useLocale()
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -106,7 +111,7 @@ export function Root({ src, autoplay = false, completeOnEnd = false, class: clas
 
   return (
     <AudioContext.Provider value={ctxValue}>
-      <div class={className} role="group" aria-label="Audio player">
+      <div class={className} role="group" aria-label={ariaLabel ?? t('audio.player')}>
         <audio ref={audioRef} src={src} autoplay={autoplay} preload="metadata" />
         {children}
       </div>

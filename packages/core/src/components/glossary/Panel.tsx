@@ -1,16 +1,19 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext, useEffect, useRef } from 'preact/hooks'
 import { useFocusTrap } from '../../hooks/useFocusTrap.ts'
+import { useLocale } from '../../i18n/index.ts'
 import { GlossaryContext } from './context.ts'
 
 export interface GlossaryPanelProps {
   class?: string
   children?: ComponentChildren
+  'aria-label'?: string
 }
 
-export function Panel({ class: className, children }: GlossaryPanelProps): VNode | null {
+export function Panel({ class: className, children, 'aria-label': ariaLabel }: GlossaryPanelProps): VNode | null {
   const ctx = useContext(GlossaryContext)
   if (!ctx) throw new Error('Glossary.Panel must be used within Glossary.Root')
+  const { t } = useLocale()
 
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -37,7 +40,7 @@ export function Panel({ class: className, children }: GlossaryPanelProps): VNode
   if (!ctx.isOpen) return null
 
   return (
-    <div ref={panelRef} class={className} role="dialog" aria-label="Glossary" aria-modal="true">
+    <div ref={panelRef} class={className} role="dialog" aria-label={ariaLabel ?? t('glossary.panel')} aria-modal="true">
       {children ?? (
         <>
           <dl>

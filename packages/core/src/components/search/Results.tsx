@@ -1,20 +1,23 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
+import { useLocale } from '../../i18n/index.ts'
 import { SearchContext } from './context.ts'
 
 export interface SearchResultsProps {
   class?: string
   children?: ComponentChildren
+  'aria-label'?: string
 }
 
-export function Results({ class: className, children }: SearchResultsProps): VNode | null {
+export function Results({ class: className, children, 'aria-label': ariaLabel }: SearchResultsProps): VNode | null {
   const ctx = useContext(SearchContext)
   if (!ctx) throw new Error('Search.Results must be used within Search.Root')
+  const { t } = useLocale()
 
   if (!ctx.isOpen) return null
 
   return (
-    <div class={className} role="listbox" id="search-results-listbox" aria-label="Search results">
+    <div class={className} role="listbox" id="search-results-listbox" aria-label={ariaLabel ?? t('search.results')}>
       {children ?? (
         ctx.results.length > 0
           ? ctx.results.map((r, i) => (

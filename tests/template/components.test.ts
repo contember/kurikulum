@@ -330,7 +330,7 @@ describe('Navigation', () => {
     const navs = container.getElementsByTagName('nav')
     expect(navs.length).toBe(1)
     expect(navs[0].getAttribute('role')).toBe('navigation')
-    expect(navs[0].getAttribute('aria-label')).toBe('Navigace kurzu')
+    expect(navs[0].getAttribute('aria-label')).toBe('Course navigation')
   })
 
   it('has aria-disabled on disabled buttons', () => {

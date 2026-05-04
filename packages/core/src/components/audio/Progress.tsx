@@ -1,14 +1,17 @@
 import type { VNode } from 'preact'
 import { useCallback, useContext } from 'preact/hooks'
+import { useLocale } from '../../i18n/index.ts'
 import { AudioContext } from './context.ts'
 
 export interface AudioProgressProps {
   class?: string
+  'aria-label'?: string
 }
 
-export function Progress({ class: className }: AudioProgressProps): VNode {
+export function Progress({ class: className, 'aria-label': ariaLabel }: AudioProgressProps): VNode {
   const ctx = useContext(AudioContext)
   if (!ctx) throw new Error('Audio.Progress must be used within Audio.Root')
+  const { t } = useLocale()
 
   const handleInput = useCallback((e: Event) => {
     const value = Number((e.target as HTMLInputElement).value)
@@ -36,7 +39,7 @@ export function Progress({ class: className }: AudioProgressProps): VNode {
       value={ctx.currentTime}
       onInput={handleInput}
       onKeyDown={handleKeyDown}
-      aria-label="Seek"
+      aria-label={ariaLabel ?? t('audio.seek')}
       aria-valuemin={0}
       aria-valuemax={ctx.duration || 0}
       aria-valuenow={ctx.currentTime}

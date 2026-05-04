@@ -1,6 +1,7 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useCourse } from '../../hooks/index.ts'
+import { useLocale } from '../../i18n/index.ts'
 import type { AttemptAnswer } from '../../types.ts'
 import { AssessmentContext } from './context.ts'
 import { TimerContext } from './timerContext.ts'
@@ -15,6 +16,7 @@ export interface AssessmentRootProps {
   onTimeExpired?: () => void // callback when time runs out (before auto-submit)
   children?: ComponentChildren
   class?: string
+  'aria-label'?: string
 }
 
 function formatTime(seconds: number): string {
@@ -24,9 +26,10 @@ function formatTime(seconds: number): string {
 }
 
 export function Root(
-  { id, passThreshold, maxAttempts, weight = 1, timeLimit, onTimeExpired, children, class: className }: AssessmentRootProps,
+  { id, passThreshold, maxAttempts, weight = 1, timeLimit, onTimeExpired, children, class: className, 'aria-label': ariaLabel }: AssessmentRootProps,
 ): VNode {
   const runtime = useCourse()
+  const { t } = useLocale()
   const [submitted, setSubmitted] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const evaluatorsRef = useRef<Map<string, { evaluate: () => number; weight: number; getResponse?: () => string }>>(new Map())
@@ -155,7 +158,7 @@ export function Root(
     >
       <div
         role="region"
-        aria-label="Assessment"
+        aria-label={ariaLabel ?? t('assessment.aria')}
         class={className}
         data-submitted={submitted || undefined}
         data-passed={submitted ? String(passed) : undefined}

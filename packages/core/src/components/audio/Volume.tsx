@@ -1,14 +1,17 @@
 import type { VNode } from 'preact'
 import { useCallback, useContext } from 'preact/hooks'
+import { useLocale } from '../../i18n/index.ts'
 import { AudioContext } from './context.ts'
 
 export interface AudioVolumeProps {
   class?: string
+  'aria-label'?: string
 }
 
-export function Volume({ class: className }: AudioVolumeProps): VNode {
+export function Volume({ class: className, 'aria-label': ariaLabel }: AudioVolumeProps): VNode {
   const ctx = useContext(AudioContext)
   if (!ctx) throw new Error('Audio.Volume must be used within Audio.Root')
+  const { t } = useLocale()
 
   const handleInput = useCallback((e: Event) => {
     const value = Number((e.target as HTMLInputElement).value)
@@ -24,7 +27,7 @@ export function Volume({ class: className }: AudioVolumeProps): VNode {
       step={0.05}
       value={ctx.volume}
       onInput={handleInput}
-      aria-label="Volume"
+      aria-label={ariaLabel ?? t('audio.volume')}
       aria-valuemin={0}
       aria-valuemax={1}
       aria-valuenow={ctx.volume}
