@@ -30,6 +30,10 @@ export type {
 export { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
+// i18n
+export { coreDictCs, coreDictEn, LocaleContext, LocaleProvider, useLocale } from './i18n/index.ts'
+export type { Dict, LocaleContextValue, LocaleProviderProps } from './i18n/index.ts'
+
 // Hooks
 export {
   useAssessment,
