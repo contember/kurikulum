@@ -104,6 +104,14 @@ export function createScorm2004Adapter(win?: Window): DeliveryAdapter {
       api.SetValue('cmi.session_time', formatDuration(ms))
     },
 
+    getLanguagePreference() {
+      return api.GetValue('cmi.learner_preference.language') || null
+    },
+
+    setLanguagePreference(lang: string) {
+      api.SetValue('cmi.learner_preference.language', lang)
+    },
+
     recordInteraction(interaction: InteractionRecord) {
       const n = interactionCount++
       const prefix = `cmi.interactions.${n}`

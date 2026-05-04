@@ -129,6 +129,12 @@ export interface DeliveryAdapter {
   getLocation(): string | null
   setSessionTime(ms: number): void
 
+  // Learner language preference (optional). Backed by
+  // cmi.student_preference.language (SCORM 1.2),
+  // cmi.learner_preference.language (SCORM 2004), localStorage (standalone).
+  getLanguagePreference?(): string | null
+  setLanguagePreference?(lang: string): void
+
   // Interactions
   recordInteraction(interaction: InteractionRecord): void
 

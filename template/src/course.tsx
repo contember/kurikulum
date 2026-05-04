@@ -1,5 +1,5 @@
 import { CourseProvider, createAdapter, createXApiAdapter, LocaleProvider, useLocale } from 'kurikulum'
-import type { CourseConfig } from 'kurikulum'
+import type { CourseConfig, DeliveryAdapter } from 'kurikulum'
 import type { ComponentType, VNode } from 'preact'
 import { render } from 'preact'
 import { available, bundles, defaultLocale } from 'virtual:kurikulum-content'
@@ -17,18 +17,18 @@ import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
 
-function pickInitialLocale(): string {
+function pickInitialLocale(adapter: DeliveryAdapter): string {
   if (typeof window !== 'undefined') {
     const fromUrl = new URLSearchParams(window.location.search).get('lang')
     if (fromUrl && available.includes(fromUrl)) return fromUrl
   }
+  const fromAdapter = adapter.getLanguagePreference?.()?.split('-')[0]
+  if (fromAdapter && available.includes(fromAdapter)) return fromAdapter
+  if (typeof navigator !== 'undefined') {
+    const navLang = navigator.language?.split('-')[0]
+    if (navLang && available.includes(navLang)) return navLang
+  }
   return available.includes(defaultLocale) ? defaultLocale : available[0] ?? ''
-}
-
-const initialLocale = pickInitialLocale()
-
-if (!bundles[initialLocale]) {
-  throw new Error(`[kurikulum] no content bundle for locale '${initialLocale}'. Available: [${available.join(', ')}]`)
 }
 
 function createAdapterFromTarget() {
@@ -47,6 +47,11 @@ function createAdapterFromTarget() {
 }
 
 const adapter = createAdapterFromTarget()
+const initialLocale = pickInitialLocale(adapter)
+
+if (!bundles[initialLocale]) {
+  throw new Error(`[kurikulum] no content bundle for locale '${initialLocale}'. Available: [${available.join(', ')}]`)
+}
 
 // Use the initial bundle's title for course config; CourseConfig is a one-shot
 // init value, so live retitling on locale switch isn't supported (CourseProvider
@@ -137,6 +142,7 @@ function CourseShell(): VNode {
 }
 
 function handleLocaleChange(next: string) {
+  adapter.setLanguagePreference?.(next)
   if (typeof window === 'undefined') return
   const url = new URL(window.location.href)
   url.searchParams.set('lang', next)

@@ -2,6 +2,7 @@ import type { DeliveryAdapter, InteractionRecord } from '../types.ts'
 
 const SUSPEND_KEY = 'kurikulum:suspend'
 const LOCATION_KEY = 'kurikulum:location'
+const LOCALE_KEY = 'kurikulum:locale'
 
 export function createStandaloneAdapter(): DeliveryAdapter {
   return {
@@ -34,6 +35,14 @@ export function createStandaloneAdapter(): DeliveryAdapter {
 
     setSessionTime(ms: number) {
       console.log('[kurikulum]', 'setSessionTime', ms)
+    },
+
+    getLanguagePreference() {
+      return localStorage.getItem(LOCALE_KEY)
+    },
+
+    setLanguagePreference(lang: string) {
+      localStorage.setItem(LOCALE_KEY, lang)
     },
 
     recordInteraction(interaction: InteractionRecord) {

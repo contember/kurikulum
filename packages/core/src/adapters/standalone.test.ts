@@ -91,6 +91,17 @@ describe('createStandaloneAdapter', () => {
     expect(adapter2.getSuspendData()).toBe('state-data')
     expect(adapter2.getLocation()).toBe('page-3')
   })
+
+  it('persists language preference to localStorage', () => {
+    const adapter = createStandaloneAdapter()
+    expect(adapter.getLanguagePreference?.()).toBeNull()
+
+    adapter.setLanguagePreference?.('cs')
+    expect(adapter.getLanguagePreference?.()).toBe('cs')
+
+    const adapter2 = createStandaloneAdapter()
+    expect(adapter2.getLanguagePreference?.()).toBe('cs')
+  })
 })
 
 describe('createAdapter', () => {

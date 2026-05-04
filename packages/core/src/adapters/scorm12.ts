@@ -115,6 +115,14 @@ export function createScorm12Adapter(win?: Window): DeliveryAdapter {
       api.LMSSetValue('cmi.core.session_time', formatTime(ms))
     },
 
+    getLanguagePreference() {
+      return api.LMSGetValue('cmi.student_preference.language') || null
+    },
+
+    setLanguagePreference(lang: string) {
+      api.LMSSetValue('cmi.student_preference.language', lang)
+    },
+
     recordInteraction(interaction: InteractionRecord) {
       const n = interactionCount++
       const prefix = `cmi.interactions.${n}`

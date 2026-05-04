@@ -178,6 +178,20 @@ describe('createScorm2004Adapter', () => {
         progress: [true, true, false],
       })
     })
+
+    it('reads cmi.learner_preference.language for getLanguagePreference', () => {
+      mockAPI._store['cmi.learner_preference.language'] = 'en'
+      expect(adapter.getLanguagePreference?.()).toBe('en')
+    })
+
+    it('returns null when language preference is empty', () => {
+      expect(adapter.getLanguagePreference?.()).toBeNull()
+    })
+
+    it('writes cmi.learner_preference.language for setLanguagePreference', () => {
+      adapter.setLanguagePreference?.('cs')
+      expect(mockAPI.SetValue).toHaveBeenCalledWith('cmi.learner_preference.language', 'cs')
+    })
   })
 
   describe('recordInteraction', () => {
