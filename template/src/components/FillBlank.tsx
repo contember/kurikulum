@@ -1,4 +1,4 @@
-import { FillBlank as FB } from 'kurikulum'
+import { FillBlank as FB, useLocale } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface FillBlankProps {
@@ -12,6 +12,7 @@ export interface FillBlankProps {
 }
 
 export function FillBlank({ id, question, accept, caseSensitive, weight, placeholder, children }: FillBlankProps): VNode {
+  const { t } = useLocale()
   return (
     <FB.Root id={id} accept={accept} caseSensitive={caseSensitive} weight={weight} aria-label={question}>
       <FB.Label class="text-base font-semibold text-text mb-3">{question}</FB.Label>
@@ -21,7 +22,7 @@ export function FillBlank({ id, question, accept, caseSensitive, weight, placeho
       />
       {children}
       <FB.Submit class="mt-3 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-        Odeslat
+        {t('actions.submit')}
       </FB.Submit>
     </FB.Root>
   )

@@ -1,5 +1,6 @@
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext, useEffect, useRef } from 'preact/hooks'
+import { useLocale } from '../../i18n/index.ts'
 import { AssessmentContext } from './context.ts'
 
 export interface StatusProps {
@@ -10,6 +11,7 @@ export interface StatusProps {
 export function Status({ children, class: className }: StatusProps): VNode | null {
   const ctx = useContext(AssessmentContext)
   if (!ctx) throw new Error('Assessment.Status must be used within Assessment.Root')
+  const { t } = useLocale()
 
   const statusRef = useRef<HTMLDivElement>(null)
 
@@ -23,7 +25,7 @@ export function Status({ children, class: className }: StatusProps): VNode | nul
 
   const content = typeof children === 'function'
     ? children({ score: ctx.score, maxScore: ctx.maxScore, passed: ctx.passed })
-    : <p>Skóre: {ctx.score}/{ctx.maxScore}</p>
+    : <p>{t('assess.score', { score: ctx.score ?? '—', max: ctx.maxScore })}</p>
 
   return (
     <div

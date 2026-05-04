@@ -148,7 +148,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -196,7 +196,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
           h(CS.Feedback, { correct: 'All correct!', incorrect: 'Try again!' }),
         ),
     )
@@ -208,7 +208,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -238,7 +238,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
           h(CS.Feedback, { correct: 'Correct!', incorrect: 'Wrong!' }),
         ),
     )
@@ -250,7 +250,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -276,14 +276,14 @@ describe('CategorySort', () => {
           h(CS.Item, { id: 'newspaper' }),
           h(CS.Item, { id: 'jar' }),
           h(CS.Category, { id: 'plastic' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )
     expect(submitBtn).not.toBeNull()
     expect(submitBtn!.disabled).toBe(true)
@@ -311,7 +311,7 @@ describe('CategorySort', () => {
             h(CS.Category, { id: 'paper' }),
             h(CS.Category, { id: 'glass' }),
           ),
-          h(A.Submit, null, 'Odeslat'),
+          h(A.Submit, null, 'Submit'),
         ),
     )
 
@@ -321,7 +321,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -349,7 +349,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -359,7 +359,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -390,7 +390,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -401,7 +401,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -456,7 +456,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -466,14 +466,14 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
     await flushEffects()
 
     const submitBtns = Array.from(container.getElementsByTagName('button')).filter(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )
     expect(submitBtns.length).toBe(0)
   })
@@ -496,7 +496,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -506,7 +506,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -540,8 +540,8 @@ describe('CategorySort', () => {
             h(CS.Category, { id: 'paper' }),
             h(CS.Category, { id: 'glass' }),
           ),
-          h(A.Submit, null, 'Odeslat'),
-          h(A.Retry, null, 'Zkusit znovu'),
+          h(A.Submit, null, 'Submit'),
+          h(A.Retry, null, 'Try again'),
         ),
     )
 
@@ -552,7 +552,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -561,7 +561,7 @@ describe('CategorySort', () => {
     expect(runtime.state.passed).toBe(false)
 
     const retryBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Zkusit'),
+      b => b.textContent?.includes('Try again'),
     )
     expect(retryBtn).not.toBeNull()
     retryBtn!.click()
@@ -591,7 +591,7 @@ describe('CategorySort', () => {
           h(CS.Category, { id: 'plastic' }),
           h(CS.Category, { id: 'paper' }),
           h(CS.Category, { id: 'glass' }),
-          h(CS.Submit, null, 'Odeslat'),
+          h(CS.Submit, null, 'Submit'),
         ),
     )
 
@@ -602,7 +602,7 @@ describe('CategorySort', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()

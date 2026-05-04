@@ -296,7 +296,7 @@ describe('Ordering DnD', () => {
 
     // Submit
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()

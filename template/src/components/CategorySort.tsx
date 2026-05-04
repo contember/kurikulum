@@ -1,4 +1,4 @@
-import { CategorySort as CS, CategorySortContext } from 'kurikulum'
+import { CategorySort as CS, CategorySortContext, useLocale } from 'kurikulum'
 import type { CategoryDef, CategoryItemDef } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
@@ -14,6 +14,7 @@ export interface CategorySortProps {
 }
 
 export function CategorySort({ id, categories, items, partialCredit, question, weight, children }: CategorySortProps): VNode {
+  const { t } = useLocale()
   return (
     <CS.Root id={id} categories={categories} items={items} partialCredit={partialCredit} weight={weight} aria-label={question}>
       {question && <legend class="text-base font-semibold text-text mb-4">{question}</legend>}
@@ -22,7 +23,7 @@ export function CategorySort({ id, categories, items, partialCredit, question, w
           <CategorySortItems />
           <CategorySortCategories />
           <CS.Submit class="mt-5 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-            Odeslat
+            {t('actions.submit')}
           </CS.Submit>
         </>
       )}
@@ -32,6 +33,7 @@ export function CategorySort({ id, categories, items, partialCredit, question, w
 
 function CategorySortItems(): VNode | null {
   const ctx = useContext(CategorySortContext)
+  const { t } = useLocale()
   if (!ctx) return null
 
   const unassigned = ctx.items.filter(item => !ctx.assignments.has(item.id))
@@ -39,8 +41,8 @@ function CategorySortItems(): VNode | null {
 
   return (
     <div class="mb-5">
-      <div class="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">Položky k roztřídění</div>
-      <div class="flex flex-wrap gap-2" role="list" aria-label="Items to sort">
+      <div class="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">{t('categorySort.items')}</div>
+      <div class="flex flex-wrap gap-2" role="list" aria-label={t('categorySort.items')}>
         {unassigned.map(item => (
           <CS.Item
             key={item.id}
@@ -57,6 +59,7 @@ function CategorySortItems(): VNode | null {
 
 function CategorySortCategories(): VNode | null {
   const ctx = useContext(CategorySortContext)
+  const { t } = useLocale()
   if (!ctx) return null
 
   return (
@@ -84,7 +87,7 @@ function CategorySortCategories(): VNode | null {
                 ))}
                 {assignedItems.length === 0 && !ctx.submitted && (
                   <div class="text-xs text-text-muted py-4 text-center select-none">
-                    Přetáhněte sem
+                    {t('categorySort.dropHere')}
                   </div>
                 )}
               </div>

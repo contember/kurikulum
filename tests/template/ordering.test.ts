@@ -281,7 +281,7 @@ describe('Ordering', () => {
     await arrangeCorrectly(container, rerender, ['A', 'B'])
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -314,7 +314,7 @@ describe('Ordering', () => {
     await arrangeCorrectly(container, rerender, ['B', 'A', 'C'])
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -338,7 +338,7 @@ describe('Ordering', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -364,7 +364,7 @@ describe('Ordering', () => {
     await flushEffects()
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -377,7 +377,7 @@ describe('Ordering', () => {
 
     // Submit button should be hidden
     const submitBtns = Array.from(container.getElementsByTagName('button')).filter(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )
     expect(submitBtns.length).toBe(0)
   })
@@ -436,7 +436,7 @@ describe('Ordering', () => {
     const buttons = container.getElementsByTagName('button')
     let submitBtn: HTMLButtonElement | null = null
     for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].textContent?.includes('Odeslat')) {
+      if (buttons[i].textContent?.includes('Submit')) {
         submitBtn = buttons[i] as HTMLButtonElement
         break
       }
@@ -481,7 +481,7 @@ describe('Ordering', () => {
     const buttons = container.getElementsByTagName('button')
     let submitBtn: HTMLButtonElement | null = null
     for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].textContent?.includes('Odeslat')) {
+      if (buttons[i].textContent?.includes('Submit')) {
         submitBtn = buttons[i] as HTMLButtonElement
         break
       }
@@ -494,7 +494,7 @@ describe('Ordering', () => {
     const allButtons = container.getElementsByTagName('button')
     let retryBtn: HTMLButtonElement | null = null
     for (let i = 0; i < allButtons.length; i++) {
-      if (allButtons[i].textContent?.includes('Zkusit')) {
+      if (allButtons[i].textContent?.includes('Try again')) {
         retryBtn = allButtons[i] as HTMLButtonElement
         break
       }
@@ -525,7 +525,7 @@ describe('Ordering', () => {
     expect(runtime.isComplete('q1')).toBe(false)
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()
@@ -556,7 +556,7 @@ describe('Ordering', () => {
     expect(container.textContent).not.toContain('Try again!')
 
     const submitBtn = Array.from(container.getElementsByTagName('button')).find(
-      b => b.textContent?.includes('Odeslat'),
+      b => b.textContent?.includes('Submit'),
     )!
     submitBtn.click()
     rerender()

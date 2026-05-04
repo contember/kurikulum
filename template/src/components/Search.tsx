@@ -1,4 +1,4 @@
-import { Search as S, useFocusTrap, useSearch } from 'kurikulum'
+import { Search as S, useFocusTrap, useLocale, useSearch } from 'kurikulum'
 import type { SearchEntry } from 'kurikulum'
 import type { VNode } from 'preact'
 import { useEffect, useRef } from 'preact/hooks'
@@ -18,13 +18,14 @@ export function Search({ index, children }: SearchProps): VNode {
 
 export function SearchButton(): VNode {
   const ctx = useSearch()
+  const { t } = useLocale()
 
   return (
     <button
       type="button"
       onClick={ctx.open}
       class="px-3 py-2 text-sm bg-bg-surface text-text border border-border rounded-default hover:bg-bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-      aria-label="Search course content (Ctrl+K)"
+      aria-label={t('search.toggle.aria')}
     >
       <span class="flex items-center gap-2">
         <svg
@@ -41,7 +42,7 @@ export function SearchButton(): VNode {
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <span class="hidden sm:inline">Search</span>
+        <span class="hidden sm:inline">{t('search.toggle')}</span>
       </span>
     </button>
   )
@@ -49,6 +50,7 @@ export function SearchButton(): VNode {
 
 export function SearchModal(): VNode | null {
   const ctx = useSearch()
+  const { t } = useLocale()
   const modalRef = useRef<HTMLDivElement>(null)
 
   useFocusTrap(modalRef, ctx.isOpen)
@@ -71,21 +73,21 @@ export function SearchModal(): VNode | null {
       <div
         class="relative z-10 w-full max-w-lg bg-bg-surface border border-border rounded-lg shadow-xl overflow-hidden"
         role="dialog"
-        aria-label="Search"
+        aria-label={t('search.modal.aria')}
         aria-modal="true"
       >
         <div class="p-4 border-b border-border">
           <S.Input
             class="w-full px-3 py-2 border border-border rounded-default bg-bg-surface text-text placeholder-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            placeholder="Search course content..."
+            placeholder={t('search.placeholder')}
           />
         </div>
 
         <SearchResultsList />
 
         <div class="px-4 py-2 border-t border-border text-xs text-text-secondary flex justify-between">
-          <span>Navigate with arrow keys</span>
-          <span>Esc to close</span>
+          <span>{t('search.hints.navigate')}</span>
+          <span>{t('search.hints.close')}</span>
         </div>
       </div>
     </div>
@@ -94,6 +96,7 @@ export function SearchModal(): VNode | null {
 
 function SearchResultsList(): VNode | null {
   const ctx = useSearch()
+  const { t } = useLocale()
 
   if (!ctx.query.trim()) return null
 
@@ -101,8 +104,8 @@ function SearchResultsList(): VNode | null {
     <div class="max-h-80 overflow-y-auto">
       <div aria-live="polite" role="status" class="sr-only">
         {ctx.results.length > 0
-          ? `${ctx.results.length} results found`
-          : `No results found for "${ctx.query}"`}
+          ? t('search.results.found', { count: ctx.results.length })
+          : t('search.results.none', { query: ctx.query })}
       </div>
       {ctx.results.length > 0
         ? (
@@ -116,7 +119,7 @@ function SearchResultsList(): VNode | null {
         )
         : (
           <div class="px-4 py-8 text-center text-text-secondary" role="status">
-            No results found for "{ctx.query}"
+            {t('search.results.none', { query: ctx.query })}
           </div>
         )}
     </div>
@@ -157,8 +160,8 @@ function Highlight({ text, query }: { text: string; query: string }): VNode {
   if (!query.trim()) return <>{text}</>
 
   // Normalize for matching but render original text
-  const normalizedText = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-  const normalizedQuery = query.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const normalizedText = text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  const normalizedQuery = query.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
   const index = normalizedText.indexOf(normalizedQuery)
   if (index === -1) return <>{text}</>

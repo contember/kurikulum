@@ -310,7 +310,7 @@ describe('FillBlank', () => {
     const buttons = container.getElementsByTagName('button')
     let submitBtn: HTMLButtonElement | null = null
     for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].textContent?.includes('Odeslat')) {
+      if (buttons[i].textContent?.includes('Submit')) {
         submitBtn = buttons[i] as HTMLButtonElement
         break
       }
@@ -346,7 +346,7 @@ describe('FillBlank', () => {
     const buttons = container.getElementsByTagName('button')
     let submitBtn: HTMLButtonElement | null = null
     for (let i = 0; i < buttons.length; i++) {
-      if (buttons[i].textContent?.includes('Odeslat')) {
+      if (buttons[i].textContent?.includes('Submit')) {
         submitBtn = buttons[i] as HTMLButtonElement
         break
       }
@@ -359,7 +359,7 @@ describe('FillBlank', () => {
     const allButtons = container.getElementsByTagName('button')
     let retryBtn: HTMLButtonElement | null = null
     for (let i = 0; i < allButtons.length; i++) {
-      if (allButtons[i].textContent?.includes('Zkusit')) {
+      if (allButtons[i].textContent?.includes('Try again')) {
         retryBtn = allButtons[i] as HTMLButtonElement
         break
       }

@@ -1,4 +1,4 @@
-import { CourseProvider, createAdapter, createXApiAdapter } from 'kurikulum'
+import { CourseProvider, createAdapter, createXApiAdapter, LocaleProvider } from 'kurikulum'
 import type { CourseConfig } from 'kurikulum'
 import type { ComponentType, VNode } from 'preact'
 import { render } from 'preact'
@@ -11,6 +11,7 @@ import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
 import { Page } from './components/Page.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
+import { dictionaries } from './i18n.ts'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
@@ -72,60 +73,70 @@ function Body({ id }: { id: string }): VNode | null {
   return <C />
 }
 
+function handleLocaleChange(next: string) {
+  if (typeof window === 'undefined') return
+  const url = new URL(window.location.href)
+  url.searchParams.set('lang', next)
+  window.history.replaceState(null, '', url.toString())
+  window.location.reload()
+}
+
 function App() {
   return (
-    <CourseProvider config={config} adapter={adapter}>
-      <Search index={searchIndex[locale] ?? []}>
-        <Glossary entries={glossary}>
-          <Notes>
-            <div class="h-screen flex flex-col bg-bg text-text font-sans">
-              <Course>
-                <SearchModal />
-                <GlossaryPanel />
-                <NotesPanel />
+    <LocaleProvider locale={locale} available={available} dictionaries={dictionaries} onChange={handleLocaleChange}>
+      <CourseProvider config={config} adapter={adapter}>
+        <Search index={searchIndex[locale] ?? []}>
+          <Glossary entries={glossary}>
+            <Notes>
+              <div class="h-screen flex flex-col bg-bg text-text font-sans">
+                <Course>
+                  <SearchModal />
+                  <GlossaryPanel />
+                  <NotesPanel />
 
-                <Page id="intro" completion="mount">
-                  <Body id="intro" />
-                </Page>
-                <Page id="theory" completion="timer" completionTimer={5}>
-                  <Body id="theory" />
-                </Page>
-                <Page id="media" completion="scroll">
-                  <Body id="media" />
-                </Page>
-                <Page id="standalone-quiz" completion="interactive">
-                  <Body id="standalone-quiz" />
-                </Page>
-                <Page id="advanced-quiz" completion="interactive">
-                  <Body id="advanced-quiz" />
-                </Page>
-                <Page id="assessment" completion="interactive">
-                  <Body id="assessment" />
-                </Page>
-                <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
-                  <Body id="bonus" />
-                </Page>
-                <Page id="scroll-page" completion="scroll">
-                  <Body id="scroll-page" />
-                </Page>
-                <Page id="summary" completion="mount" when={(rt) => rt.state.assessments['final-test']?.passed === true}>
-                  <Body id="summary" />
-                </Page>
-              </Course>
-              <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
-                <SearchButton />
-                <GlossaryToggle />
-                <NotesToggle />
-                <div class="ml-auto">
-                  <Navigation />
-                </div>
-              </footer>
-              <ResumeDialog />
-            </div>
-          </Notes>
-        </Glossary>
-      </Search>
-    </CourseProvider>
+                  <Page id="intro" completion="mount">
+                    <Body id="intro" />
+                  </Page>
+                  <Page id="theory" completion="timer" completionTimer={5}>
+                    <Body id="theory" />
+                  </Page>
+                  <Page id="media" completion="scroll">
+                    <Body id="media" />
+                  </Page>
+                  <Page id="standalone-quiz" completion="interactive">
+                    <Body id="standalone-quiz" />
+                  </Page>
+                  <Page id="advanced-quiz" completion="interactive">
+                    <Body id="advanced-quiz" />
+                  </Page>
+                  <Page id="assessment" completion="interactive">
+                    <Body id="assessment" />
+                  </Page>
+                  <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
+                    <Body id="bonus" />
+                  </Page>
+                  <Page id="scroll-page" completion="scroll">
+                    <Body id="scroll-page" />
+                  </Page>
+                  <Page id="summary" completion="mount" when={(rt) => rt.state.assessments['final-test']?.passed === true}>
+                    <Body id="summary" />
+                  </Page>
+                </Course>
+                <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
+                  <SearchButton />
+                  <GlossaryToggle />
+                  <NotesToggle />
+                  <div class="ml-auto">
+                    <Navigation />
+                  </div>
+                </footer>
+                <ResumeDialog />
+              </div>
+            </Notes>
+          </Glossary>
+        </Search>
+      </CourseProvider>
+    </LocaleProvider>
   )
 }
 

@@ -1,4 +1,4 @@
-import { Glossary as G, useGlossary } from 'kurikulum'
+import { Glossary as G, useGlossary, useLocale } from 'kurikulum'
 import type { GlossaryEntry } from 'kurikulum'
 import type { VNode } from 'preact'
 
@@ -25,16 +25,17 @@ export function GlossaryPanel(): VNode | null {
 
 function GlossaryPanelContent(): VNode {
   const ctx = useGlossary()
+  const { t } = useLocale()
 
   return (
     <>
       <div class="flex items-center justify-between p-4 border-b border-border">
-        <h2 class="text-lg font-semibold text-text">Slovníček</h2>
+        <h2 class="text-lg font-semibold text-text">{t('glossary.title')}</h2>
         <button
           type="button"
           onClick={ctx.close}
           class="p-1 text-text-secondary hover:text-text rounded-default focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          aria-label="Zavřít slovníček"
+          aria-label={t('glossary.toggle.close')}
         >
           ✕
         </button>
@@ -42,7 +43,7 @@ function GlossaryPanelContent(): VNode {
       <div class="p-4">
         <G.Search
           class="w-full px-3 py-2 border border-border rounded-default bg-bg-surface text-text placeholder-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          placeholder="Hledat pojem…"
+          placeholder={t('glossary.search.placeholder')}
         />
       </div>
       <dl class="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
@@ -71,16 +72,17 @@ export function GlossaryTerm({ term, children }: { term: string; children?: prea
 
 export function GlossaryToggle(): VNode {
   const ctx = useGlossary()
+  const { t } = useLocale()
 
   return (
     <button
       type="button"
       onClick={ctx.toggle}
       class="px-3 py-2 text-sm bg-bg-surface text-text border border-border rounded-default hover:bg-bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-      aria-label={ctx.isOpen ? 'Zavřít slovníček' : 'Otevřít slovníček'}
+      aria-label={ctx.isOpen ? t('glossary.toggle.close') : t('glossary.toggle.open')}
       aria-expanded={ctx.isOpen}
     >
-      Slovníček
+      {t('glossary.title')}
     </button>
   )
 }

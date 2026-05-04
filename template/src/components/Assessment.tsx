@@ -1,4 +1,4 @@
-import { Assessment as A } from 'kurikulum'
+import { Assessment as A, useLocale } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 
 export interface AssessmentProps {
@@ -11,6 +11,7 @@ export interface AssessmentProps {
 }
 
 export function Assessment({ id, passThreshold, maxAttempts, timeLimit, onTimeExpired, children }: AssessmentProps): VNode {
+  const { t } = useLocale()
   return (
     <A.Root id={id} passThreshold={passThreshold} maxAttempts={maxAttempts} timeLimit={timeLimit} onTimeExpired={onTimeExpired}>
       {timeLimit != null && (
@@ -23,24 +24,26 @@ export function Assessment({ id, passThreshold, maxAttempts, timeLimit, onTimeEx
         {children}
       </div>
       <A.Submit class="mt-8 px-6 py-3 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-        Odeslat
+        {t('actions.submit')}
       </A.Submit>
       <A.Status class="mt-4 outline-none">
-        {({ score, maxScore, passed }) => (
-          <>
-            <p class="text-sm">
-              Skóre: {score !== null && score % 1 !== 0 ? score.toFixed(1) : score}/{maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore}
-            </p>
-            {passed === true ? <p class="text-success font-medium">✓ Splněno!</p> : null}
-            {passed === false ? <p class="text-danger font-medium">✗ Nesplněno.</p> : null}
-          </>
-        )}
+        {({ score, maxScore, passed }) => {
+          const scoreText = score !== null && score % 1 !== 0 ? score.toFixed(1) : score
+          const maxText = maxScore % 1 !== 0 ? maxScore.toFixed(1) : maxScore
+          return (
+            <>
+              <p class="text-sm">{t('assess.score', { score: scoreText ?? '—', max: maxText })}</p>
+              {passed === true ? <p class="text-success font-medium">{t('assess.passed')}</p> : null}
+              {passed === false ? <p class="text-danger font-medium">{t('assess.failed')}</p> : null}
+            </>
+          )
+        }}
       </A.Status>
       <A.Retry class="mt-2 px-5 py-2.5 bg-text-secondary text-white text-sm font-medium rounded-default hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-        Zkusit znovu
+        {t('actions.retry')}
       </A.Retry>
       <A.AttemptsExhausted class="text-text-secondary text-sm">
-        Vyčerpány všechny pokusy.
+        {t('assess.exhausted')}
       </A.AttemptsExhausted>
       <A.History class="mt-4 text-sm text-text-secondary" />
     </A.Root>

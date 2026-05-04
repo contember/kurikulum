@@ -1,4 +1,4 @@
-import { Matching as M, MatchingContext } from 'kurikulum'
+import { Matching as M, MatchingContext, useLocale } from 'kurikulum'
 import type { MatchingSlotRenderProps } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { useContext } from 'preact/hooks'
@@ -12,6 +12,7 @@ export interface MatchingProps {
 }
 
 export function Matching({ id, question, weight, children }: MatchingProps): VNode {
+  const { t } = useLocale()
   return (
     <M.Root id={id} weight={weight} aria-label={question}>
       <M.Label class="text-base font-semibold text-text mb-4">{question}</M.Label>
@@ -19,7 +20,7 @@ export function Matching({ id, question, weight, children }: MatchingProps): VNo
       <div class="hidden">{children}</div>
       <MatchingUI />
       <M.Submit class="mt-5 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-        Odeslat
+        {t('actions.submit')}
       </M.Submit>
     </M.Root>
   )
@@ -31,6 +32,7 @@ export function MatchingPair({ prompt, response }: { prompt: string; response: s
 
 function MatchingUI(): VNode | null {
   const ctx = useContext(MatchingContext)
+  const { t } = useLocale()
   if (!ctx || ctx.pairs.length === 0) return null
 
   return (
@@ -56,7 +58,7 @@ function MatchingUI(): VNode | null {
                   ? <PlacedChip pairIndex={idx} selection={selection} isCorrect={isCorrect} />
                   : (
                     <span class="text-sm text-text-muted select-none">
-                      {hasSelectedResponse ? 'Klikněte pro přiřazení' : 'Přetáhněte odpověď…'}
+                      {hasSelectedResponse ? t('matching.click') : t('matching.drag')}
                     </span>
                   )}
             </M.Slot>
@@ -67,7 +69,7 @@ function MatchingUI(): VNode | null {
       {/* Response chip pool */}
       {ctx.unplacedResponses.length > 0 && !ctx.submitted && (
         <div class="mt-4 pt-4 border-t border-border/50">
-          <div class="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">Odpovědi</div>
+          <div class="text-xs font-medium text-text-muted uppercase tracking-wide mb-2">{t('matching.responses')}</div>
           <div class="flex flex-wrap gap-2" role="list">
             {ctx.unplacedResponses.map(response => (
               <M.ResponseChip

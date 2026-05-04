@@ -197,7 +197,7 @@ describe('MCQ', () => {
     rerender()
 
     const buttons = container.getElementsByTagName('button')
-    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -217,7 +217,7 @@ describe('MCQ', () => {
 
     const buttons = container.getElementsByTagName('button')
     expect(buttons.length).toBe(1)
-    expect(buttons[0].textContent).toBe('Odeslat')
+    expect(buttons[0].textContent).toBe('Submit')
   })
 })
 
@@ -327,7 +327,7 @@ describe('QuestionFeedback', () => {
     rerender()
 
     const buttons = container.getElementsByTagName('button')
-    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -366,7 +366,7 @@ describe('QuestionFeedback', () => {
     rerender()
 
     const buttons = container.getElementsByTagName('button')
-    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(buttons).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -403,7 +403,7 @@ describe('Assessment', () => {
     fireChange(inputs[2]) // q2: wrong (first option of q2)
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -437,7 +437,7 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -445,7 +445,7 @@ describe('Assessment', () => {
     rerender()
 
     expect(runtime.state.passed).toBe(true)
-    expect(container.textContent).toContain('Splněno!')
+    expect(container.textContent).toContain('Passed!')
   })
 
   it('shows failed when threshold not met', async () => {
@@ -472,7 +472,7 @@ describe('Assessment', () => {
     fireChange(inputs[2]) // q2: wrong
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -480,7 +480,7 @@ describe('Assessment', () => {
     rerender()
 
     expect(runtime.state.passed).toBe(false)
-    expect(container.textContent).toContain('Nesplněno.')
+    expect(container.textContent).toContain('Not passed.')
   })
 
   it('limits attempts with maxAttempts', async () => {
@@ -504,15 +504,15 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
     await flushEffects()
     rerender()
 
-    expect(container.textContent).toContain('Vyčerpány všechny pokusy')
-    const retryBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Zkusit znovu')
+    expect(container.textContent).toContain('No attempts remaining')
+    const retryBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Try again')
     expect(retryBtn).toBeUndefined()
   })
 
@@ -538,7 +538,7 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    let submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    let submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -548,7 +548,7 @@ describe('Assessment', () => {
     expect(runtime.state.attempts).toBe(1)
 
     // Retry button should appear
-    const retryBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Zkusit znovu')
+    const retryBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Try again')
     expect(retryBtn).toBeDefined()
     retryBtn!.click()
     rerender()
@@ -564,7 +564,7 @@ describe('Assessment', () => {
     fireChange(inputs[1])
     rerender()
 
-    submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -573,7 +573,7 @@ describe('Assessment', () => {
 
     expect(runtime.state.attempts).toBe(2)
     expect(runtime.state.passed).toBe(true)
-    expect(container.textContent).toContain('Splněno!')
+    expect(container.textContent).toContain('Passed!')
   })
 
   it('works with MultiSelect questions', async () => {
@@ -606,7 +606,7 @@ describe('Assessment', () => {
     fireChange(inputs[1]) // JavaScript
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -649,7 +649,7 @@ describe('Assessment', () => {
     fireChange(inputs[2])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -681,7 +681,7 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -737,7 +737,7 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -770,14 +770,14 @@ describe('Assessment', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
     await flushEffects()
     rerender()
 
-    expect(container.textContent).toContain('✓ Splněno!')
+    expect(container.textContent).toContain('✓ Passed!')
   })
 
   it('shows failure icon alongside color in assessment status', async () => {
@@ -801,14 +801,14 @@ describe('Assessment', () => {
     fireChange(inputs[1])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
     await flushEffects()
     rerender()
 
-    expect(container.textContent).toContain('✗ Nesplněno.')
+    expect(container.textContent).toContain('✗ Not passed.')
   })
 })
 
@@ -851,7 +851,7 @@ describe('MultiSelect a11y', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -892,7 +892,7 @@ describe('QuestionFeedback a11y', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -931,7 +931,7 @@ describe('QuestionFeedback a11y', () => {
     fireChange(inputs[1])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -965,7 +965,7 @@ describe('Weighted scoring', () => {
     fireChange(inputs[0])
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1002,7 +1002,7 @@ describe('Weighted scoring', () => {
     fireChange(inputs[2]) // q2: wrong (first option of q2)
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1039,7 +1039,7 @@ describe('Weighted scoring', () => {
     fireChange(inputs[2]) // q2: correct
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1076,7 +1076,7 @@ describe('MultiSelect partial credit', () => {
     fireChange(inputs[1]) // B correct
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1109,7 +1109,7 @@ describe('MultiSelect partial credit', () => {
     fireChange(inputs[0]) // A correct only
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1153,7 +1153,7 @@ describe('MultiSelect partial credit', () => {
     fireChange(inputs[3]) // D incorrect
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1186,7 +1186,7 @@ describe('MultiSelect partial credit', () => {
     fireChange(inputs[1]) // B incorrect
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 
@@ -1229,7 +1229,7 @@ describe('MultiSelect partial credit', () => {
     fireChange(inputs[2]) // q2: select first correct only → 0.5
     rerender()
 
-    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Odeslat')!
+    const submitBtn = Array.from(container.getElementsByTagName('button')).find(b => b.textContent === 'Submit')!
     submitBtn.click()
     rerender()
 

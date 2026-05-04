@@ -171,7 +171,7 @@ describe('Course', () => {
     const links = Array.from(container.getElementsByTagName('a'))
     const skipLink = links.find(a => a.getAttribute('href') === '#page-content')
     expect(skipLink).toBeDefined()
-    expect(skipLink!.textContent).toBe('Přeskočit na obsah')
+    expect(skipLink!.textContent).toBe('Skip to content')
   })
 
   it('hides pages that do not match current page', () => {

@@ -1,4 +1,4 @@
-import { Ordering as O, OrderingContext, OrderingItemContext } from 'kurikulum'
+import { Ordering as O, OrderingContext, OrderingItemContext, useLocale } from 'kurikulum'
 import type { ComponentChildren, VNode } from 'preact'
 import { toChildArray } from 'preact'
 import { useContext } from 'preact/hooks'
@@ -13,6 +13,7 @@ export interface OrderingProps {
 }
 
 export function Ordering({ id, question, weight, dragEnabled, children }: OrderingProps): VNode {
+  const { t } = useLocale()
   const allChildren = toChildArray(children)
   const items = allChildren.filter(c => typeof c === 'object' && c !== null && (c as any).type === OrderingItem)
   const rest = allChildren.filter(c => !items.includes(c))
@@ -25,7 +26,7 @@ export function Ordering({ id, question, weight, dragEnabled, children }: Orderi
       </O.List>
       {rest}
       <O.Submit class="mt-5 px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-default hover:bg-primary-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors">
-        Odeslat
+        {t('actions.submit')}
       </O.Submit>
     </O.Root>
   )
@@ -80,6 +81,7 @@ function ItemCorrectIcon(): VNode | null {
 
 function ItemControls(): VNode | null {
   const itemCtx = useContext(OrderingItemContext)
+  const { t } = useLocale()
   if (!itemCtx) return null
 
   return (
@@ -103,7 +105,7 @@ function ItemControls(): VNode | null {
           onClick={itemCtx.moveUp}
           disabled={itemCtx.disabled || itemCtx.isFirst}
           aria-disabled={itemCtx.disabled || itemCtx.isFirst}
-          aria-label="Move up"
+          aria-label={t('ordering.up')}
           class="w-6 h-5 flex items-center justify-center rounded-t border border-border bg-surface text-text-muted hover:bg-bg-muted hover:text-text disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-colors"
         >
           <svg class="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -115,7 +117,7 @@ function ItemControls(): VNode | null {
           onClick={itemCtx.moveDown}
           disabled={itemCtx.disabled || itemCtx.isLast}
           aria-disabled={itemCtx.disabled || itemCtx.isLast}
-          aria-label="Move down"
+          aria-label={t('ordering.down')}
           class="w-6 h-5 flex items-center justify-center rounded-b border border-border bg-surface text-text-muted hover:bg-bg-muted hover:text-text disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 transition-colors"
         >
           <svg class="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
