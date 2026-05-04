@@ -1,101 +1,118 @@
 # Course Setup
 
-Configure and compose a course in `src/course.tsx`.
+Compose a course in `src/course.tsx`. The framework provides an opinionated `<KurikulumApp>` root that wires the LocaleProvider, CourseProvider, content bundle context, and a default adapter — so the entry file stays tiny.
 
-## Minimal course.tsx
+## Minimal `course.tsx`
 
 ```tsx
-import { CourseProvider, createAdapter } from 'kurikulum'
 import type { CourseConfig } from 'kurikulum'
+import { KurikulumApp } from 'kurikulum/auto'
 import { render } from 'preact'
-import { Course } from './components/Course.tsx'
-import { Navigation } from './components/Navigation.tsx'
 import { Page } from './components/Page.tsx'
-import { MyIntro } from './pages/MyIntro.tsx'
-import { MyQuiz } from './pages/MyQuiz.tsx'
+import { DefaultLayout } from './layout.tsx'
 import './styles.css'
 
-const adapter = createAdapter('standalone')
-
-const config: CourseConfig = {
-  title: 'My Course',
-  pages: ['intro', 'quiz'],
+const config: Omit<CourseConfig, 'title'> = {
+  pages: ['intro', 'theory', 'quiz'],
+  version: '1',
 }
 
 function App() {
   return (
-    <CourseProvider config={config} adapter={adapter}>
-      <div class="h-screen flex flex-col bg-bg text-text font-sans">
-        <Course>
-          <Page id="intro" completion="mount">
-            <MyIntro />
-          </Page>
-          <Page id="quiz" completion="interactive">
-            <MyQuiz />
-          </Page>
-        </Course>
-        <footer class="flex items-center p-4 border-t border-border bg-bg-surface">
-          <div class="ml-auto">
-            <Navigation />
-          </div>
-        </footer>
-      </div>
-    </CourseProvider>
+    <KurikulumApp config={config}>
+      <DefaultLayout>
+        <Page id="intro" completion="mount" />
+        <Page id="theory" completion="timer" completionTimer={10} />
+        <Page id="quiz" completion="interactive" />
+      </DefaultLayout>
+    </KurikulumApp>
   )
 }
 
 render(<App />, document.getElementById('app')!)
 ```
 
-## Full course.tsx (all features)
+That's it. **Page bodies, course title, and glossary entries come from `src/content/<locale>/index.ts`.** See `docs/i18n.md` for the content layout convention.
+
+## What `<KurikulumApp>` does for you
+
+- **Adapter**: reads `import.meta.env.KURIKULUM_TARGET` (set by the kurikulum() Vite plugin) and creates the matching adapter (`standalone`, `scorm-1.2`, `scorm-2004`, `cmi5`, `xapi`). xAPI config is parsed from URL query params.
+- **Initial locale**: URL `?lang=…` → `adapter.getLanguagePreference()` → `navigator.language` → `defaultLocale` from `virtual:kurikulum-content`.
+- **`LocaleProvider`** with `coreDictCs` / `coreDictEn` chrome dictionaries.
+- **`CourseProvider`** with the merged config (title is filled from the active bundle if you don't pass one).
+- **Content bundle context**: components below — including `<Page>` — read `bundles[activeLocale]` automatically.
+- **Locale-change handler**: persists to the adapter (`cmi.*_preference.language` or localStorage) and pushes `?lang=` to the URL via `history.replaceState`.
+
+## Page declarations
+
+Each `<Page>` declares its **structural** properties (id, completion strategy, conditional visibility). The body for the page comes from the active locale's content bundle — `<Page id="intro" />` with no children auto-renders `bundles[locale].pages.intro`.
 
 ```tsx
-<CourseProvider config={config} adapter={adapter}>
-  <Search index={searchIndex}>
-    <Glossary entries={glossaryEntries}>
-      <Notes>
-        <div class="h-screen flex flex-col bg-bg text-text font-sans">
-          <Course>
-            <SearchModal />
-            <GlossaryPanel />
-            <NotesPanel />
-
-            <Page id="intro" completion="mount">...</Page>
-            <Page id="theory" completion="timer" completionTimer={5}>...</Page>
-            <Page id="quiz" completion="interactive">...</Page>
-          </Course>
-          <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
-            <SearchButton />
-            <GlossaryToggle />
-            <NotesToggle />
-            <div class="ml-auto">
-              <Navigation />
-            </div>
-          </footer>
-          <ResumeDialog />
-        </div>
-      </Notes>
-    </Glossary>
-  </Search>
-</CourseProvider>
+<Page id="intro" completion="mount" />
+<Page id="theory" completion="timer" completionTimer={10} />
+<Page id="long-text" completion="scroll" />
+<Page id="quiz" completion="interactive" />
+<Page
+  id="bonus"
+  completion="mount"
+  when={(rt) => rt.state.assessments['quiz']?.passed === true}
+/>
 ```
 
-Provider nesting order: `CourseProvider > Search > Glossary > Notes > layout`
+You can still pass children to override the auto-resolved body (e.g. for one-off custom layouts):
 
-**Note:** `ResumeDialog` must be rendered as a sibling of `<Course>`, not a child. `<Course>` uses `overflow-y:auto`, and some LMS iframes clip `position: fixed` children inside scroll containers.
+```tsx
+<Page id="custom" completion="mount">
+  <MyOneOffComponent />
+</Page>
+```
 
 ## Suspend Data Versioning
 
 When changing course structure (adding/removing pages), bump `version` and handle migration:
 
-```typescript
-const config: CourseConfig = {
-  title: 'My Course',
+```tsx
+const config: Omit<CourseConfig, 'title'> = {
   pages: ['intro', 'new-page', 'quiz'],
   version: '2',
   onMigrate(old, oldVersion) {
-    if (oldVersion === '1') return old // Compatible
+    if (oldVersion === '1') return old // Compatible — keep state
     return null // Reset
   },
 }
 ```
+
+## Overriding `<KurikulumApp>` defaults
+
+Every default is a prop you can override:
+
+| Prop                                      | Default                                               |
+| ----------------------------------------- | ----------------------------------------------------- |
+| `adapter`                                 | `createDefaultAdapter()` (env-driven)                 |
+| `dictionaries`                            | `{ cs: coreDictCs, en: coreDictEn }`                  |
+| `bundles` / `available` / `defaultLocale` | `virtual:kurikulum-content`                           |
+| `initialLocale`                           | `detectLocale({ available, defaultLocale, adapter })` |
+| `onLocaleChange`                          | `(next) => persistLocaleChange(adapter, next)`        |
+| `fallbackLocale`                          | `defaultLocale`                                       |
+| `fallbackDictLocale`                      | `'en'`                                                |
+
+Need full control? Use the manual variant from the main barrel and compose providers yourself:
+
+```tsx
+import { KurikulumApp } from 'kurikulum'                    // manual API
+import { available, bundles, defaultLocale } from 'virtual:kurikulum-content'
+
+<KurikulumApp
+  config={config}
+  dictionaries={myDictionaries}
+  bundles={bundles}
+  available={available}
+  defaultLocale={defaultLocale}
+>
+  …
+</KurikulumApp>
+```
+
+## Custom layout
+
+`<DefaultLayout>` ships with the template (`src/layout.tsx`) and provides Search/Glossary/Notes panels, footer with Navigation, the resume dialog, and the dev locale switcher. Replace it with anything that mounts a `<Course>` and consumes the same context (see `template/src/layout.tsx` for a starting point).
