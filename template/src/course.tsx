@@ -1,9 +1,7 @@
-import { KurikulumApp } from 'kurikulum'
 import type { CourseConfig } from 'kurikulum'
+import { KurikulumApp } from 'kurikulum/auto'
 import { render } from 'preact'
-import { available, bundles, defaultLocale } from 'virtual:kurikulum-content'
 import { Page } from './components/Page.tsx'
-import { dictionaries } from './i18n.ts'
 import { DefaultLayout } from './layout.tsx'
 import './styles.css'
 
@@ -17,7 +15,7 @@ const config: Omit<CourseConfig, 'title'> = {
 
 function App() {
   return (
-    <KurikulumApp config={config} dictionaries={dictionaries} bundles={bundles} available={available} defaultLocale={defaultLocale}>
+    <KurikulumApp config={config}>
       <DefaultLayout>
         <Page id="intro" completion="mount" />
         <Page id="theory" completion="timer" completionTimer={5} />

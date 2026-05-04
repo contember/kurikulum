@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./auto": "./src/app/auto.tsx",
     "./vite": "./src/vite/index.ts",
     "./scorm/package": "./src/scorm/package.ts",
     "./cmi5/package": "./src/cmi5/package.ts"

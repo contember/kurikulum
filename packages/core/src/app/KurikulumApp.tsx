@@ -15,9 +15,9 @@ export interface KurikulumAppProps {
   dictionaries: Record<string, Dict>
   /** Per-locale content bundles produced by `virtual:kurikulum-content`. */
   bundles: Record<string, ContentBundle>
-  /** Locale codes available in this build (`virtual:kurikulum-content`). */
+  /** Locale codes available in this build. */
   available: string[]
-  /** Build-time default locale (`virtual:kurikulum-content`). */
+  /** Build-time default locale. */
   defaultLocale: string
   /** Fallback locale when the active bundle is missing a page. Defaults to defaultLocale. */
   fallbackLocale?: string
@@ -33,13 +33,20 @@ export interface KurikulumAppProps {
 }
 
 /**
- * Top-level Kurikulum app shell. Wires:
- *   - LocaleProvider (with detection chain)
- *   - CourseProvider (env-driven adapter by default)
- *   - ContentBundleContext (active per-locale bundle, follows useLocale().locale)
+ * Top-level Kurikulum app shell — manual API. Wires LocaleProvider +
+ * CourseProvider + ContentBundleContext. Most apps want `kurikulum/auto`
+ * which pre-wires bundles/available/defaultLocale from the
+ * `virtual:kurikulum-content` module and provides core dict defaults.
  *
- * Replace any default by passing the matching prop. For maximum control you
- * can compose LocaleProvider + CourseProvider + ContentBundleContext yourself.
+ * @example
+ *   import { KurikulumApp } from 'kurikulum'
+ *   import * as content from 'virtual:kurikulum-content'
+ *
+ *   <KurikulumApp config={config} dictionaries={dictionaries} {...content}>
+ *     <DefaultLayout>
+ *       <Page id="intro" completion="mount" />
+ *     </DefaultLayout>
+ *   </KurikulumApp>
  */
 export function KurikulumApp(props: KurikulumAppProps): VNode {
   const adapterRef = useRef<DeliveryAdapter | null>(null)
