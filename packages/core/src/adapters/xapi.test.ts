@@ -378,7 +378,7 @@ describe('createXApiAdapter', () => {
       adapter.terminate()
       await new Promise(r => setTimeout(r, 50))
 
-      const queue = localStorage.getItem('tabule:xapi:queue')
+      const queue = localStorage.getItem('kurikulum:xapi:queue')
       expect(queue).not.toBeNull()
 
       const statements = JSON.parse(queue!)
@@ -388,7 +388,7 @@ describe('createXApiAdapter', () => {
     it('retries offline queue on next flush', async () => {
       // First: save some statements to offline queue
       localStorage.setItem(
-        'tabule:xapi:queue',
+        'kurikulum:xapi:queue',
         JSON.stringify([
           {
             actor: { objectType: 'Agent' },
@@ -417,8 +417,35 @@ describe('createXApiAdapter', () => {
 
       // Queue should be cleared after successful send
       await new Promise(r => setTimeout(r, 50))
-      const queue = localStorage.getItem('tabule:xapi:queue')
+      const queue = localStorage.getItem('kurikulum:xapi:queue')
       expect(queue).toBeNull()
+    })
+
+    it('migrates statements from the legacy tabule:xapi:queue key', async () => {
+      localStorage.setItem(
+        'tabule:xapi:queue',
+        JSON.stringify([
+          {
+            actor: { objectType: 'Agent' },
+            verb: { id: 'legacy', display: { 'en-US': 'legacy' } },
+            object: { id: 'test', definition: { type: 'test' } },
+            timestamp: new Date().toISOString(),
+          },
+        ]),
+      )
+
+      const { fetchFn, calls } = createMockFetch({ ok: true })
+      const adapter = createXApiAdapter(createConfig(), fetchFn)
+      adapter.terminate()
+      await new Promise(r => setTimeout(r, 50))
+
+      // Legacy key should have been removed during migration
+      expect(localStorage.getItem('tabule:xapi:queue')).toBeNull()
+
+      // Legacy statement should have been included in the flush
+      const statementCalls = calls.filter(c => c.url.includes('/statements'))
+      const sent: XApiStatement[] = JSON.parse(statementCalls[statementCalls.length - 1].init.body as string)
+      expect(sent.map(s => s.verb.id)).toContain('legacy')
     })
   })
 

@@ -16,7 +16,7 @@ function escapeXml(str: string): string {
 }
 
 export function generateCmi5Manifest(options: Cmi5ManifestOptions): string {
-  const identifier = options.identifier ?? 'tabule-course'
+  const identifier = options.identifier ?? 'kurikulum-course'
   const title = escapeXml(options.title)
   const activityId = escapeXml(options.activityId)
   const launchUrl = escapeXml(options.launchUrl ?? 'index.html')

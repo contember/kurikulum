@@ -68,7 +68,7 @@ describe('generateCmi5Manifest', () => {
       files: [],
     })
 
-    expect(xml).toContain('id="tabule-course-au"')
+    expect(xml).toContain('id="kurikulum-course-au"')
     expect(xml).toContain('launchUrl="index.html"')
   })
 })

@@ -53,7 +53,8 @@ const ACTIVITY_TYPES = {
   interaction: 'http://adlnet.gov/expapi/activities/cmi.interaction',
 } as const
 
-const OFFLINE_QUEUE_KEY = 'tabule:xapi:queue'
+const OFFLINE_QUEUE_KEY = 'kurikulum:xapi:queue'
+const LEGACY_OFFLINE_QUEUE_KEY = 'tabule:xapi:queue'
 const BATCH_INTERVAL_MS = 10_000
 
 function formatDuration(ms: number): string {
@@ -129,7 +130,14 @@ export function createXApiAdapter(config: XApiConfig, fetchFn?: typeof fetch): D
   function loadOfflineQueue(): XApiStatement[] {
     try {
       const raw = localStorage.getItem(OFFLINE_QUEUE_KEY)
-      return raw ? JSON.parse(raw) : []
+      if (raw) return JSON.parse(raw)
+      // One-shot migration from the legacy key.
+      const legacy = localStorage.getItem(LEGACY_OFFLINE_QUEUE_KEY)
+      if (legacy) {
+        localStorage.removeItem(LEGACY_OFFLINE_QUEUE_KEY)
+        return JSON.parse(legacy)
+      }
+      return []
     } catch {
       return []
     }

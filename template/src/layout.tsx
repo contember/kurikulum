@@ -14,10 +14,30 @@ export interface DefaultLayoutProps {
 }
 
 /**
- * Opinionated chrome layout: full-height column with the page content
- * scrolling above a footer of Search/Glossary/Notes toggles and Navigation.
- * Glossary entries and the search index are pulled from the active locale's
- * content bundle / virtual:search-index.
+ * Opinionated chrome layout. Mounts inside `<KurikulumApp>` and provides:
+ *   - `<Search>` + `<SearchButton>` + `<SearchModal>` (Ctrl+K), seeded with
+ *     the active locale's slice of `virtual:search-index`.
+ *   - `<Glossary>` + `<GlossaryPanel>` + `<GlossaryToggle>`, seeded from the
+ *     active content bundle's `glossary`.
+ *   - `<Notes>` + `<NotesPanel>` + `<NotesToggle>`.
+ *   - `<Course>` host with full-height scrolling content, the children you
+ *     pass in (typically a list of `<Page>` declarations), then a footer
+ *     with the search/glossary/notes toggles and `<Navigation>`.
+ *   - `<ResumeDialog>` (sibling of `<Course>` so it isn't clipped by LMS
+ *     iframe overflow).
+ *   - `<DevLocaleBar>` floating switcher — visible only in `vite serve` +
+ *     auto locale mode.
+ *
+ * Replace it with your own layout when you want a different chrome — start
+ * by copying this file as a template and swap the wrapping components.
+ *
+ * @example
+ *   <KurikulumApp config={config}>
+ *     <DefaultLayout>
+ *       <Page id="intro" completion="mount" />
+ *       <Page id="quiz" completion="interactive" />
+ *     </DefaultLayout>
+ *   </KurikulumApp>
  */
 export function DefaultLayout({ children }: DefaultLayoutProps): VNode {
   const { locale } = useLocale()
