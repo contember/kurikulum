@@ -1,7 +1,9 @@
-import type { Plugin, PluginOption } from 'vite'
+import type { PluginOption } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 import { createCmi5Package } from '../cmi5/package.ts'
 import { createScormPackage } from '../scorm/package.ts'
+import { contentPlugin, type ContentPluginOptions } from './content-plugin.ts'
+import { discoverContent } from './content-utils.ts'
 import { searchIndexPlugin, type SearchIndexPluginOptions } from './search-index-plugin.ts'
 
 export type KurikulumTarget = 'standalone' | 'scorm-1.2' | 'scorm-2004' | 'cmi5' | 'xapi'
@@ -24,10 +26,20 @@ export interface KurikulumCmi5Options {
 export interface KurikulumPluginOptions {
   /** Build target. Defaults to process.env.KURIKULUM_TARGET ?? 'standalone'. */
   target?: KurikulumTarget
-  /** Output directory. Defaults to `dist/${target}`. */
+  /**
+   * Active locale, or 'auto' to load every locale (multi-locale dev mode).
+   * Defaults: when running `vite` (serve) → 'auto'; when running `vite build` →
+   * process.env.KURIKULUM_LOCALE or the first locale found under contentDir.
+   */
+  locale?: string
+  /** Content directory relative to Vite root. Default 'src/content'. */
+  contentDir?: string
+  /** Output directory. Defaults to `dist/${target}` or `dist/${target}-${locale}` when an explicit locale is set. */
   outDir?: string
   /** Search-index plugin options. Pass false to disable. */
   search?: SearchIndexPluginOptions | false
+  /** Content plugin options. Pass false to disable. */
+  content?: Omit<ContentPluginOptions, 'locale' | 'contentDir'> | false
   /** Inline assets into a single index.html. Defaults to true (Kurikulum builds are self-contained). */
   singleFile?: boolean
   /** SCORM packaging. Auto-enabled for scorm-1.2 / scorm-2004. Pass false to skip. */
@@ -38,40 +50,58 @@ export interface KurikulumPluginOptions {
   env?: Record<string, string>
   /** xAPI activity ID. Defaults to process.env.KURIKULUM_XAPI_ACTIVITY_ID. */
   xapiActivityId?: string
+  /** Override Vite root used for content discovery. Defaults to process.cwd(). */
+  root?: string
 }
 
 /**
  * One-stop Vite plugin that wires up everything Kurikulum needs:
- *   - search-index virtual module
+ *   - virtual:kurikulum-content (per-locale content bundles, tree-shaken in single-locale builds)
+ *   - virtual:search-index (per-locale search entries)
  *   - single-file bundling for SCORM/cmi5 targets
- *   - import.meta.env.KURIKULUM_TARGET / KURIKULUM_XAPI_ACTIVITY_ID defines
- *   - per-target outDir
+ *   - import.meta.env defines (KURIKULUM_TARGET, KURIKULUM_LOCALE, KURIKULUM_LOCALES,
+ *     KURIKULUM_AVAILABLE_LOCALES, KURIKULUM_DEV_LOCALE_SWITCHER, KURIKULUM_XAPI_ACTIVITY_ID)
+ *   - per-target/locale outDir
  *   - post-build SCORM/cmi5 zip packaging
- *
- * Usage:
- *   import { kurikulum } from 'kurikulum/vite'
- *   export default defineConfig({ plugins: [preact(), kurikulum()] })
  */
 export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] {
   const target = (options.target ?? process.env.KURIKULUM_TARGET ?? 'standalone') as KurikulumTarget
-  const outDir = options.outDir ?? `dist/${target}`
   const xapiActivityId = options.xapiActivityId
     ?? process.env.KURIKULUM_XAPI_ACTIVITY_ID
     ?? 'https://example.com/courses/default'
+  const contentDirInput = options.contentDir ?? 'src/content'
+  const root = options.root ?? process.cwd()
+
+  const isBuild = process.argv.some(a => a === 'build')
+  const explicitLocale = options.locale ?? process.env.KURIKULUM_LOCALE
+
+  const info = discoverContent(root, contentDirInput)
+  let locale: string
+  if (explicitLocale) {
+    locale = explicitLocale
+  } else {
+    locale = isBuild ? (info.locales[0] ?? '') : 'auto'
+  }
+
+  if (locale && locale !== 'auto' && !info.locales.includes(locale)) {
+    console.warn(`[kurikulum] requested locale '${locale}' not found at ${info.absolute}; available: [${info.locales.join(', ')}]`)
+  }
+
+  const activeLocales = locale === 'auto'
+    ? info.locales
+    : info.locales.includes(locale)
+    ? [locale]
+    : []
+  const devSwitcher = !isBuild && locale === 'auto' && info.locales.length > 1
 
   const isScorm = target === 'scorm-1.2' || target === 'scorm-2004'
   const isCmi5 = target === 'cmi5'
   const wantsSingleFile = options.singleFile ?? true
 
+  const outDirSuffix = explicitLocale ? `${target}-${explicitLocale}` : target
+  const outDir = options.outDir ?? `dist/${outDirSuffix}`
+
   const plugins: PluginOption[] = []
-
-  if (options.search !== false) {
-    plugins.push(searchIndexPlugin(options.search ?? {}) as Plugin)
-  }
-
-  if (wantsSingleFile) {
-    plugins.push(viteSingleFile())
-  }
 
   plugins.push({
     name: 'kurikulum-config',
@@ -80,6 +110,10 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
         define: {
           'import.meta.env.KURIKULUM_TARGET': JSON.stringify(target),
           'import.meta.env.KURIKULUM_XAPI_ACTIVITY_ID': JSON.stringify(xapiActivityId),
+          'import.meta.env.KURIKULUM_LOCALE': JSON.stringify(locale),
+          'import.meta.env.KURIKULUM_LOCALES': JSON.stringify(activeLocales),
+          'import.meta.env.KURIKULUM_AVAILABLE_LOCALES': JSON.stringify(info.locales),
+          'import.meta.env.KURIKULUM_DEV_LOCALE_SWITCHER': JSON.stringify(devSwitcher),
           ...mapDefine(options.env ?? {}),
         },
         build: { outDir },
@@ -87,10 +121,23 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
     },
   })
 
+  if (options.content !== false) {
+    plugins.push(contentPlugin({ contentDir: contentDirInput, locale, ...(options.content ?? {}) }))
+  }
+
+  if (options.search !== false) {
+    plugins.push(searchIndexPlugin({ contentDir: contentDirInput, ...(options.search ?? {}) }))
+  }
+
+  if (wantsSingleFile) {
+    plugins.push(viteSingleFile())
+  }
+
   if (isScorm && options.scorm !== false) {
     const scorm = options.scorm ?? {}
     const title = scorm.title ?? 'Course'
-    const outputZip = scorm.outputZip ?? defaultZipPath(outDir, title)
+    const zipName = explicitLocale ? `${title}-${explicitLocale}` : title
+    const outputZip = scorm.outputZip ?? defaultZipPath(outDir, zipName)
 
     plugins.push({
       name: 'kurikulum-scorm-package',
@@ -110,7 +157,8 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
   if (isCmi5 && options.cmi5 !== false) {
     const cmi5 = options.cmi5 ?? {}
     const title = cmi5.title ?? 'Course'
-    const outputZip = cmi5.outputZip ?? defaultZipPath(outDir, `${title}-cmi5`)
+    const zipName = explicitLocale ? `${title}-${explicitLocale}-cmi5` : `${title}-cmi5`
+    const outputZip = cmi5.outputZip ?? defaultZipPath(outDir, zipName)
     const activityId = cmi5.activityId ?? xapiActivityId
 
     plugins.push({

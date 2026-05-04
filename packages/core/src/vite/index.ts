@@ -1,3 +1,4 @@
+export { contentPlugin, type ContentPluginOptions } from './content-plugin.ts'
 export {
   kurikulum,
   type KurikulumCmi5Options,
@@ -5,4 +6,4 @@ export {
   type KurikulumScormOptions,
   type KurikulumTarget,
 } from './kurikulum-plugin.ts'
-export { extractSearchEntries, type SearchEntry, searchIndexPlugin, type SearchIndexPluginOptions } from './search-index-plugin.ts'
+export { extractLocaleEntries, type SearchEntry, type SearchIndex, searchIndexPlugin, type SearchIndexPluginOptions } from './search-index-plugin.ts'

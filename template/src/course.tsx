@@ -1,6 +1,8 @@
 import { CourseProvider, createAdapter, createXApiAdapter } from 'kurikulum'
 import type { CourseConfig } from 'kurikulum'
+import type { ComponentType, VNode } from 'preact'
 import { render } from 'preact'
+import { available, bundles, defaultLocale } from 'virtual:kurikulum-content'
 import searchIndex from 'virtual:search-index'
 import { Course } from './components/Course.tsx'
 import { Glossary, GlossaryPanel, GlossaryToggle } from './components/Glossary.tsx'
@@ -9,19 +11,26 @@ import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
 import { Page } from './components/Page.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
-import { glossary, title } from './content/cs/index.ts'
-import { AdvancedQuizPage } from './content/cs/pages/AdvancedQuizPage.tsx'
-import { AssessmentPage } from './content/cs/pages/AssessmentPage.tsx'
-import { BonusPage } from './content/cs/pages/BonusPage.tsx'
-import { IntroPage } from './content/cs/pages/IntroPage.tsx'
-import { MediaPage } from './content/cs/pages/MediaPage.tsx'
-import { QuickQuizPage } from './content/cs/pages/QuickQuizPage.tsx'
-import { ScrollPage } from './content/cs/pages/ScrollPage.tsx'
-import { SummaryPage } from './content/cs/pages/SummaryPage.tsx'
-import { TheoryPage } from './content/cs/pages/TheoryPage.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
+
+function pickInitialLocale(): string {
+  if (typeof window !== 'undefined') {
+    const fromUrl = new URLSearchParams(window.location.search).get('lang')
+    if (fromUrl && available.includes(fromUrl)) return fromUrl
+  }
+  return available.includes(defaultLocale) ? defaultLocale : available[0] ?? ''
+}
+
+const locale = pickInitialLocale()
+const bundle = bundles[locale]
+
+if (!bundle) {
+  throw new Error(`[kurikulum] no content bundle for locale '${locale}'. Available: [${available.join(', ')}]`)
+}
+
+const { title, glossary, pages } = bundle
 
 function createAdapterFromTarget() {
   if (target === 'xapi') {
@@ -52,10 +61,21 @@ const config: CourseConfig = {
   },
 }
 
+function Body({ id }: { id: string }): VNode | null {
+  const C = pages[id] as ComponentType | undefined
+  if (!C) {
+    if (import.meta.env.DEV) {
+      return <div class="bg-danger/20 text-danger p-4 rounded">⚠ no "{id}" page in locale "{locale}"</div>
+    }
+    return null
+  }
+  return <C />
+}
+
 function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
-      <Search index={searchIndex}>
+      <Search index={searchIndex[locale] ?? []}>
         <Glossary entries={glossary}>
           <Notes>
             <div class="h-screen flex flex-col bg-bg text-text font-sans">
@@ -65,31 +85,31 @@ function App() {
                 <NotesPanel />
 
                 <Page id="intro" completion="mount">
-                  <IntroPage />
+                  <Body id="intro" />
                 </Page>
                 <Page id="theory" completion="timer" completionTimer={5}>
-                  <TheoryPage />
+                  <Body id="theory" />
                 </Page>
                 <Page id="media" completion="scroll">
-                  <MediaPage />
+                  <Body id="media" />
                 </Page>
                 <Page id="standalone-quiz" completion="interactive">
-                  <QuickQuizPage />
+                  <Body id="standalone-quiz" />
                 </Page>
                 <Page id="advanced-quiz" completion="interactive">
-                  <AdvancedQuizPage />
+                  <Body id="advanced-quiz" />
                 </Page>
                 <Page id="assessment" completion="interactive">
-                  <AssessmentPage />
+                  <Body id="assessment" />
                 </Page>
                 <Page id="bonus" completion="mount" when={(rt) => rt.state.assessments['quick-quiz']?.passed === true}>
-                  <BonusPage />
+                  <Body id="bonus" />
                 </Page>
                 <Page id="scroll-page" completion="scroll">
-                  <ScrollPage />
+                  <Body id="scroll-page" />
                 </Page>
                 <Page id="summary" completion="mount" when={(rt) => rt.state.assessments['final-test']?.passed === true}>
-                  <SummaryPage />
+                  <Body id="summary" />
                 </Page>
               </Course>
               <footer class="flex items-center gap-4 p-4 border-t border-border bg-bg-surface">
