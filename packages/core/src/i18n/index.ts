@@ -1,3 +1,4 @@
 export { LocaleContext, LocaleProvider, type LocaleProviderProps, useLocale } from './context.tsx'
 export { coreDictCs, coreDictEn } from './dicts.ts'
+export { LocaleSwitcher, type LocaleSwitcherProps } from './Switcher.tsx'
 export type { Dict, LocaleContextValue } from './types.ts'
