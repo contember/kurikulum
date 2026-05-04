@@ -116,6 +116,7 @@ export type { PackageOptions } from './scorm/package.ts'
 // Vite plugins (runtime values are Node-only; import from 'kurikulum/vite'
 // in build scripts / vite.config so that node:fs/node:path don't leak into
 // the browser bundle)
+export type { KurikulumCmi5Options, KurikulumPluginOptions, KurikulumScormOptions, KurikulumTarget } from './vite/kurikulum-plugin.ts'
 export type { SearchIndexPluginOptions } from './vite/search-index-plugin.ts'
 
 // cmi5 packaging (types + manifest only; createCmi5Package is Node-only,

@@ -13,13 +13,13 @@
     "happy-dom": "^20.8.9",
     "jszip": "^3.10.1",
     "tailwindcss": "^4.0.0",
-    "vite": "^8.0.0",
-    "vite-plugin-singlefile": "^2.0.0"
+    "vite": "^8.0.0"
   },
   "scripts": {
     "dev": "bunx --bun vite",
     "build": "bunx --bun vite build",
-    "build:scorm": "KURIKULUM_TARGET=scorm-1.2 bunx --bun vite build && bun run package",
-    "package": "bun node_modules/kurikulum/src/scorm/package.ts dist/scorm-1.2 Course dist/Course.zip"
+    "build:scorm": "KURIKULUM_TARGET=scorm-1.2 bunx --bun vite build",
+    "build:scorm-2004": "KURIKULUM_TARGET=scorm-2004 bunx --bun vite build",
+    "build:cmi5": "KURIKULUM_TARGET=cmi5 bunx --bun vite build"
   }
 }

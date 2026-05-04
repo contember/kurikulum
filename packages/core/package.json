@@ -5,8 +5,9 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./vite": "./src/vite/search-index-plugin.ts",
-    "./scorm/package": "./src/scorm/package.ts"
+    "./vite": "./src/vite/index.ts",
+    "./scorm/package": "./src/scorm/package.ts",
+    "./cmi5/package": "./src/cmi5/package.ts"
   },
   "files": ["src"],
   "repository": {
@@ -15,15 +16,23 @@
     "directory": "packages/core"
   },
   "peerDependencies": {
-    "preact": "^10.0.0"
+    "preact": "^10.0.0",
+    "vite": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "happy-dom": "^20.8.9",
     "jszip": "^3.10.1",
-    "preact": "^10.0.0"
+    "preact": "^10.0.0",
+    "vite": "^8.0.0"
   },
   "dependencies": {
     "@types/archiver": "^7.0.0",
-    "archiver": "^7.0.1"
+    "archiver": "^7.0.1",
+    "vite-plugin-singlefile": "^2.0.0"
   }
 }
