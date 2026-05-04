@@ -9,15 +9,16 @@ import { Notes, NotesPanel, NotesToggle } from './components/Notes.tsx'
 import { Page } from './components/Page.tsx'
 import { ResumeDialog } from './components/ResumeDialog.tsx'
 import { Search, SearchButton, SearchModal } from './components/Search.tsx'
-import { AdvancedQuizPage } from './pages/AdvancedQuizPage.tsx'
-import { AssessmentPage } from './pages/AssessmentPage.tsx'
-import { BonusPage } from './pages/BonusPage.tsx'
-import { IntroPage } from './pages/IntroPage.tsx'
-import { MediaPage } from './pages/MediaPage.tsx'
-import { QuickQuizPage } from './pages/QuickQuizPage.tsx'
-import { ScrollPage } from './pages/ScrollPage.tsx'
-import { SummaryPage } from './pages/SummaryPage.tsx'
-import { TheoryPage } from './pages/TheoryPage.tsx'
+import { glossary, title } from './content/cs/index.ts'
+import { AdvancedQuizPage } from './content/cs/pages/AdvancedQuizPage.tsx'
+import { AssessmentPage } from './content/cs/pages/AssessmentPage.tsx'
+import { BonusPage } from './content/cs/pages/BonusPage.tsx'
+import { IntroPage } from './content/cs/pages/IntroPage.tsx'
+import { MediaPage } from './content/cs/pages/MediaPage.tsx'
+import { QuickQuizPage } from './content/cs/pages/QuickQuizPage.tsx'
+import { ScrollPage } from './content/cs/pages/ScrollPage.tsx'
+import { SummaryPage } from './content/cs/pages/SummaryPage.tsx'
+import { TheoryPage } from './content/cs/pages/TheoryPage.tsx'
 import './styles.css'
 
 const target = (import.meta.env.KURIKULUM_TARGET as string) || 'standalone'
@@ -40,7 +41,7 @@ function createAdapterFromTarget() {
 const adapter = createAdapterFromTarget()
 
 const config: CourseConfig = {
-  title: 'Základy webové bezpečnosti',
+  title,
   pages: ['intro', 'theory', 'media', 'standalone-quiz', 'advanced-quiz', 'assessment', 'bonus', 'scroll-page', 'summary'],
   version: '2',
   onMigrate(old, oldVersion) {
@@ -51,19 +52,11 @@ const config: CourseConfig = {
   },
 }
 
-const glossaryEntries = [
-  { term: 'XSS', definition: 'Cross-Site Scripting — útok vložením škodlivého skriptu do webové stránky.' },
-  { term: 'SQL Injection', definition: 'Útok vložením SQL kódu do vstupního pole aplikace za účelem manipulace s databází.' },
-  { term: 'CSRF', definition: 'Cross-Site Request Forgery — útok zneužívající autentizovanou session oběti k provedení nechtěné akce.' },
-  { term: 'CSP', definition: 'Content Security Policy — HTTP hlavička omezující zdroje, ze kterých může prohlížeč načítat obsah.' },
-  { term: 'OWASP', definition: 'Open Web Application Security Project — nezisková organizace zaměřená na bezpečnost webových aplikací.' },
-]
-
 function App() {
   return (
     <CourseProvider config={config} adapter={adapter}>
       <Search index={searchIndex}>
-        <Glossary entries={glossaryEntries}>
+        <Glossary entries={glossary}>
           <Notes>
             <div class="h-screen flex flex-col bg-bg text-text font-sans">
               <Course>

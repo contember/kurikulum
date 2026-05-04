@@ -1,8 +1,8 @@
 import type { VNode } from 'preact'
-import { AudioPlayer } from '../components/AudioPlayer.tsx'
-import { Image } from '../components/Image.tsx'
-import { Text } from '../components/Text.tsx'
-import { Video } from '../components/Video.tsx'
+import { AudioPlayer } from '../../../components/AudioPlayer.tsx'
+import { Image } from '../../../components/Image.tsx'
+import { Text } from '../../../components/Text.tsx'
+import { Video } from '../../../components/Video.tsx'
 
 export function MediaPage(): VNode {
   return (

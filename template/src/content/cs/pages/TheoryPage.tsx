@@ -1,6 +1,6 @@
 import type { VNode } from 'preact'
-import { GlossaryTerm } from '../components/Glossary.tsx'
-import { Text } from '../components/Text.tsx'
+import { GlossaryTerm } from '../../../components/Glossary.tsx'
+import { Text } from '../../../components/Text.tsx'
 
 export function TheoryPage(): VNode {
   return (

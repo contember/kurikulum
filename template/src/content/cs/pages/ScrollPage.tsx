@@ -1,5 +1,5 @@
 import type { VNode } from 'preact'
-import { Text } from '../components/Text.tsx'
+import { Text } from '../../../components/Text.tsx'
 
 export function ScrollPage(): VNode {
   return (

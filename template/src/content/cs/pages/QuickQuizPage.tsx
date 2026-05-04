@@ -1,9 +1,9 @@
 import type { VNode } from 'preact'
-import { Assessment } from '../components/Assessment.tsx'
-import { MCQ } from '../components/MCQ.tsx'
-import { MultiSelect } from '../components/MultiSelect.tsx'
-import { Option } from '../components/Option.tsx'
-import { Text } from '../components/Text.tsx'
+import { Assessment } from '../../../components/Assessment.tsx'
+import { MCQ } from '../../../components/MCQ.tsx'
+import { MultiSelect } from '../../../components/MultiSelect.tsx'
+import { Option } from '../../../components/Option.tsx'
+import { Text } from '../../../components/Text.tsx'
 
 export function QuickQuizPage(): VNode {
   return (

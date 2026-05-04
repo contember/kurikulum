@@ -1,11 +1,11 @@
 import type { VNode } from 'preact'
-import { Assessment } from '../components/Assessment.tsx'
-import { CategorySort } from '../components/CategorySort.tsx'
-import { FillBlank } from '../components/FillBlank.tsx'
-import { Matching, MatchingPair } from '../components/Matching.tsx'
-import { Ordering, OrderingItem } from '../components/Ordering.tsx'
-import { QuestionFeedback } from '../components/QuestionFeedback.tsx'
-import { Text } from '../components/Text.tsx'
+import { Assessment } from '../../../components/Assessment.tsx'
+import { CategorySort } from '../../../components/CategorySort.tsx'
+import { FillBlank } from '../../../components/FillBlank.tsx'
+import { Matching, MatchingPair } from '../../../components/Matching.tsx'
+import { Ordering, OrderingItem } from '../../../components/Ordering.tsx'
+import { QuestionFeedback } from '../../../components/QuestionFeedback.tsx'
+import { Text } from '../../../components/Text.tsx'
 
 export function AdvancedQuizPage(): VNode {
   return (

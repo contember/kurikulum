@@ -1,6 +1,6 @@
 import type { VNode } from 'preact'
-import { Image } from '../components/Image.tsx'
-import { Text } from '../components/Text.tsx'
+import { Image } from '../../../components/Image.tsx'
+import { Text } from '../../../components/Text.tsx'
 
 export function SummaryPage(): VNode {
   return (
