@@ -31,8 +31,21 @@ export { CourseContext, CourseProvider, createNotifier } from './context.tsx'
 export type { CourseContextValue, CourseProviderProps } from './context.tsx'
 
 // i18n
-export { coreDictCs, coreDictEn, LocaleContext, LocaleProvider, LocaleSwitcher, useLocale } from './i18n/index.ts'
-export type { Dict, LocaleContextValue, LocaleProviderProps, LocaleSwitcherProps } from './i18n/index.ts'
+export {
+  ContentBundleContext,
+  coreDictCs,
+  coreDictEn,
+  LocaleContext,
+  LocaleProvider,
+  LocaleSwitcher,
+  useContentBundle,
+  useLocale,
+} from './i18n/index.ts'
+export type { ContentBundle, Dict, LocaleContextValue, LocaleProviderProps, LocaleSwitcherProps } from './i18n/index.ts'
+
+// App shell — opinionated root + helpers consolidating adapter + locale wiring
+export { createDefaultAdapter, detectLocale, KurikulumApp, persistLocaleChange } from './app/index.ts'
+export type { DetectLocaleOptions, KurikulumAppProps } from './app/index.ts'
 
 // Hooks
 export {

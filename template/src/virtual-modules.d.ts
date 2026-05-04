@@ -1,12 +1,5 @@
 declare module 'virtual:kurikulum-content' {
-  import type { ComponentType } from 'preact'
-
-  export interface ContentBundle {
-    title: string
-    glossary: Array<{ term: string; definition: string }>
-    pages: Record<string, ComponentType>
-  }
-
+  import type { ContentBundle } from 'kurikulum'
   export const bundles: Record<string, ContentBundle>
   export const available: string[]
   export const defaultLocale: string
