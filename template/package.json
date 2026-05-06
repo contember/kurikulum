@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "kurikulum": "^0.1.6",
+    "kurikulum": "^0.2.0",
     "preact": "^10.0.0"
   },
   "devDependencies": {
