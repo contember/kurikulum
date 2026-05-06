@@ -22,7 +22,6 @@ export function Page({ id, completion = 'mount', completionTimer, active, when, 
       class="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8 outline-none"
     >
       {children}
-      <P.ScrollSentinel />
     </P.Root>
   )
 }

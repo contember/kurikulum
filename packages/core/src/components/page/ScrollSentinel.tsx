@@ -1,16 +1,13 @@
-import type { VNode } from 'preact'
-import { useContext } from 'preact/hooks'
-import { PageContext } from './context.ts'
-
 export interface ScrollSentinelProps {
   class?: string
 }
 
-export function ScrollSentinel({ class: className }: ScrollSentinelProps): VNode | null {
-  const ctx = useContext(PageContext)
-  if (!ctx) throw new Error('Page.ScrollSentinel must be used within Page.Root')
-
-  if (ctx.completion !== 'scroll') return null
-
-  return <div ref={ctx.sentinelRef} aria-hidden="true" class={className} />
+/**
+ * @deprecated Page.Root auto-renders the scroll sentinel inside `<main>`
+ * whenever `completion === 'scroll'`, so this component is no longer
+ * necessary. Kept exported as a no-op for backwards compatibility — remove
+ * `<Page.ScrollSentinel />` from your layouts.
+ */
+export function ScrollSentinel(_props: ScrollSentinelProps = {}): null {
+  return null
 }
