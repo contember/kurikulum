@@ -1,3 +1,10 @@
+declare module '@kurikulum/content-bundle' {
+  import type { ContentBundle } from 'kurikulum'
+  export const bundles: Record<string, ContentBundle>
+  export const available: string[]
+  export const defaultLocale: string
+}
+
 declare module 'virtual:kurikulum-content' {
   import type { ContentBundle } from 'kurikulum'
   export const bundles: Record<string, ContentBundle>

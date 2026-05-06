@@ -1,7 +1,9 @@
+import { resolve } from 'node:path'
 import type { PluginOption } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 import { createCmi5Package } from '../cmi5/package.ts'
 import { createScormPackage } from '../scorm/package.ts'
+import { CONTENT_BUNDLE_ALIAS } from './content-bundle-alias.ts'
 import { contentPlugin, type ContentPluginOptions } from './content-plugin.ts'
 import { discoverContent } from './content-utils.ts'
 import { searchIndexPlugin, type SearchIndexPluginOptions } from './search-index-plugin.ts'
@@ -101,6 +103,12 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
   const outDirSuffix = explicitLocale ? `${target}-${explicitLocale}` : target
   const outDir = options.outDir ?? `dist/${outDirSuffix}`
 
+  // Real on-disk path for the generated content module. Lives under the
+  // project's `node_modules/` so it's already gitignored and never lands in
+  // the source tree (which matters when kurikulum is symlinked in workspace
+  // dev — writing into the package source would dirty the working tree).
+  const contentBundleFile = resolve(root, 'node_modules/.kurikulum/content.mjs')
+
   const plugins: PluginOption[] = []
 
   plugins.push({
@@ -116,49 +124,29 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
           'import.meta.env.KURIKULUM_DEV_LOCALE_SWITCHER': JSON.stringify(devSwitcher),
           ...mapDefine(options.env ?? {}),
         },
+        resolve: {
+          alias: { [CONTENT_BUNDLE_ALIAS]: contentBundleFile },
+        },
+        // Don't let the dep optimizer pre-bundle the alias entry. The
+        // alias-resolved file statically imports user-source content modules
+        // (per-locale `index.ts`), and pulling those into a node_modules
+        // chunk would inline kurikulum sources alongside them — breaking the
+        // CourseContext singleton when kurikulum is workspace-symlinked or
+        // otherwise served from source. Excluding keeps the file disk-served
+        // and lets every import resolve through the regular module graph.
+        optimizeDeps: { exclude: [CONTENT_BUNDLE_ALIAS] },
         build: { outDir },
       }
     },
   })
 
-  // Resolve `kurikulum/auto` to an in-process virtual module that wires the
-  // Manual KurikulumApp from `kurikulum` against `virtual:kurikulum-content`.
-  // This keeps `kurikulum/auto` out of the dep-prebundler entirely (it imports
-  // virtuals, which the optimizer can't resolve), while the bare `kurikulum`
-  // import is free to pre-bundle into one chunk. The wired module imports from
-  // pre-bundled `kurikulum`, so the chrome and KurikulumApp share one
-  // CourseContext — without `optimizeDeps.exclude` and without leaving every
-  // kurikulum source file at the mercy of `?v=` cache-bust churn.
-  plugins.push({
-    name: 'kurikulum-auto-alias',
-    enforce: 'pre',
-    resolveId(id) {
-      if (id === 'kurikulum/auto') return '\0kurikulum-auto'
-    },
-    load(id) {
-      if (id !== '\0kurikulum-auto') return
-      return [
-        `import { coreDictCs, coreDictEn, KurikulumApp as Manual } from 'kurikulum'`,
-        `import { h } from 'preact'`,
-        `import * as content from 'virtual:kurikulum-content'`,
-        ``,
-        `const DEFAULT_DICTIONARIES = { cs: coreDictCs, en: coreDictEn }`,
-        ``,
-        `export function KurikulumApp(props) {`,
-        `  return h(Manual, {`,
-        `    bundles: content.bundles,`,
-        `    available: content.available,`,
-        `    defaultLocale: content.defaultLocale,`,
-        `    dictionaries: DEFAULT_DICTIONARIES,`,
-        `    ...props,`,
-        `  })`,
-        `}`,
-      ].join('\n')
-    },
-  })
-
   if (options.content !== false) {
-    plugins.push(contentPlugin({ contentDir: contentDirInput, locale, ...(options.content ?? {}) }))
+    plugins.push(contentPlugin({
+      contentDir: contentDirInput,
+      locale,
+      outFile: contentBundleFile,
+      ...(options.content ?? {}),
+    }))
   }
 
   if (options.search !== false) {

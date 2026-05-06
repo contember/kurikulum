@@ -1,8 +1,11 @@
+// `@kurikulum/content-bundle` is a runtime alias provided by the kurikulum()
+// Vite plugin (see vite/content-bundle-alias.ts). Keep this literal in sync
+// with the CONTENT_BUNDLE_ALIAS constant — `content-bundle-alias.test.ts`
+// enforces that.
+import { available, bundles, defaultLocale } from '@kurikulum/content-bundle'
+import { coreDictCs, coreDictEn, KurikulumApp as Manual, type KurikulumAppProps as ManualProps } from 'kurikulum'
+import type { Dict } from 'kurikulum'
 import type { VNode } from 'preact'
-import { available, bundles, defaultLocale } from 'virtual:kurikulum-content'
-import { coreDictCs, coreDictEn } from '../i18n/dicts.ts'
-import type { Dict } from '../i18n/types.ts'
-import { KurikulumApp as Manual, type KurikulumAppProps as ManualProps } from './KurikulumApp.tsx'
 
 const DEFAULT_DICTIONARIES: Record<string, Dict> = { cs: coreDictCs, en: coreDictEn }
 
@@ -12,9 +15,14 @@ export type KurikulumAppProps =
 
 /**
  * Pre-wired Kurikulum app shell. Pulls per-locale bundles, available
- * locales, and the default locale from `virtual:kurikulum-content` (set
- * up by the kurikulum() Vite plugin), and falls back to the built-in
- * `coreDictCs` / `coreDictEn` chrome dictionaries unless overridden.
+ * locales, and the default locale from the generated `@kurikulum/content-bundle`
+ * module (set up by the kurikulum() Vite plugin), and falls back to the
+ * built-in `coreDictCs` / `coreDictEn` chrome dictionaries unless overridden.
+ *
+ * The bare-package self-import (`from 'kurikulum'`) is deliberate: it lets
+ * the dep optimizer share the kurikulum chunk between `kurikulum/auto` and
+ * direct `kurikulum` imports, so they end up holding the same CourseContext
+ * singleton at runtime.
  *
  * @example
  *   import { KurikulumApp } from 'kurikulum/auto'
