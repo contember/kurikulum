@@ -111,6 +111,15 @@ async function main() {
   try {
     await waitForPort(`http://localhost:${PORT}/`, 30_000)
 
+    // Vite 8 pre-bundles deps lazily on first import-graph request. Run the
+    // runtime check first — it loads the page in a real browser, which fans
+    // out to course.tsx → kurikulum and triggers the optimizer. Static
+    // checks then assert what the optimizer actually produced.
+    step('runtime check: headless browser renders the page without errors')
+    await runtimeCheck(`http://localhost:${PORT}/`)
+    console.log('  ✓ page renders content from the active locale bundle')
+    console.log('  ✓ no console errors / no unhandled exceptions')
+
     step('static checks: optimizer state')
     const depsDir = join(smokeDir, 'node_modules/.vite/deps')
     if (!existsSync(join(depsDir, 'kurikulum.js'))) {
@@ -138,11 +147,6 @@ async function main() {
     }
     console.log('  ✓ auto.tsx imports kurikulum from /node_modules/.vite/deps/kurikulum.js')
     console.log('  ✓ auto.tsx imports content from /node_modules/.kurikulum/content.mjs')
-
-    step('runtime check: headless browser renders the page without errors')
-    await runtimeCheck(`http://localhost:${PORT}/`)
-    console.log('  ✓ page renders content from the active locale bundle')
-    console.log('  ✓ no console errors / no unhandled exceptions')
 
     console.log('\n✓ smoke test passed')
   } finally {
