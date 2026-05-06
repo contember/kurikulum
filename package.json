@@ -9,7 +9,10 @@
     "format:check": "dprint check",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "check": "bun run lint && bun run format:check && bun run typecheck && bun run test"
+    "check": "bun run lint && bun run format:check && bun run typecheck && bun run test",
+    "smoke": "bun run smoke:npm && bun run smoke:workspace",
+    "smoke:npm": "bun tests/smoke/dev-preview.ts",
+    "smoke:workspace": "bun tests/smoke/dev-preview-workspace.ts"
   },
   "dependencies": {
     "kurikulum": "workspace:*"
@@ -20,6 +23,7 @@
     "dprint": "^0.51.1",
     "happy-dom": "^20.8.9",
     "jszip": "^3.10.1",
+    "playwright-core": "^1.50.0",
     "preact": "^10.0.0",
     "typescript": "^5.8.0"
   }

@@ -45,6 +45,12 @@ jobs:
       - name: Test
         run: bun test
 
+      - name: Install playwright chromium
+        run: bunx playwright-core install --with-deps chromium
+
+      - name: Smoke tests (npm-install + workspace dev preview)
+        run: bun run smoke
+
       - name: Set version
         run: |
           node -e "

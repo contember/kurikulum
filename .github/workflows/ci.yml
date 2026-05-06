@@ -28,3 +28,29 @@ jobs:
 
       - name: Test
         run: bun test
+
+  smoke:
+    # Boots the template against a packed tarball (npm-install path that
+    # produced the 0.1.4 → 0.2.0 bug chain — workspace symlinks hide it
+    # locally because Vite skips pre-bundling for symlinked deps) AND
+    # against the workspace template directly (the symlink path
+    # maintainers actually run during dev). Both must render without
+    # console errors and wire up the expected module graph.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install playwright chromium
+        run: bunx playwright-core install --with-deps chromium
+
+      - name: Run smoke tests (npm-install + workspace)
+        run: bun run smoke
