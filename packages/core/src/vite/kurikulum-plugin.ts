@@ -117,6 +117,14 @@ export function kurikulum(options: KurikulumPluginOptions = {}): PluginOption[] 
           ...mapDefine(options.env ?? {}),
         },
         build: { outDir },
+        // Skip dep pre-bundling for `kurikulum`. Otherwise Vite pre-bundles the
+        // root entry but not the `kurikulum/auto` subpath (it pulls in virtual
+        // modules), producing two copies of the package — and two distinct
+        // CourseContexts — so chrome components throw "useCourse must be used
+        // within a CourseProvider". A workspace-symlinked install (the local
+        // monorepo case) skips pre-bundling and avoids this; npm-installed
+        // consumers hit it.
+        optimizeDeps: { exclude: ['kurikulum'] },
       }
     },
   })
