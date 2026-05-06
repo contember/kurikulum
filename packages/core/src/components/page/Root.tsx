@@ -1,5 +1,5 @@
 import type { ComponentChildren, VNode } from 'preact'
-import { createElement } from 'preact'
+import { createElement, Fragment, toChildArray } from 'preact'
 import { useContext, useEffect, useMemo, useRef } from 'preact/hooks'
 import { CompletableRegistry, createCompletionHandler } from '../../completion.ts'
 import type { CompletionHandler, CompletionStrategy } from '../../completion.ts'
@@ -8,6 +8,7 @@ import { useCompletion, useCourse } from '../../hooks/index.ts'
 import { useContentBundle } from '../../i18n/contentBundle.tsx'
 import type { CourseRuntime } from '../../types.ts'
 import { PageContext } from './context.ts'
+import { ScrollSentinel } from './ScrollSentinel.tsx'
 
 export interface PageRootProps {
   id: string
@@ -67,21 +68,30 @@ export function Root({ id, completion = 'mount', completionTimer, active = true,
     }
   }, [id, active])
 
+  // Decide whether to fall back to the bundle. Filter out ScrollSentinel from
+  // the "is empty" check: the template's `Page` wrapper appends one
+  // unconditionally, so without this filter `<Page id="intro" />` would look
+  // like it has children and the bundle lookup would be skipped.
+  const childArray = toChildArray(children)
+  const meaningful = childArray.filter(c => !(typeof c === 'object' && c !== null && (c as VNode).type === ScrollSentinel))
+  const sentinels = childArray.filter(c => typeof c === 'object' && c !== null && (c as VNode).type === ScrollSentinel)
+
   let body: ComponentChildren = children
-  if (body === undefined || body === null || (Array.isArray(body) && body.length === 0)) {
+  if (meaningful.length === 0) {
     const Body = bundle?.pages[id]
     if (Body) {
-      body = createElement(Body, null)
+      body = createElement(Fragment, null, createElement(Body, null), ...sentinels)
     } else if (typeof process === 'undefined' || process.env?.NODE_ENV !== 'production') {
-      body = bundle
+      const fallback = bundle
         ? createElement(
           'div',
           { 'data-kurikulum-missing-page': id, style: 'background:#fee;color:#900;padding:1rem;border-radius:.25rem' },
           `⚠ no "${id}" page in active content bundle`,
         )
         : null
+      body = createElement(Fragment, null, fallback, ...sentinels)
     } else {
-      body = null
+      body = createElement(Fragment, null, ...sentinels)
     }
   }
 
