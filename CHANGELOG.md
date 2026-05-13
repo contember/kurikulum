@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.1
+
+### Fixed
+
+- **Search index leaked TypeScript syntax and JSX expression containers
+  into results.** The `searchIndexPlugin` ran `stripTags` over each
+  page component's full source, so tokens like `function HishingHowPage(): VNode { return (`,
+  bare imports, and `{t('translated.key')}` expressions ended up in
+  search hits. The plugin now extracts the body of the component's
+  `return` (handling both `return (…)` and bare `return <jsx>` shapes
+  with a string- and comment-aware paren walker), strips JSX expression
+  containers `{…}`, then strips tags. Visible JSX text is preserved.
+
 ## 0.2.0
 
 ### Breaking
