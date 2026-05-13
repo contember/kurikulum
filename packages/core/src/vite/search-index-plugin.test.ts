@@ -104,6 +104,61 @@ describe('extractLocaleEntries', () => {
     expect(entry.title).toBe('Subtitle')
   })
 
+  it('does not leak function declarations or VNode return types into content', () => {
+    writePage(
+      'Hishing',
+      `import type { VNode } from 'preact'
+      import { Text } from '../../../components/Text.tsx'
+      export function HishingHowPage(): VNode {
+        return (
+          <>
+            <h1>Lekce 4 — Jak správně mýt a dezinfikovat ruce</h1>
+            <Text>Mytí a dezinfekce rukou nejsou totéž.</Text>
+          </>
+        )
+      }`,
+    )
+    writeIndex(`
+      import { HishingHowPage } from './pages/Hishing.tsx'
+      export const pages = { hishing: HishingHowPage }
+    `)
+    const [entry] = extractLocaleEntries(join(localeDir, 'index.ts'))
+    expect(entry.title).toBe('Lekce 4 — Jak správně mýt a dezinfikovat ruce')
+    expect(entry.content).not.toContain('VNode')
+    expect(entry.content).not.toContain('function')
+    expect(entry.content).not.toContain('return')
+    expect(entry.content).not.toContain('HishingHowPage')
+    expect(entry.content).not.toContain('import')
+    expect(entry.content).toContain('Mytí a dezinfekce rukou nejsou totéž.')
+  })
+
+  it('strips JSX expression containers from content', () => {
+    writePage(
+      'WithExpr',
+      `import { Text } from '../../../components/Text.tsx'
+      export function WithExpr() {
+        return (
+          <Text>
+            <h1>Title</h1>
+            <p>Hello {userName} world</p>
+            <p>Items: {items.length}</p>
+            <p>{t('translated.key')}</p>
+          </Text>
+        )
+      }`,
+    )
+    writeIndex(`
+      import { WithExpr } from './pages/WithExpr.tsx'
+      export const pages = { expr: WithExpr }
+    `)
+    const [entry] = extractLocaleEntries(join(localeDir, 'index.ts'))
+    expect(entry.content).not.toContain('userName')
+    expect(entry.content).not.toContain('items.length')
+    expect(entry.content).not.toContain("t('translated.key')")
+    expect(entry.content).toContain('Hello')
+    expect(entry.content).toContain('world')
+  })
+
   it('skips pages map entries whose components were not imported from a file path', () => {
     writeIndex(`
       export const pages = {

@@ -20,13 +20,104 @@ export interface SearchEntry {
 export type SearchIndex = Record<string, SearchEntry[]>
 
 function stripTags(text: string): string {
-  return text.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+// Pull the body of the page component's `return ...` so the search index sees
+// only the JSX, not the surrounding function declaration / type annotations /
+// imports. Without this, stripTags on the whole source leaks TS syntax (e.g.
+// `function HishingHowPage(): VNode { return (`) into search results.
+function extractReturnBody(source: string): string | null {
+  const match = source.match(/\breturn\s*([<(])/)
+  if (!match) return null
+  const openerIdx = match.index! + match[0].length - 1
+  if (match[1] === '(') {
+    return extractBalancedParens(source, openerIdx + 1)
+  }
+  // `return <jsx>` (no wrapping parens) — keep everything after `return`, then
+  // let stripTags / stripBraceExpressions strip the JSX and any trailing `}`
+  // from the enclosing function.
+  return source.slice(openerIdx)
+}
+
+function extractBalancedParens(source: string, start: number): string | null {
+  let i = start
+  let depth = 1
+  let inString: string | null = null
+  let inLine = false
+  let inBlock = false
+  while (i < source.length && depth > 0) {
+    const ch = source[i]
+    const next = source[i + 1]
+    if (inLine) {
+      if (ch === '\n') inLine = false
+    } else if (inBlock) {
+      if (ch === '*' && next === '/') { inBlock = false; i++ }
+    } else if (inString) {
+      if (ch === '\\') { i++ } else if (ch === inString) inString = null
+    } else if (ch === '/' && next === '/') {
+      inLine = true; i++
+    } else if (ch === '/' && next === '*') {
+      inBlock = true; i++
+    } else if (ch === '"' || ch === "'" || ch === '`') {
+      inString = ch
+    } else if (ch === '(') depth++
+    else if (ch === ')') depth--
+    i++
+  }
+  if (depth !== 0) return null
+  return source.slice(start, i - 1)
+}
+
+// Drop JSX expression containers like `{t('key')}` / `{variable}` / `{cond && <X />}`
+// — they're noise (or other-language tokens) for a full-text search index, and we
+// have no AST here to evaluate them. Tracks strings so a `}` inside a string
+// literal doesn't close the wrong block.
+function stripBraceExpressions(input: string): string {
+  let out = ''
+  let depth = 0
+  let inString: string | null = null
+  let i = 0
+  while (i < input.length) {
+    const ch = input[i]
+    if (inString) {
+      if (depth === 0) out += ch
+      if (ch === '\\') {
+        i++
+        if (depth === 0 && i < input.length) out += input[i]
+      } else if (ch === inString) {
+        inString = null
+      }
+      i++
+      continue
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inString = ch
+      if (depth === 0) out += ch
+      i++
+      continue
+    }
+    if (ch === '{') {
+      depth++
+      i++
+      continue
+    }
+    if (ch === '}') {
+      depth = Math.max(0, depth - 1)
+      i++
+      continue
+    }
+    if (depth === 0) out += ch
+    i++
+  }
+  return out
 }
 
 function extractContent(source: string): { title: string; content: string } {
   const titleMatch = source.match(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/)
   const title = titleMatch ? stripTags(titleMatch[1]) : ''
-  const content = stripTags(source)
+  const body = extractReturnBody(source) ?? source
+  const content = stripTags(stripBraceExpressions(body))
   return { title, content }
 }
 
