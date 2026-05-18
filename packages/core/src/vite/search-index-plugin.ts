@@ -52,13 +52,19 @@ function extractBalancedParens(source: string, start: number): string | null {
     if (inLine) {
       if (ch === '\n') inLine = false
     } else if (inBlock) {
-      if (ch === '*' && next === '/') { inBlock = false; i++ }
+      if (ch === '*' && next === '/') {
+        inBlock = false
+        i++
+      }
     } else if (inString) {
-      if (ch === '\\') { i++ } else if (ch === inString) inString = null
+      if (ch === '\\') i++
+      else if (ch === inString) inString = null
     } else if (ch === '/' && next === '/') {
-      inLine = true; i++
+      inLine = true
+      i++
     } else if (ch === '/' && next === '*') {
-      inBlock = true; i++
+      inBlock = true
+      i++
     } else if (ch === '"' || ch === "'" || ch === '`') {
       inString = ch
     } else if (ch === '(') depth++

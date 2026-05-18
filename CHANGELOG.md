@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+Re-release of 0.2.1 — that version never reached npm because the Release
+workflow's `format:check` step failed on a single unformatted file in
+`search-index-plugin.ts`. No runtime changes vs. 0.2.1.
+
 ## 0.2.1
 
 ### Fixed
