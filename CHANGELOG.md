@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.3
+
+### Added
+
+- **Interactive content components (non-quiz).** New template components for
+  in-lesson engagement beyond scored questions: `FlipCard` (tap-to-reveal, with
+  optional `completeOnFlip` to gate an `interactive` page), `Accordion` /
+  `AccordionItem` (collapsible sections on native `<details>`), and `Tabs` /
+  `Tab` (switchable panels). Core ships the supporting chrome dictionary keys
+  (`flip.aria`, `flip.hint`, `tabs.aria`). See `docs/interactive.md`.
+
 ## 0.2.2
 
 Re-release of 0.2.1 — that version never reached npm because the Release
