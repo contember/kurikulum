@@ -15,3 +15,20 @@ export function CrossIcon({ class: className }: { class?: string }): VNode {
     </svg>
   )
 }
+
+export function ChevronIcon({ class: className }: { class?: string }): VNode {
+  return (
+    <svg class={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m4 6 4 4 4-4" />
+    </svg>
+  )
+}
+
+export function FlipIcon({ class: className }: { class?: string }): VNode {
+  return (
+    <svg class={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 8a6 6 0 0 1 10.5-4M14 8a6 6 0 0 1-10.5 4" />
+      <path d="M12.5 1.5V4H10M3.5 14.5V12H6" />
+    </svg>
+  )
+}

@@ -6,10 +6,10 @@ import { DefaultLayout } from './layout.tsx'
 import './styles.css'
 
 const config: Omit<CourseConfig, 'title'> = {
-  pages: ['intro', 'theory', 'media', 'standalone-quiz', 'advanced-quiz', 'assessment', 'bonus', 'scroll-page', 'summary'],
-  version: '2',
+  pages: ['intro', 'theory', 'interactive', 'media', 'standalone-quiz', 'advanced-quiz', 'assessment', 'bonus', 'scroll-page', 'summary'],
+  version: '3',
   onMigrate(old, oldVersion) {
-    return !oldVersion || oldVersion === '1' ? old : null
+    return !oldVersion || oldVersion === '1' || oldVersion === '2' ? old : null
   },
 }
 
@@ -19,6 +19,7 @@ function App() {
       <DefaultLayout>
         <Page id="intro" completion="mount" />
         <Page id="theory" completion="timer" completionTimer={5} />
+        <Page id="interactive" completion="interactive" />
         <Page id="media" completion="scroll" />
         <Page id="standalone-quiz" completion="interactive" />
         <Page id="advanced-quiz" completion="interactive" />

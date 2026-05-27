@@ -33,6 +33,7 @@ Two-layer architecture (Radix + shadcn/ui style):
 - Pages & completion — `docs/pages.md`
 - Assessment (quiz) — `docs/assessment.md`
 - Questions (MCQ, FillBlank, Matching, Ordering, CategorySort) — `docs/questions.md`
+- Interactive content (FlipCard, Accordion, Tabs) — `docs/interactive.md`
 - Text, images, video, audio — `docs/media.md`
 - Glossary, notes, search — `docs/tools.md`
 - Adapters & SCORM/xAPI build — `docs/adapters.md`

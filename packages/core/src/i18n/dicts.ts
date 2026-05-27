@@ -25,6 +25,9 @@ export const coreDictEn: Dict = {
   'categorySort.items': 'Items to sort',
   // Course chrome
   'course.skipLink': 'Skip to content',
+  // Flip card
+  'flip.aria': 'Flip card',
+  'flip.hint': 'Tap to flip',
   // Glossary
   'glossary.panel': 'Glossary',
   'glossary.search': 'Search glossary',
@@ -67,6 +70,8 @@ export const coreDictEn: Dict = {
   'search.results.none': 'No results for "{query}"',
   'search.toggle': 'Search',
   'search.toggle.aria': 'Search course content (Ctrl+K)',
+  // Tabs
+  'tabs.aria': 'Tabs',
 }
 
 export const coreDictCs: Dict = {
@@ -83,6 +88,8 @@ export const coreDictCs: Dict = {
   'categorySort.dropHere': 'Přetáhněte sem',
   'categorySort.items': 'Položky k roztřídění',
   'course.skipLink': 'Přeskočit na obsah',
+  'flip.aria': 'Otočit kartičku',
+  'flip.hint': 'Klikněte pro otočení',
   'glossary.panel': 'Slovník',
   'glossary.search': 'Hledat ve slovníku',
   'glossary.search.placeholder': 'Hledat pojem…',
@@ -118,4 +125,5 @@ export const coreDictCs: Dict = {
   'search.results.none': 'Nenalezeno: „{query}"',
   'search.toggle': 'Hledat',
   'search.toggle.aria': 'Hledat v kurzu (Ctrl+K)',
+  'tabs.aria': 'Záložky',
 }

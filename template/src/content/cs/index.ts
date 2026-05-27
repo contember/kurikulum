@@ -1,6 +1,7 @@
 import { AdvancedQuizPage } from './pages/AdvancedQuizPage.tsx'
 import { AssessmentPage } from './pages/AssessmentPage.tsx'
 import { BonusPage } from './pages/BonusPage.tsx'
+import { InteractivePage } from './pages/InteractivePage.tsx'
 import { IntroPage } from './pages/IntroPage.tsx'
 import { MediaPage } from './pages/MediaPage.tsx'
 import { QuickQuizPage } from './pages/QuickQuizPage.tsx'
@@ -21,6 +22,7 @@ export const glossary = [
 export const pages = {
   intro: IntroPage,
   theory: TheoryPage,
+  interactive: InteractivePage,
   media: MediaPage,
   'standalone-quiz': QuickQuizPage,
   'advanced-quiz': AdvancedQuizPage,

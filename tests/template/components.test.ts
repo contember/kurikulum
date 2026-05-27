@@ -16,10 +16,13 @@ import { CourseContext, createCourseRuntime, createNotifier } from 'kurikulum'
 import type { CourseContextValue } from 'kurikulum'
 import { h } from 'preact'
 import { render } from 'preact'
+import { Accordion, AccordionItem } from '../../template/src/components/Accordion.tsx'
 import { Course } from '../../template/src/components/Course.tsx'
+import { FlipCard } from '../../template/src/components/FlipCard.tsx'
 import { Image } from '../../template/src/components/Image.tsx'
 import { Navigation } from '../../template/src/components/Navigation.tsx'
 import { Page } from '../../template/src/components/Page.tsx'
+import { Tab, Tabs } from '../../template/src/components/Tabs.tsx'
 import { Text } from '../../template/src/components/Text.tsx'
 import { Video } from '../../template/src/components/Video.tsx'
 
@@ -552,5 +555,90 @@ describe('Video', () => {
     expect(container.textContent).toContain('Some text')
     expect(container.getElementsByTagName('img').length).toBe(1)
     expect(container.getElementsByTagName('video').length).toBe(1)
+  })
+})
+
+describe('FlipCard', () => {
+  it('shows the front and reveals the back on click', () => {
+    const container = document.createElement('div')
+    render(h(FlipCard, { front: 'Front side', back: 'Back side' }), container)
+
+    const button = container.getElementsByTagName('button')[0]
+    expect(button).toBeDefined()
+    expect(container.textContent).toContain('Front side')
+    expect(container.textContent).not.toContain('Back side')
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+
+    button.click()
+    render(h(FlipCard, { front: 'Front side', back: 'Back side' }), container)
+    // Re-render the same element to flush state
+    expect(container.textContent).toContain('Back side')
+  })
+
+  it('toggles aria-pressed / data-flipped when flipped', () => {
+    const container = document.createElement('div')
+    function App() {
+      return h(FlipCard, { front: 'F', back: 'B' })
+    }
+    render(h(App, null), container)
+    const button = container.getElementsByTagName('button')[0]
+    button.click()
+    render(h(App, null), container)
+    const flipped = container.getElementsByTagName('button')[0]
+    expect(flipped.getAttribute('aria-pressed')).toBe('true')
+    expect(flipped.getAttribute('data-flipped')).toBe('true')
+    expect(container.textContent).toContain('B')
+  })
+})
+
+describe('Accordion', () => {
+  it('renders each item as a details/summary with its title', () => {
+    const container = document.createElement('div')
+    render(
+      h(
+        Accordion,
+        null,
+        h(AccordionItem, { title: 'First' }, 'First body'),
+        h(AccordionItem, { title: 'Second', open: true }, 'Second body'),
+      ),
+      container,
+    )
+
+    const details = container.getElementsByTagName('details')
+    expect(details.length).toBe(2)
+    const summaries = container.getElementsByTagName('summary')
+    expect(summaries[0].textContent).toContain('First')
+    expect(summaries[1].textContent).toContain('Second')
+    // open prop is reflected
+    expect(details[0].hasAttribute('open')).toBe(false)
+    expect(details[1].hasAttribute('open')).toBe(true)
+    expect(container.textContent).toContain('First body')
+  })
+})
+
+describe('Tabs', () => {
+  it('shows the first tab by default and switches on click', () => {
+    const container = document.createElement('div')
+    function App() {
+      return h(
+        Tabs,
+        null,
+        h(Tab, { label: 'One' }, 'Panel one'),
+        h(Tab, { label: 'Two' }, 'Panel two'),
+      )
+    }
+    render(h(App, null), container)
+
+    const tabs = Array.from(container.getElementsByTagName('button')).filter(b => b.getAttribute('role') === 'tab')
+    expect(tabs.length).toBe(2)
+    expect(tabs[0].getAttribute('aria-selected')).toBe('true')
+    expect(container.textContent).toContain('Panel one')
+    expect(container.textContent).not.toContain('Panel two')
+
+    tabs[1].click()
+    render(h(App, null), container)
+    const tabsAfter = Array.from(container.getElementsByTagName('button')).filter(b => b.getAttribute('role') === 'tab')
+    expect(tabsAfter[1].getAttribute('aria-selected')).toBe('true')
+    expect(container.textContent).toContain('Panel two')
   })
 })
